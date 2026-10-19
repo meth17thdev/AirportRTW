@@ -21,8 +21,8 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
-		024A07B023FCBC3C009FBA6C /* RTWCore.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 024A07AF23FCBC3C009FBA6C /* RTWCore.hpp */; };
-		024A07B223FCBC3C009FBA6C /* RTWCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 024A07B123FCBC3C009FBA6C /* RTWCore.cpp */; };
+		024A07B023FCBC3C009FBA6C /* RTWEthernetController.hpp in Headers */ = {isa = PBXBuildFile; fileRef = 024A07AF23FCBC3C009FBA6C /* RTWEthernetController.hpp */; };
+		024A07B223FCBC3C009FBA6C /* RTWEthernetController.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 024A07B123FCBC3C009FBA6C /* RTWEthernetController.cpp */; };
 		024A082E23FCBC6C009FBA6C /* aes.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07C923FCBC6C009FBA6C /* aes.c */; };
 		024A082F23FCBC6C009FBA6C /* hmac.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07CA23FCBC6C009FBA6C /* hmac.c */; };
 		024A083023FCBC6C009FBA6C /* sha2.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07CB23FCBC6C009FBA6C /* sha2.c */; };
@@ -817,7 +817,7 @@
 		F8F92586240974EF0088B8D5 /* types.h in Headers */ = {isa = PBXBuildFile; fileRef = F8F9257B240974EF0088B8D5 /* types.h */; };
 		F8F9EDE1240B7415009CB8E7 /* _task.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F8F9EDE0240B7415009CB8E7 /* _task.cpp */; };
 		F8FA0EEC2501E7EE00B1822E /* zutil.h in Headers */ = {isa = PBXBuildFile; fileRef = F8FA0EEB2501E7EE00B1822E /* zutil.h */; };
-		55F614EF7545F5692B4BB4B1 /* ItlRtw89.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* ItlRtw89.cpp */; };
+		55F614EF7545F5692B4BB4B1 /* RTWCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* RTWCore.cpp */; };
 		9C5148DE531256CFA37555D6 /* Rtw89LinuxBridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B0AEFC852BE8B8E4F2517B /* Rtw89LinuxBridge.cpp */; };
 		02B6ABA0A18553E0E29FAA25 /* Rtw89PciTransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBF678ACAE6C9B8EA2717480 /* Rtw89PciTransport.cpp */; };
 		D9EBFFDFC87C65E5827B3ABF /* fw_blobs89.c in Sources */ = {isa = PBXBuildFile; fileRef = B5095A0234873394B56C5F95 /* fw_blobs89.c */; };
@@ -852,7 +852,7 @@
 		ED8417BFE3E89C9548E902E1 /* ser.c in Sources */ = {isa = PBXBuildFile; fileRef = 36945556B12C57A61E294743 /* ser.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		A5E884963090B53D031F1196 /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 9D6293E74769FFA90E8FB1CC /* util.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		A90DD8E8231AEA63617F889A /* wow.c in Sources */ = {isa = PBXBuildFile; fileRef = 415126AC9B02715679EA30CC /* wow.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
-		10673B4712F96BA1967DAADB /* ItlRtw89.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* ItlRtw89.cpp */; };
+		10673B4712F96BA1967DAADB /* RTWCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* RTWCore.cpp */; };
 		7A72243A686EDEC2ABBD923B /* Rtw89LinuxBridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B0AEFC852BE8B8E4F2517B /* Rtw89LinuxBridge.cpp */; };
 		1EC41A877C9F3FF6593F4D53 /* Rtw89PciTransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBF678ACAE6C9B8EA2717480 /* Rtw89PciTransport.cpp */; };
 		C991C3A0AE070C5F4137483B /* fw_blobs89.c in Sources */ = {isa = PBXBuildFile; fileRef = B5095A0234873394B56C5F95 /* fw_blobs89.c */; };
@@ -887,7 +887,7 @@
 		89205409CE8D7231AB9C5214 /* ser.c in Sources */ = {isa = PBXBuildFile; fileRef = 36945556B12C57A61E294743 /* ser.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		FA87BB16CA0FEE73AFB7FC48 /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 9D6293E74769FFA90E8FB1CC /* util.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		314A174690D775D359EEC9D6 /* wow.c in Sources */ = {isa = PBXBuildFile; fileRef = 415126AC9B02715679EA30CC /* wow.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
-		90E26B017F69738A768EBB3C /* ItlRtw89.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* ItlRtw89.cpp */; };
+		90E26B017F69738A768EBB3C /* RTWCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* RTWCore.cpp */; };
 		3EE2A33532DC686153DE55DD /* Rtw89LinuxBridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B0AEFC852BE8B8E4F2517B /* Rtw89LinuxBridge.cpp */; };
 		99D4174D1F7DADF9B15C405D /* Rtw89PciTransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBF678ACAE6C9B8EA2717480 /* Rtw89PciTransport.cpp */; };
 		712DAFB159EE8D2829874051 /* fw_blobs89.c in Sources */ = {isa = PBXBuildFile; fileRef = B5095A0234873394B56C5F95 /* fw_blobs89.c */; };
@@ -922,7 +922,7 @@
 		4B53C99745D74E5BAF33AA9C /* ser.c in Sources */ = {isa = PBXBuildFile; fileRef = 36945556B12C57A61E294743 /* ser.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		EC04488A3188F46AF42747D8 /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 9D6293E74769FFA90E8FB1CC /* util.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		6082B47A11A302A5EEA20363 /* wow.c in Sources */ = {isa = PBXBuildFile; fileRef = 415126AC9B02715679EA30CC /* wow.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
-		D720D1BDFB6833C4BC4CB005 /* ItlRtw89.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* ItlRtw89.cpp */; };
+		D720D1BDFB6833C4BC4CB005 /* RTWCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* RTWCore.cpp */; };
 		075730A11D2387C299C47A3E /* Rtw89LinuxBridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B0AEFC852BE8B8E4F2517B /* Rtw89LinuxBridge.cpp */; };
 		5017A2540C77A38CC44BA07C /* Rtw89PciTransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBF678ACAE6C9B8EA2717480 /* Rtw89PciTransport.cpp */; };
 		20E207BFBA25E283BD2B2D80 /* fw_blobs89.c in Sources */ = {isa = PBXBuildFile; fileRef = B5095A0234873394B56C5F95 /* fw_blobs89.c */; };
@@ -957,7 +957,7 @@
 		8A834FBF99CF3ABEB13C70C1 /* ser.c in Sources */ = {isa = PBXBuildFile; fileRef = 36945556B12C57A61E294743 /* ser.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		9CEBC9DEFF0F580F1D411142 /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 9D6293E74769FFA90E8FB1CC /* util.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		4D63805C5CC52FADE3B2766D /* wow.c in Sources */ = {isa = PBXBuildFile; fileRef = 415126AC9B02715679EA30CC /* wow.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
-		BD49DBE0A1E24FB591A113EB /* ItlRtw89.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* ItlRtw89.cpp */; };
+		BD49DBE0A1E24FB591A113EB /* RTWCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* RTWCore.cpp */; };
 		742C0ACC5AB7001FE82E4267 /* Rtw89LinuxBridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B0AEFC852BE8B8E4F2517B /* Rtw89LinuxBridge.cpp */; };
 		DF18DBF599FBB5E54BD8F97B /* Rtw89PciTransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBF678ACAE6C9B8EA2717480 /* Rtw89PciTransport.cpp */; };
 		5291A7870F1FBF21ED99BAD2 /* fw_blobs89.c in Sources */ = {isa = PBXBuildFile; fileRef = B5095A0234873394B56C5F95 /* fw_blobs89.c */; };
@@ -992,7 +992,7 @@
 		9D720E36A5D79A0BDAC32AF5 /* ser.c in Sources */ = {isa = PBXBuildFile; fileRef = 36945556B12C57A61E294743 /* ser.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		0DA327832AD1E91C2E3B12C5 /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 9D6293E74769FFA90E8FB1CC /* util.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		338421D51781CB806B959C87 /* wow.c in Sources */ = {isa = PBXBuildFile; fileRef = 415126AC9B02715679EA30CC /* wow.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
-		504BD0075677FE0F6ECD2EBB /* ItlRtw89.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* ItlRtw89.cpp */; };
+		504BD0075677FE0F6ECD2EBB /* RTWCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* RTWCore.cpp */; };
 		AB63A4F2FB461A4A5AAC0EB7 /* Rtw89LinuxBridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B0AEFC852BE8B8E4F2517B /* Rtw89LinuxBridge.cpp */; };
 		2D8F63CC2ED3F2D97080DDCC /* Rtw89PciTransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBF678ACAE6C9B8EA2717480 /* Rtw89PciTransport.cpp */; };
 		A1A3A20BF34BF97698A9DB6D /* fw_blobs89.c in Sources */ = {isa = PBXBuildFile; fileRef = B5095A0234873394B56C5F95 /* fw_blobs89.c */; };
@@ -1027,7 +1027,7 @@
 		ADFB322A50E923AB72A63B79 /* ser.c in Sources */ = {isa = PBXBuildFile; fileRef = 36945556B12C57A61E294743 /* ser.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		D659653A4499128AEDCF24C2 /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 9D6293E74769FFA90E8FB1CC /* util.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		FAEB109D672E340B95E6EF20 /* wow.c in Sources */ = {isa = PBXBuildFile; fileRef = 415126AC9B02715679EA30CC /* wow.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
-		9544599FC9B4E88C4069CC33 /* ItlRtw89.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* ItlRtw89.cpp */; };
+		9544599FC9B4E88C4069CC33 /* RTWCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* RTWCore.cpp */; };
 		AC380F09A6595ED1CFB0C43D /* Rtw89LinuxBridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B0AEFC852BE8B8E4F2517B /* Rtw89LinuxBridge.cpp */; };
 		317FDFB519B9C01051CAD082 /* Rtw89PciTransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBF678ACAE6C9B8EA2717480 /* Rtw89PciTransport.cpp */; };
 		74E7CDA0267E0C329139603B /* fw_blobs89.c in Sources */ = {isa = PBXBuildFile; fileRef = B5095A0234873394B56C5F95 /* fw_blobs89.c */; };
@@ -1062,7 +1062,7 @@
 		F75BD29238B1C1701DEFC7D9 /* ser.c in Sources */ = {isa = PBXBuildFile; fileRef = 36945556B12C57A61E294743 /* ser.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		4ABF0F98FC8C6353CE9EE1A3 /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 9D6293E74769FFA90E8FB1CC /* util.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		C43A6B63C3CEB3D677EEB6A7 /* wow.c in Sources */ = {isa = PBXBuildFile; fileRef = 415126AC9B02715679EA30CC /* wow.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
-		3E4F07BA4656D98D488A8CE4 /* ItlRtw89.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* ItlRtw89.cpp */; };
+		3E4F07BA4656D98D488A8CE4 /* RTWCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* RTWCore.cpp */; };
 		AFD7F6C32301EAE31EA9F953 /* Rtw89LinuxBridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B0AEFC852BE8B8E4F2517B /* Rtw89LinuxBridge.cpp */; };
 		61D113992A2A41C5EAE5586A /* Rtw89PciTransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBF678ACAE6C9B8EA2717480 /* Rtw89PciTransport.cpp */; };
 		7438ADA4FC4877F94D28BE09 /* fw_blobs89.c in Sources */ = {isa = PBXBuildFile; fileRef = B5095A0234873394B56C5F95 /* fw_blobs89.c */; };
@@ -1097,7 +1097,7 @@
 		2796A1F78A3C6866FAEF2295 /* ser.c in Sources */ = {isa = PBXBuildFile; fileRef = 36945556B12C57A61E294743 /* ser.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		DFA51BD36D26312DCDA4C388 /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 9D6293E74769FFA90E8FB1CC /* util.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		F3E950E151C308863FA37B62 /* wow.c in Sources */ = {isa = PBXBuildFile; fileRef = 415126AC9B02715679EA30CC /* wow.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
-		11B7260157DAE3F1881A81C4 /* ItlRtw89.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* ItlRtw89.cpp */; };
+		11B7260157DAE3F1881A81C4 /* RTWCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* RTWCore.cpp */; };
 		DF5AD42BDFBE7D5624063978 /* Rtw89LinuxBridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B0AEFC852BE8B8E4F2517B /* Rtw89LinuxBridge.cpp */; };
 		0454D4C216E616334FE6490F /* Rtw89PciTransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBF678ACAE6C9B8EA2717480 /* Rtw89PciTransport.cpp */; };
 		B3B71ECEF5A5851FAD3CBF24 /* fw_blobs89.c in Sources */ = {isa = PBXBuildFile; fileRef = B5095A0234873394B56C5F95 /* fw_blobs89.c */; };
@@ -1132,6 +1132,12 @@
 		E54B81109F472EE79C59ED7D /* ser.c in Sources */ = {isa = PBXBuildFile; fileRef = 36945556B12C57A61E294743 /* ser.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		00E4D4F918EA1AE399CB490A /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 9D6293E74769FFA90E8FB1CC /* util.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		5EA6FDEA71C3BFD70D5A3CDC /* wow.c in Sources */ = {isa = PBXBuildFile; fileRef = 415126AC9B02715679EA30CC /* wow.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
+		00B6E3322109E6A8EBBE7429 /* AirportRTW-Sequoia WCL/AirportRTWV2.cpp */ = {isa = PBXBuildFile; fileRef = DCF64BCD448F0C0719DD9131 /* AirportRTWV2.cpp */; };
+		1015BB37CB80C30DD4C9AD6F /* AirportRTW-Sequoia WCL/AirportRTWSkywalkInterface.cpp */ = {isa = PBXBuildFile; fileRef = 1609A38552302A3D45D6666F /* AirportRTWSkywalkInterface.cpp */; };
+		F96FE56B42C261B5064A461F /* WCL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8FAB4E5DB5F79F637B6A1D80 /* WCL.cpp */; };
+		AB9BDFA642C2339CCA9690F5 /* AirportRTW-Tahoe WCL/AirportRTWV2.cpp */ = {isa = PBXBuildFile; fileRef = DCF64BCD448F0C0719DD9131 /* AirportRTWV2.cpp */; };
+		1690A53773C7C2C8CB17D267 /* AirportRTW-Tahoe WCL/AirportRTWSkywalkInterface.cpp */ = {isa = PBXBuildFile; fileRef = 1609A38552302A3D45D6666F /* AirportRTWSkywalkInterface.cpp */; };
+		1FFA68848225A8F70988BB11 /* WCL.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 8FAB4E5DB5F79F637B6A1D80 /* WCL.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1202,8 +1208,8 @@
 
 /* Begin PBXFileReference section */
 		024A07AC23FCBC3C009FBA6C /* RTWCore.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RTWCore.kext; sourceTree = BUILT_PRODUCTS_DIR; };
-		024A07AF23FCBC3C009FBA6C /* RTWCore.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RTWCore.hpp; sourceTree = "<group>"; };
-		024A07B123FCBC3C009FBA6C /* RTWCore.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RTWCore.cpp; sourceTree = "<group>"; };
+		024A07AF23FCBC3C009FBA6C /* RTWEthernetController.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RTWEthernetController.hpp; sourceTree = "<group>"; };
+		024A07B123FCBC3C009FBA6C /* RTWEthernetController.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RTWEthernetController.cpp; sourceTree = "<group>"; };
 		024A07B323FCBC3C009FBA6C /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		024A07BA23FCBC6C009FBA6C /* compat.cpp */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.cpp.cpp; path = compat.cpp; sourceTree = "<group>"; };
 		024A07C923FCBC6C009FBA6C /* aes.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = aes.c; sourceTree = "<group>"; };
@@ -1417,7 +1423,7 @@
 		F8F9EDE0240B7415009CB8E7 /* _task.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = _task.cpp; sourceTree = "<group>"; };
 		F8FA0EEB2501E7EE00B1822E /* zutil.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = zutil.h; sourceTree = "<group>"; };
 		F8FA0EED2501E8C100B1822E /* zutil.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = zutil.c; sourceTree = "<group>"; };
-		E492786407CA2D19603227AE /* ItlRtw89.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "rtw/hal_rtw89/ItlRtw89.cpp"; sourceTree = SOURCE_ROOT; };
+		E492786407CA2D19603227AE /* RTWCore.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "rtw/hal_rtw89/RTWCore.cpp"; sourceTree = SOURCE_ROOT; };
 		A3B0AEFC852BE8B8E4F2517B /* Rtw89LinuxBridge.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "rtw/hal_rtw89/Rtw89LinuxBridge.cpp"; sourceTree = SOURCE_ROOT; };
 		CBF678ACAE6C9B8EA2717480 /* Rtw89PciTransport.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "rtw/hal_rtw89/Rtw89PciTransport.cpp"; sourceTree = SOURCE_ROOT; };
 		B5095A0234873394B56C5F95 /* fw_blobs89.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "rtw/hal_rtw89/compat/fw_blobs89.c"; sourceTree = SOURCE_ROOT; };
@@ -1452,6 +1458,16 @@
 		36945556B12C57A61E294743 /* ser.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "rtw/hal_rtw89/driver/ser.c"; sourceTree = SOURCE_ROOT; };
 		9D6293E74769FFA90E8FB1CC /* util.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "rtw/hal_rtw89/driver/util.c"; sourceTree = SOURCE_ROOT; };
 		415126AC9B02715679EA30CC /* wow.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "rtw/hal_rtw89/driver/wow.c"; sourceTree = SOURCE_ROOT; };
+		DCF64BCD448F0C0719DD9131 /* WCL/AirportRTWV2.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "AirportRTW/WCL/AirportRTWV2.cpp"; sourceTree = SOURCE_ROOT; };
+		1609A38552302A3D45D6666F /* WCL/AirportRTWSkywalkInterface.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "AirportRTW/WCL/AirportRTWSkywalkInterface.cpp"; sourceTree = SOURCE_ROOT; };
+		8FAB4E5DB5F79F637B6A1D80 /* WCL/WCL.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "AirportRTW/WCL/WCL.cpp"; sourceTree = SOURCE_ROOT; };
+		47ADF3F8BBEBE53EE3B01A23 /* WCL/AirportRTWNativeController.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "AirportRTW/WCL/AirportRTWNativeController.hpp"; sourceTree = SOURCE_ROOT; };
+		511E0B690B4B222E8418B477 /* WCL/AirportRTWNativeInterface.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "AirportRTW/WCL/AirportRTWNativeInterface.hpp"; sourceTree = SOURCE_ROOT; };
+		73BA20AE42ABF8F3111FEB4E /* WCL/WCL.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = "AirportRTW/WCL/WCL.hpp"; sourceTree = SOURCE_ROOT; };
+		01935F6CFD2C50362EA5817C /* WCL/Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "AirportRTW/WCL/Info.plist"; sourceTree = SOURCE_ROOT; };
+		81632BF798E8CCEBEEBAE982 /* WCL/Sequoia-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = "AirportRTW/WCL/Sequoia-Info.plist"; sourceTree = SOURCE_ROOT; };
+		65E48D12232BFA112866A0C8 /* AirportRTW-Sequoia.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AirportRTW.kext; sourceTree = BUILT_PRODUCTS_DIR; };
+		F1BAE27F6026D65A80023BE7 /* AirportRTW-Tahoe.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AirportRTW.kext; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1533,6 +1549,7 @@
 		024A07A223FCBC3C009FBA6C = {
 			isa = PBXGroup;
 			children = (
+				E2C02CA36143CD7E41E9AFA5 /* Modern Wi-Fi frontend */,
 				5088ECB8252883BF0068A63D /* README.md */,
 				5088ECB9252883C60068A63D /* LICENSE */,
 				5088ECBA252884060068A63D /* iwlwifi-firmware-license */,
@@ -1557,6 +1574,8 @@
 				F8AE6558285471560085B4CF /* AirportRTW.kext */,
 				F8B2110A2A2EC2680043ECBD /* AirportRTW.kext */,
 				F8D94CF52B9ABFE20081A3C4 /* AirportRTW.kext */,
+				F1BAE27F6026D65A80023BE7 /* AirportRTW-Tahoe.kext */,
+				65E48D12232BFA112866A0C8 /* AirportRTW-Sequoia.kext */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -1565,8 +1584,8 @@
 			isa = PBXGroup;
 			children = (
 				0250B31C23FD768400FF8CEA /* firmware */,
-				024A07AF23FCBC3C009FBA6C /* RTWCore.hpp */,
-				024A07B123FCBC3C009FBA6C /* RTWCore.cpp */,
+				024A07AF23FCBC3C009FBA6C /* RTWEthernetController.hpp */,
+				024A07B123FCBC3C009FBA6C /* RTWEthernetController.cpp */,
 				024A07B323FCBC3C009FBA6C /* Info.plist */,
 				F8D76361244F21BB00DEA040 /* pm.cpp */,
 				F8E49A12249B923500BE6868 /* ItlNetworkUserClient.cpp */,
@@ -1872,6 +1891,21 @@
 			path = linux;
 			sourceTree = "<group>";
 		};
+		E2C02CA36143CD7E41E9AFA5 /* Modern Wi-Fi frontend */ = {
+			isa = PBXGroup;
+			children = (
+				DCF64BCD448F0C0719DD9131,
+				1609A38552302A3D45D6666F,
+				8FAB4E5DB5F79F637B6A1D80,
+				47ADF3F8BBEBE53EE3B01A23,
+				511E0B690B4B222E8418B477,
+				73BA20AE42ABF8F3111FEB4E,
+				01935F6CFD2C50362EA5817C,
+				81632BF798E8CCEBEEBAE982,
+			);
+			name = "Modern Wi-Fi frontend";
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXHeadersBuildPhase section */
@@ -1935,7 +1969,7 @@
 				F8F9257E240974EF0088B8D5 /* bitfield.h in Headers */,
 				F8FA0EEC2501E7EE00B1822E /* zutil.h in Headers */,
 				F8C2EC642408031A007A9422 /* ieee80211_priv.h in Headers */,
-				024A07B023FCBC3C009FBA6C /* RTWCore.hpp in Headers */,
+				024A07B023FCBC3C009FBA6C /* RTWEthernetController.hpp in Headers */,
 				F8C2EC5A2408031A007A9422 /* ieee80211_crypto.h in Headers */,
 				F8C2EC582408031A007A9422 /* ieee80211_regdomain.h in Headers */,
 				024A085323FCBC6C009FBA6C /* spr.h in Headers */,
@@ -2412,6 +2446,46 @@
 			productReference = F8D94CF52B9ABFE20081A3C4 /* AirportRTW.kext */;
 			productType = "com.apple.product-type.kernel-extension";
 		};
+		5A114CB722D761DE4489EF6D /* AirportRTW-Sequoia */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 2639B58CC1BB2A3D0390C571 /* Build configuration list for PBXNativeTarget "AirportRTW-Sequoia" */;
+			buildPhases = (
+				F8D94C832B9ABFE20081A3C4 /* Headers */,
+				A89C00012F00000000000003 /* Build RTW89 C Archive */,
+				EF0E3CF530C596A6860C2AE2 /* Sources */,
+				F8D94CEF2B9ABFE20081A3C4 /* Frameworks */,
+				F8D94CF12B9ABFE20081A3C4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F8D94C812B9ABFE20081A3C4 /* PBXTargetDependency */,
+			);
+			name = "AirportRTW-Sequoia";
+			productName = AirportRTW;
+			productReference = 65E48D12232BFA112866A0C8 /* AirportRTW.kext */;
+			productType = "com.apple.product-type.kernel-extension";
+		};
+		82B2FB54D35A3204C66B1DFE /* AirportRTW-Tahoe */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D7C87442B70DCD5E05043AC7 /* Build configuration list for PBXNativeTarget "AirportRTW-Tahoe" */;
+			buildPhases = (
+				F8D94C832B9ABFE20081A3C4 /* Headers */,
+				A89C00012F00000000000003 /* Build RTW89 C Archive */,
+				2BDE232A93EB317822B619FF /* Sources */,
+				F8D94CEF2B9ABFE20081A3C4 /* Frameworks */,
+				F8D94CF12B9ABFE20081A3C4 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F8D94C812B9ABFE20081A3C4 /* PBXTargetDependency */,
+			);
+			name = "AirportRTW-Tahoe";
+			productName = AirportRTW;
+			productReference = F1BAE27F6026D65A80023BE7 /* AirportRTW.kext */;
+			productType = "com.apple.product-type.kernel-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -2469,6 +2543,8 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
+				82B2FB54D35A3204C66B1DFE /* AirportRTW-Tahoe */,
+				5A114CB722D761DE4489EF6D /* AirportRTW-Sequoia */,
 				024A07AB23FCBC3C009FBA6C /* RTWCore */,
 				35CBE72A251CB8CA00435CBC /* AirportRTW-High Sierra */,
 				35CBE6BF251CB8BF00435CBC /* AirportRTW-Mojave */,
@@ -2621,7 +2697,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				55F614EF7545F5692B4BB4B1 /* ItlRtw89.cpp in Sources */,
+				55F614EF7545F5692B4BB4B1 /* RTWCore.cpp in Sources */,
 				9C5148DE531256CFA37555D6 /* Rtw89LinuxBridge.cpp in Sources */,
 				02B6ABA0A18553E0E29FAA25 /* Rtw89PciTransport.cpp in Sources */,
 				D9EBFFDFC87C65E5827B3ABF /* fw_blobs89.c in Sources */,
@@ -2680,7 +2756,7 @@
 				F8C2EC502408031A007A9422 /* _string.c in Sources */,
 				024A082E23FCBC6C009FBA6C /* aes.c in Sources */,
 				F8C2EC4F2408031A007A9422 /* ieee80211_proto.c in Sources */,
-				024A07B223FCBC3C009FBA6C /* RTWCore.cpp in Sources */,
+				024A07B223FCBC3C009FBA6C /* RTWEthernetController.cpp in Sources */,
 				024A084923FCBC6C009FBA6C /* ecb_enc.c in Sources */,
 				024A084F23FCBC6C009FBA6C /* md5.c in Sources */,
 				024A083623FCBC6C009FBA6C /* michael.c in Sources */,
@@ -2716,7 +2792,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				10673B4712F96BA1967DAADB /* ItlRtw89.cpp in Sources */,
+				10673B4712F96BA1967DAADB /* RTWCore.cpp in Sources */,
 				7A72243A686EDEC2ABBD923B /* Rtw89LinuxBridge.cpp in Sources */,
 				1EC41A877C9F3FF6593F4D53 /* Rtw89PciTransport.cpp in Sources */,
 				C991C3A0AE070C5F4137483B /* fw_blobs89.c in Sources */,
@@ -2813,7 +2889,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				90E26B017F69738A768EBB3C /* ItlRtw89.cpp in Sources */,
+				90E26B017F69738A768EBB3C /* RTWCore.cpp in Sources */,
 				3EE2A33532DC686153DE55DD /* Rtw89LinuxBridge.cpp in Sources */,
 				99D4174D1F7DADF9B15C405D /* Rtw89PciTransport.cpp in Sources */,
 				712DAFB159EE8D2829874051 /* fw_blobs89.c in Sources */,
@@ -2910,7 +2986,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				D720D1BDFB6833C4BC4CB005 /* ItlRtw89.cpp in Sources */,
+				D720D1BDFB6833C4BC4CB005 /* RTWCore.cpp in Sources */,
 				075730A11D2387C299C47A3E /* Rtw89LinuxBridge.cpp in Sources */,
 				5017A2540C77A38CC44BA07C /* Rtw89PciTransport.cpp in Sources */,
 				20E207BFBA25E283BD2B2D80 /* fw_blobs89.c in Sources */,
@@ -3007,7 +3083,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				BD49DBE0A1E24FB591A113EB /* ItlRtw89.cpp in Sources */,
+				BD49DBE0A1E24FB591A113EB /* RTWCore.cpp in Sources */,
 				742C0ACC5AB7001FE82E4267 /* Rtw89LinuxBridge.cpp in Sources */,
 				DF18DBF599FBB5E54BD8F97B /* Rtw89PciTransport.cpp in Sources */,
 				5291A7870F1FBF21ED99BAD2 /* fw_blobs89.c in Sources */,
@@ -3105,7 +3181,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				504BD0075677FE0F6ECD2EBB /* ItlRtw89.cpp in Sources */,
+				504BD0075677FE0F6ECD2EBB /* RTWCore.cpp in Sources */,
 				AB63A4F2FB461A4A5AAC0EB7 /* Rtw89LinuxBridge.cpp in Sources */,
 				2D8F63CC2ED3F2D97080DDCC /* Rtw89PciTransport.cpp in Sources */,
 				A1A3A20BF34BF97698A9DB6D /* fw_blobs89.c in Sources */,
@@ -3202,7 +3278,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				9544599FC9B4E88C4069CC33 /* ItlRtw89.cpp in Sources */,
+				9544599FC9B4E88C4069CC33 /* RTWCore.cpp in Sources */,
 				AC380F09A6595ED1CFB0C43D /* Rtw89LinuxBridge.cpp in Sources */,
 				317FDFB519B9C01051CAD082 /* Rtw89PciTransport.cpp in Sources */,
 				F8AE650A285471560085B4CF /* _mbuf.cpp in Sources */,
@@ -3268,7 +3344,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				3E4F07BA4656D98D488A8CE4 /* ItlRtw89.cpp in Sources */,
+				3E4F07BA4656D98D488A8CE4 /* RTWCore.cpp in Sources */,
 				AFD7F6C32301EAE31EA9F953 /* Rtw89LinuxBridge.cpp in Sources */,
 				61D113992A2A41C5EAE5586A /* Rtw89PciTransport.cpp in Sources */,
 				F8B210BC2A2EC2680043ECBD /* _mbuf.cpp in Sources */,
@@ -3333,7 +3409,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				11B7260157DAE3F1881A81C4 /* ItlRtw89.cpp in Sources */,
+				11B7260157DAE3F1881A81C4 /* RTWCore.cpp in Sources */,
 				DF5AD42BDFBE7D5624063978 /* Rtw89LinuxBridge.cpp in Sources */,
 				0454D4C216E616334FE6490F /* Rtw89PciTransport.cpp in Sources */,
 				F8D94CA72B9ABFE20081A3C4 /* _mbuf.cpp in Sources */,
@@ -3380,6 +3456,136 @@
 				F8D94CD02B9ABFE20081A3C4 /* arc4.c in Sources */,
 				F8D94CD12B9ABFE20081A3C4 /* AirportRTWEthernetInterface.cpp in Sources */,
 				F8D94CD22B9ABFE20081A3C4 /* AirportRTWSkywalkInterface.cpp in Sources */,
+				F8D94CD32B9ABFE20081A3C4 /* blf.c in Sources */,
+				F8D94CD42B9ABFE20081A3C4 /* _ifq.cpp in Sources */,
+				F8D94CD52B9ABFE20081A3C4 /* poly1305.c in Sources */,
+				F8D94CD62B9ABFE20081A3C4 /* key_wrap.c in Sources */,
+				F8D94CD72B9ABFE20081A3C4 /* gmac.c in Sources */,
+				F8D94CD82B9ABFE20081A3C4 /* rmd160.c in Sources */,
+				F8D94CD92B9ABFE20081A3C4 /* idgen.c in Sources */,
+				F8D94CDA2B9ABFE20081A3C4 /* compat.cpp in Sources */,
+				F8D94CDB2B9ABFE20081A3C4 /* zutil.c in Sources */,
+				F8D94CDC2B9ABFE20081A3C4 /* ItlHalService.cpp in Sources */,
+				F8D94CED2B9ABFE20081A3C4 /* IOPCIEDeviceWrapper.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		EF0E3CF530C596A6860C2AE2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F96FE56B42C261B5064A461F /* WCL.cpp in Sources */,
+				11B7260157DAE3F1881A81C4 /* RTWCore.cpp in Sources */,
+				DF5AD42BDFBE7D5624063978 /* Rtw89LinuxBridge.cpp in Sources */,
+				0454D4C216E616334FE6490F /* Rtw89PciTransport.cpp in Sources */,
+				F8D94CA72B9ABFE20081A3C4 /* _mbuf.cpp in Sources */,
+				F8D94CA82B9ABFE20081A3C4 /* ieee80211_ra.c in Sources */,
+				F8D94CA92B9ABFE20081A3C4 /* _task.cpp in Sources */,
+				F8D94CAA2B9ABFE20081A3C4 /* FwBinary.cpp in Sources */,
+				F8D94CAB2B9ABFE20081A3C4 /* ieee80211_proto.c in Sources */,
+				F8D94CAC2B9ABFE20081A3C4 /* _string.c in Sources */,
+				F8D94CAD2B9ABFE20081A3C4 /* ieee80211_ioctl.c in Sources */,
+				F8D94CAE2B9ABFE20081A3C4 /* ieee80211.c in Sources */,
+				F8D94CAF2B9ABFE20081A3C4 /* ieee80211_rssadapt.c in Sources */,
+				F8D94CB02B9ABFE20081A3C4 /* ieee80211_input.c in Sources */,
+				F8D94CB12B9ABFE20081A3C4 /* timeout.c in Sources */,
+				F8D94CB22B9ABFE20081A3C4 /* ieee80211_mira.c in Sources */,
+				F8D94CB32B9ABFE20081A3C4 /* ieee80211_crypto_bip.c in Sources */,
+				F8D94CB42B9ABFE20081A3C4 /* ieee80211_crypto_tkip.c in Sources */,
+				F8D94CB52B9ABFE20081A3C4 /* ieee80211_crypto_ccmp.c in Sources */,
+				F8D94CB62B9ABFE20081A3C4 /* ieee80211_crypto_wep.c in Sources */,
+				F8D94CB72B9ABFE20081A3C4 /* ieee80211_pae_input.c in Sources */,
+				F8D94CB82B9ABFE20081A3C4 /* ieee80211_amrr.c in Sources */,
+				F8D94CB92B9ABFE20081A3C4 /* ieee80211_output.c in Sources */,
+				F8D94CBA2B9ABFE20081A3C4 /* ieee80211_crypto.c in Sources */,
+				F8D94CBB2B9ABFE20081A3C4 /* CTimeout.cpp in Sources */,
+				F8D94CBC2B9ABFE20081A3C4 /* ieee80211_regdomain.c in Sources */,
+				F8D94CBD2B9ABFE20081A3C4 /* ieee80211_node.c in Sources */,
+				F8D94CBE2B9ABFE20081A3C4 /* ieee80211_pae_output.c in Sources */,
+				F8D94CBF2B9ABFE20081A3C4 /* sha1-pbkdf2.c in Sources */,
+				F8D94CC02B9ABFE20081A3C4 /* aes.c in Sources */,
+				F8D94CC12B9ABFE20081A3C4 /* hmac.c in Sources */,
+				F8D94CC22B9ABFE20081A3C4 /* sha2.c in Sources */,
+				F8D94CC32B9ABFE20081A3C4 /* rijndael.c in Sources */,
+				F8D94CC42B9ABFE20081A3C4 /* ecb3_enc.c in Sources */,
+				F8D94CC52B9ABFE20081A3C4 /* set_key.c in Sources */,
+				F8D94CC62B9ABFE20081A3C4 /* cast.c in Sources */,
+				F8D94CC72B9ABFE20081A3C4 /* michael.c in Sources */,
+				F8D94CC82B9ABFE20081A3C4 /* arp.c in Sources */,
+				F8D94CC92B9ABFE20081A3C4 /* sha1.c in Sources */,
+				F8D94CCA2B9ABFE20081A3C4 /* cmac.c in Sources */,
+				F8D94CCB2B9ABFE20081A3C4 /* ecb_enc.c in Sources */,
+				F8D94CCC2B9ABFE20081A3C4 /* chachapoly.c in Sources */,
+				00B6E3322109E6A8EBBE7429 /* AirportRTWV2.cpp in Sources */,
+				F8D94CCF2B9ABFE20081A3C4 /* md5.c in Sources */,
+				F8D94CD02B9ABFE20081A3C4 /* arc4.c in Sources */,
+				F8D94CD12B9ABFE20081A3C4 /* AirportRTWEthernetInterface.cpp in Sources */,
+				1015BB37CB80C30DD4C9AD6F /* AirportRTWSkywalkInterface.cpp in Sources */,
+				F8D94CD32B9ABFE20081A3C4 /* blf.c in Sources */,
+				F8D94CD42B9ABFE20081A3C4 /* _ifq.cpp in Sources */,
+				F8D94CD52B9ABFE20081A3C4 /* poly1305.c in Sources */,
+				F8D94CD62B9ABFE20081A3C4 /* key_wrap.c in Sources */,
+				F8D94CD72B9ABFE20081A3C4 /* gmac.c in Sources */,
+				F8D94CD82B9ABFE20081A3C4 /* rmd160.c in Sources */,
+				F8D94CD92B9ABFE20081A3C4 /* idgen.c in Sources */,
+				F8D94CDA2B9ABFE20081A3C4 /* compat.cpp in Sources */,
+				F8D94CDB2B9ABFE20081A3C4 /* zutil.c in Sources */,
+				F8D94CDC2B9ABFE20081A3C4 /* ItlHalService.cpp in Sources */,
+				F8D94CED2B9ABFE20081A3C4 /* IOPCIEDeviceWrapper.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		2BDE232A93EB317822B619FF /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				1FFA68848225A8F70988BB11 /* WCL.cpp in Sources */,
+				11B7260157DAE3F1881A81C4 /* RTWCore.cpp in Sources */,
+				DF5AD42BDFBE7D5624063978 /* Rtw89LinuxBridge.cpp in Sources */,
+				0454D4C216E616334FE6490F /* Rtw89PciTransport.cpp in Sources */,
+				F8D94CA72B9ABFE20081A3C4 /* _mbuf.cpp in Sources */,
+				F8D94CA82B9ABFE20081A3C4 /* ieee80211_ra.c in Sources */,
+				F8D94CA92B9ABFE20081A3C4 /* _task.cpp in Sources */,
+				F8D94CAA2B9ABFE20081A3C4 /* FwBinary.cpp in Sources */,
+				F8D94CAB2B9ABFE20081A3C4 /* ieee80211_proto.c in Sources */,
+				F8D94CAC2B9ABFE20081A3C4 /* _string.c in Sources */,
+				F8D94CAD2B9ABFE20081A3C4 /* ieee80211_ioctl.c in Sources */,
+				F8D94CAE2B9ABFE20081A3C4 /* ieee80211.c in Sources */,
+				F8D94CAF2B9ABFE20081A3C4 /* ieee80211_rssadapt.c in Sources */,
+				F8D94CB02B9ABFE20081A3C4 /* ieee80211_input.c in Sources */,
+				F8D94CB12B9ABFE20081A3C4 /* timeout.c in Sources */,
+				F8D94CB22B9ABFE20081A3C4 /* ieee80211_mira.c in Sources */,
+				F8D94CB32B9ABFE20081A3C4 /* ieee80211_crypto_bip.c in Sources */,
+				F8D94CB42B9ABFE20081A3C4 /* ieee80211_crypto_tkip.c in Sources */,
+				F8D94CB52B9ABFE20081A3C4 /* ieee80211_crypto_ccmp.c in Sources */,
+				F8D94CB62B9ABFE20081A3C4 /* ieee80211_crypto_wep.c in Sources */,
+				F8D94CB72B9ABFE20081A3C4 /* ieee80211_pae_input.c in Sources */,
+				F8D94CB82B9ABFE20081A3C4 /* ieee80211_amrr.c in Sources */,
+				F8D94CB92B9ABFE20081A3C4 /* ieee80211_output.c in Sources */,
+				F8D94CBA2B9ABFE20081A3C4 /* ieee80211_crypto.c in Sources */,
+				F8D94CBB2B9ABFE20081A3C4 /* CTimeout.cpp in Sources */,
+				F8D94CBC2B9ABFE20081A3C4 /* ieee80211_regdomain.c in Sources */,
+				F8D94CBD2B9ABFE20081A3C4 /* ieee80211_node.c in Sources */,
+				F8D94CBE2B9ABFE20081A3C4 /* ieee80211_pae_output.c in Sources */,
+				F8D94CBF2B9ABFE20081A3C4 /* sha1-pbkdf2.c in Sources */,
+				F8D94CC02B9ABFE20081A3C4 /* aes.c in Sources */,
+				F8D94CC12B9ABFE20081A3C4 /* hmac.c in Sources */,
+				F8D94CC22B9ABFE20081A3C4 /* sha2.c in Sources */,
+				F8D94CC32B9ABFE20081A3C4 /* rijndael.c in Sources */,
+				F8D94CC42B9ABFE20081A3C4 /* ecb3_enc.c in Sources */,
+				F8D94CC52B9ABFE20081A3C4 /* set_key.c in Sources */,
+				F8D94CC62B9ABFE20081A3C4 /* cast.c in Sources */,
+				F8D94CC72B9ABFE20081A3C4 /* michael.c in Sources */,
+				F8D94CC82B9ABFE20081A3C4 /* arp.c in Sources */,
+				F8D94CC92B9ABFE20081A3C4 /* sha1.c in Sources */,
+				F8D94CCA2B9ABFE20081A3C4 /* cmac.c in Sources */,
+				F8D94CCB2B9ABFE20081A3C4 /* ecb_enc.c in Sources */,
+				F8D94CCC2B9ABFE20081A3C4 /* chachapoly.c in Sources */,
+				AB9BDFA642C2339CCA9690F5 /* AirportRTWV2.cpp in Sources */,
+				F8D94CCF2B9ABFE20081A3C4 /* md5.c in Sources */,
+				F8D94CD02B9ABFE20081A3C4 /* arc4.c in Sources */,
+				F8D94CD12B9ABFE20081A3C4 /* AirportRTWEthernetInterface.cpp in Sources */,
+				1690A53773C7C2C8CB17D267 /* AirportRTWSkywalkInterface.cpp in Sources */,
 				F8D94CD32B9ABFE20081A3C4 /* blf.c in Sources */,
 				F8D94CD42B9ABFE20081A3C4 /* _ifq.cpp in Sources */,
 				F8D94CD52B9ABFE20081A3C4 /* poly1305.c in Sources */,
@@ -3587,6 +3793,7 @@
 		024A07B723FCBC3C009FBA6C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a");
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
@@ -3614,6 +3821,7 @@
 		024A07B823FCBC3C009FBA6C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a");
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
@@ -3641,6 +3849,7 @@
 		35CBE6B8251CB89700435CBC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Big Sur";
 				CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -3672,6 +3881,7 @@
 		35CBE6B9251CB89700435CBC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Big Sur";
 				CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -3703,6 +3913,7 @@
 		35CBE722251CB8BF00435CBC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Mojave";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
@@ -3733,6 +3944,7 @@
 		35CBE723251CB8BF00435CBC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Mojave";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
@@ -3763,6 +3975,7 @@
 		35CBE78D251CB8CA00435CBC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/High Sierra";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
@@ -3793,6 +4006,7 @@
 		35CBE78E251CB8CA00435CBC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/High Sierra";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
@@ -3835,6 +4049,7 @@
 		F897ED16266EFF93005EE8F7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Monterey";
 				CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -3866,6 +4081,7 @@
 		F897ED17266EFF93005EE8F7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Monterey";
 				CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -3897,6 +4113,7 @@
 		F89B6BC125021C9C000F77FF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Catalina";
 				CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -3930,6 +4147,7 @@
 		F89B6BC225021C9C000F77FF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Catalina";
 				CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -4174,6 +4392,154 @@
 			};
 			name = Release;
 		};
+		0FC2B39679CD0F3D89B71FE5 /* AirportRTW-Sequoia Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Sequoia";
+				CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					AIRPORT,
+					"__IO80211_TARGET=__MAC_15_2",
+					__PRIVATE_SPI__,
+					IO80211FAMILY_V2,
+					AIRPORT_WCL,
+				);
+				INFOPLIST_FILE = "AirportRTW/WCL/Sequoia-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/rtw80211",
+					"$(inherited)",
+					"$(PROJECT_DIR)/rtw80211/openbsd",
+					"$(PROJECT_DIR)/rtw80211/linux",
+					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MODULE_NAME = com.zxystd.AirportRTW;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"$(DERIVED_FILE_DIR)/librtw89_c.a",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				PRODUCT_MODULE_NAME = AirportRTW;
+				PRODUCT_NAME = AirportRTW;
+				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				WRAPPER_EXTENSION = kext;
+			};
+			name = Debug;
+		};
+		D90D59C537BF739240BF6D4B /* AirportRTW-Sequoia Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Sequoia";
+				CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"__IO80211_TARGET=__MAC_15_2",
+					AIRPORT,
+					__PRIVATE_SPI__,
+					"$(inherited)",
+					IO80211FAMILY_V2,
+					AIRPORT_WCL,
+				);
+				INFOPLIST_FILE = "AirportRTW/WCL/Sequoia-Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/rtw80211",
+					"$(inherited)",
+					"$(PROJECT_DIR)/rtw80211/openbsd",
+					"$(PROJECT_DIR)/rtw80211/linux",
+					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 15.2;
+				MODULE_NAME = com.zxystd.AirportRTW;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"$(DERIVED_FILE_DIR)/librtw89_c.a",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				PRODUCT_MODULE_NAME = AirportRTW;
+				PRODUCT_NAME = AirportRTW;
+				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				WRAPPER_EXTENSION = kext;
+			};
+			name = Release;
+		};
+		8CF929195FE74F0249CD51DB /* AirportRTW-Tahoe Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Tahoe";
+				CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"$(inherited)",
+					AIRPORT,
+					"__IO80211_TARGET=__MAC_26_0",
+					__PRIVATE_SPI__,
+					IO80211FAMILY_V2,
+					AIRPORT_WCL,
+				);
+				INFOPLIST_FILE = "AirportRTW/WCL/Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/rtw80211",
+					"$(inherited)",
+					"$(PROJECT_DIR)/rtw80211/openbsd",
+					"$(PROJECT_DIR)/rtw80211/linux",
+					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MODULE_NAME = com.zxystd.AirportRTW;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"$(DERIVED_FILE_DIR)/librtw89_c.a",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				PRODUCT_MODULE_NAME = AirportRTW;
+				PRODUCT_NAME = AirportRTW;
+				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				WRAPPER_EXTENSION = kext;
+			};
+			name = Debug;
+		};
+		4B032EAFCA439830D8B1B744 /* AirportRTW-Tahoe Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Tahoe";
+				CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
+				GCC_PRECOMPILE_PREFIX_HEADER = NO;
+				GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"__IO80211_TARGET=__MAC_26_0",
+					AIRPORT,
+					__PRIVATE_SPI__,
+					"$(inherited)",
+					IO80211FAMILY_V2,
+					AIRPORT_WCL,
+				);
+				INFOPLIST_FILE = "AirportRTW/WCL/Info.plist";
+				LIBRARY_SEARCH_PATHS = (
+					"$(PROJECT_DIR)/rtw80211",
+					"$(inherited)",
+					"$(PROJECT_DIR)/rtw80211/openbsd",
+					"$(PROJECT_DIR)/rtw80211/linux",
+					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 26.0;
+				MODULE_NAME = com.zxystd.AirportRTW;
+				OTHER_LDFLAGS = (
+					"$(inherited)",
+					"$(DERIVED_FILE_DIR)/librtw89_c.a",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				PRODUCT_MODULE_NAME = AirportRTW;
+				PRODUCT_NAME = AirportRTW;
+				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				WRAPPER_EXTENSION = kext;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -4272,6 +4638,24 @@
 			buildConfigurations = (
 				F8D94CF32B9ABFE20081A3C4 /* Debug */,
 				F8D94CF42B9ABFE20081A3C4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		2639B58CC1BB2A3D0390C571 /* Build configuration list for AirportRTW-Sequoia */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				0FC2B39679CD0F3D89B71FE5 /* Debug */,
+				D90D59C537BF739240BF6D4B /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D7C87442B70DCD5E05043AC7 /* Build configuration list for AirportRTW-Tahoe */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				8CF929195FE74F0249CD51DB /* Debug */,
+				4B032EAFCA439830D8B1B744 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

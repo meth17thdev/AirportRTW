@@ -72,8 +72,8 @@ IOService* AirportRTW::probe(IOService *provider, SInt32 *score)
     IOLog("AirportRTW: probe PCI %04x:%04x\n",
           device->configRead16(kIOPCIConfigVendorID),
           device->configRead16(kIOPCIConfigDeviceID));
-    if (ItlRtw89::rtw89_match(device)) {
-        fHalService = new ItlRtw89;
+    if (RTWCore::rtw89_match(device)) {
+        fHalService = new RTWCore;
         device->findPCICapability(PCI_CAP_ID_MSIX, &msixCap);
         device->findPCICapability(PCI_CAP_ID_MSI, &msiCap);
         IOLog("AirportRTW-RTW89: probe accepted (MSI=%u MSI-X=%u); "

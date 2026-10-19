@@ -19,7 +19,7 @@
 #include <IOKit/IOUserClient.h>
 #include <IOKit/IOBufferMemoryDescriptor.h>
 #include <IOKit/network/IOEthernetInterface.h>
-#include "RTWCore.hpp"
+#include "RTWEthernetController.hpp"
 #include <ClientKit/Common.h>
 
 typedef IOReturn (*IOControlMethodAction)(OSObject * target, void *data, bool isSet);
@@ -56,7 +56,7 @@ private:
     
 private:
     task_t fTask;
-    RTWCore *fDriver;
+    RTWEthernetController *fDriver;
     IOEthernetInterface *fInf;
     struct _ifnet *fIfp;
     ItlDriverController *fDriverController;

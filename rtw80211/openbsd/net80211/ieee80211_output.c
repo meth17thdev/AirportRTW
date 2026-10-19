@@ -1381,7 +1381,11 @@ ieee80211_get_probe_req(struct ieee80211com *ic, struct ieee80211_node *ni)
 	u_int8_t *frm;
 
 	m = ieee80211_getmgmt(MBUF_DONTWAIT, MT_DATA,
+#ifdef AIRPORT_WCL
+        2 + (ic->ic_wcl_scan_requested ? ic->ic_wcl_scan_ssid_length : ic->ic_des_esslen) +
+#else
 	    2 + ic->ic_des_esslen +
+#endif
 	    2 + min(rs->rs_nrates, IEEE80211_RATE_SIZE) +
 	    ((rs->rs_nrates > IEEE80211_RATE_SIZE) ?
 		2 + rs->rs_nrates - IEEE80211_RATE_SIZE : 0) +
@@ -1391,7 +1395,13 @@ ieee80211_get_probe_req(struct ieee80211com *ic, struct ieee80211_node *ni)
 		return NULL;
 
 	frm = mtod(m, u_int8_t *);
+#ifdef AIRPORT_WCL
+    frm = ic->ic_wcl_scan_requested ?
+        ieee80211_add_ssid(frm, ic->ic_wcl_scan_ssid, ic->ic_wcl_scan_ssid_length) :
+        ieee80211_add_ssid(frm, ic->ic_des_essid, ic->ic_des_esslen);
+#else
 	frm = ieee80211_add_ssid(frm, ic->ic_des_essid, ic->ic_des_esslen);
+#endif
 	frm = ieee80211_add_rates(frm, rs);
 	if (rs->rs_nrates > IEEE80211_RATE_SIZE)
 		frm = ieee80211_add_xrates(frm, rs);

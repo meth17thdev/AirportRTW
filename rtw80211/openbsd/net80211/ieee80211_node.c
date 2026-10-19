@@ -828,6 +828,14 @@ ieee80211_reset_scan(struct _ifnet *ifp)
     
     memcpy(ic->ic_chan_scan, ic->ic_chan_active,
            sizeof(ic->ic_chan_active));
+#ifdef AIRPORT_WCL
+    if (ic->ic_wcl_scan_requested && ic->ic_wcl_scan_restricted) {
+        for (unsigned channel = 0; channel <= IEEE80211_CHAN_MAX; ++channel)
+            if (channel >= sizeof(ic->ic_wcl_scan_channels) * 8 ||
+                !isset(ic->ic_wcl_scan_channels, channel))
+                clrbit(ic->ic_chan_scan, channel);
+    }
+#endif
     /* NB: hack, setup so next_scan starts with the first channel */
     if (ic->ic_bss != NULL && ic->ic_bss->ni_chan == IEEE80211_CHAN_ANYC)
         ic->ic_bss->ni_chan = &ic->ic_channels[IEEE80211_CHAN_MAX];
@@ -890,6 +898,10 @@ ieee80211_begin_scan(struct _ifnet *ifp)
     ieee80211_setmode(ic, (enum ieee80211_phymode)ic->ic_curmode);
     
     ic->ic_scan_count = 0;
+#ifdef AIRPORT_WCL
+    if (ic->ic_wcl_scan_requested && !ic->ic_wcl_scan_active)
+        ic->ic_flags &= ~IEEE80211_F_ASCAN;
+#endif
     
     /* Scan the next channel. */
     ieee80211_next_scan(ifp);
@@ -1055,6 +1067,10 @@ ieee80211_match_bss(struct ieee80211com *ic, struct ieee80211_node *ni,
     u_int8_t rate;
     int fail;
     
+#ifdef AIRPORT_WCL
+    if (!ic->ic_wcl_join_requested)
+        return IEEE80211_NODE_ASSOCFAIL_ESSID;
+#endif
     fail = 0;
     if ((ic->ic_flags & IEEE80211_F_BGSCAN) == 0 &&
         isclr(ic->ic_chan_active, ieee80211_chan2ieee(ic, ni->ni_chan)))
@@ -1418,6 +1434,13 @@ ieee80211_end_scan(struct _ifnet *ifp)
     if (ic->ic_opmode == IEEE80211_M_STA)
         ieee80211_clean_inactive_nodes(ic, IEEE80211_INACT_SCAN);
     
+#ifdef AIRPORT_WCL
+    if (!ic->ic_wcl_join_requested && !bgscan) {
+        ic->ic_flags &= ~IEEE80211_F_ASCAN;
+        ieee80211_new_state(ic, IEEE80211_S_INIT, -1);
+        return;
+    }
+#endif
     ni = RB_MIN(ieee80211_tree, &ic->ic_tree);
     
 #ifndef IEEE80211_STA_ONLY

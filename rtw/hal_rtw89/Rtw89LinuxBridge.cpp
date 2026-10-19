@@ -271,6 +271,24 @@ void rtw89LinuxDetach(Rtw89PciTransport *transport,
     bzero(context->macAddress, sizeof(context->macAddress));
 }
 
+bool rtw89LinuxSetMacAddress(Rtw89LinuxContext *context, const uint8_t address[6])
+{
+    if (!context || !address || context->started || context->interfaceAdded ||
+        (address[0] & 1))
+        return false;
+    uint8_t bits = 0;
+    for (unsigned i = 0; i < 6; ++i)
+        bits |= address[i];
+    auto *vif = static_cast<struct ieee80211_vif *>(context->vif);
+    if (!bits || !vif)
+        return false;
+    // add_interface copies these into the device's MAC table. The immutable
+    // context->macAddress remains the permanent address read from efuse.
+    memcpy(vif->addr, address, sizeof(vif->addr));
+    memcpy(vif->bss_conf.addr, address, sizeof(vif->bss_conf.addr));
+    return true;
+}
+
 bool rtw89LinuxPowerUp(Rtw89LinuxContext *context)
 {
     if (!context)

@@ -45,7 +45,7 @@ bool ItlNetworkUserClient::start(IOService *provider)
 //    IOLog("start\n");
     if( !super::start( provider ))
         return false;
-    fDriver = OSDynamicCast(RTWCore, provider);
+    fDriver = OSDynamicCast(RTWEthernetController, provider);
     fInf = fDriver->getNetworkInterface();
     fIfp = fDriver->getIfp();
     fDriverInfo = fDriver->fHalService->getDriverInfo();

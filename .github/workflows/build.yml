@@ -1,0 +1,66 @@
+name: Build AirportRTW
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: macos-15-intel
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [Catalina, 'Big Sur', Monterey, Ventura, Sonoma14.0, Sonoma14.4, Sequoia, Tahoe]
+        configuration: [Debug, Release]
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install pinned MacKernelSDK
+        uses: actions/checkout@v4
+        with:
+          repository: acidanthera/MacKernelSDK
+          ref: 3f750085caa17ec3a7880f11c11bf4f48cd6a164
+          path: MacKernelSDK
+      - name: Validate source and protocol layouts
+        run: |
+          python3 tools/validate_rtw89_backend.py
+          mkdir -p build/tests
+          for abi in 150200 260000; do
+            xcrun clang++ -std=c++14 -Wall -Wextra -Werror \
+              -D__MAC_15_2=150200 -D__IO80211_TARGET=$abi \
+              tests/wcl_protocol_test.cpp -o build/tests/wcl-$abi
+            build/tests/wcl-$abi
+          done
+      - name: Build target
+        env:
+          PLATFORM: ${{ matrix.platform }}
+          CONFIGURATION: ${{ matrix.configuration }}
+        run: |
+          set -euo pipefail
+          mkdir -p logs
+          bash scripts/build_release_kexts.sh "AirportRTW-$PLATFORM" > logs/build.log 2>&1 || {
+            tail -100 logs/build.log
+            exit 1
+          }
+      - name: Check bundle
+        env:
+          PLATFORM: ${{ matrix.platform }}
+          CONFIGURATION: ${{ matrix.configuration }}
+        run: |
+          bundle="build/releases/$CONFIGURATION/$PLATFORM/AirportRTW.kext"
+          test -f "$bundle/Contents/MacOS/AirportRTW"
+          plutil -lint "$bundle/Contents/Info.plist"
+          mkdir -p artifacts
+          ditto -c -k --keepParent "$bundle" "artifacts/AirportRTW-$PLATFORM-$CONFIGURATION.zip"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: AirportRTW-${{ matrix.platform }}-${{ matrix.configuration }}
+          path: artifacts/*.zip
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: logs-${{ matrix.platform }}-${{ matrix.configuration }}
+          path: logs

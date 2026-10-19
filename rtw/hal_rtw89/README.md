@@ -2,6 +2,8 @@
 
 This backend follows the `iwn`/`iwm`/`iwx` ownership model. Its embedded
 `rtw89_softc.sc_ic` is the authoritative OpenBSD `ieee80211com`.
+Its class and files are now named `RTWCore`. The standalone Ethernet frontend
+is `RTWEthernetController`, while its product remains `RTWCore.kext`.
 
 The Linux-derived rtw89 code below this boundary is a hardware and firmware
 library. It must not own a parallel scan cache, MLME state machine, station
@@ -41,19 +43,20 @@ RTL8852AE modules:
 - `rtw8852a_rfk`
 - `rtw8852a_rfk_table`
 
-The Xcode project is maintained by `tools/wire_rtw89_xcode.py`. It adds the
-backend to every kext source phase, applies the rtw89 compatibility prefix only
-to driver C files, and adds `10ec:8852`/`10ec:a85a` to every personality.
-Running it repeatedly is safe.
+The Xcode project's backend C++ source coverage is maintained by
+`tools/wire_rtw89_xcode.py`. Linux-derived C modules are compiled separately by
+`scripts/build_rtw89_c_archive.sh` with their compatibility prefix. Running the
+wiring utility repeatedly is safe; it does not regenerate OS-specific frontends.
 
 Run `python tools/validate_rtw89_backend.py` before moving the checkout to a
-Mac. It verifies source-phase coverage, per-file compatibility flags, PCI
-personalities, Xcode project structure, and byte-for-byte embedded firmware
-integrity.
+Mac. It verifies target/source coverage and frontend isolation, PCI personalities,
+Xcode project structure, C archive inputs, and embedded firmware integrity.
+See `docs/NATIVE_WIFI_PORT.md` for the experimental Sequoia/Tahoe frontend and
+the separate AppleVTD/DMA review.
 
 ## macOS validation
 
-Build the desired `AirportRTW` or `AirportRTW` scheme in Xcode. Before loading,
+Build the desired OS target with `scripts/build_release_kexts.sh`. Before loading,
 confirm the machine reports PCI ID `10ec:8852` (or `10ec:a85a`) and remove any
 other Realtek Wi-Fi kext that claims it. The first hardware pass should verify:
 

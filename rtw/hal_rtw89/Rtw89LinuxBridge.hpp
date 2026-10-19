@@ -85,6 +85,7 @@ bool rtw89LinuxAttach(Rtw89PciTransport *transport,
 void rtw89LinuxDetach(Rtw89PciTransport *transport,
                       Rtw89LinuxContext *context);
 bool rtw89LinuxPowerUp(Rtw89LinuxContext *context);
+bool rtw89LinuxSetMacAddress(Rtw89LinuxContext *context, const uint8_t address[6]);
 void rtw89LinuxPowerDown(Rtw89LinuxContext *context);
 
 bool rtw89LinuxSetChannel(Rtw89LinuxContext *context, uint16_t channel);

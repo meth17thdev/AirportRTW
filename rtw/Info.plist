@@ -25,7 +25,7 @@
 			<key>CFBundleIdentifier</key>
 			<string>com.senmiko.RTWCore</string>
 			<key>IOClass</key>
-			<string>RTWCore</string>
+			<string>RTWEthernetController</string>
 			<key>IOMatchCategory</key>
 			<string>IODefaultMatchCategory</string>
 			<key>IOPCIPrimaryMatch</key>
