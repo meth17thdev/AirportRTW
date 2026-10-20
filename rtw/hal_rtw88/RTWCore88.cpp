@@ -1,5 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
-#include "RTW88Core.hpp"
+#include "RTWCore88.hpp"
 #include "Rtw88PciTransport.hpp"
 
 #include <IOKit/IOLib.h>
@@ -12,8 +12,8 @@ void ieee80211_recv_assoc_resp(struct ieee80211com *, mbuf_t,
 #include <IOKit/network/IONetworkMedium.h>
 #include <net80211/ieee80211_crypto.h>
 
-#define super ItlHalService
-OSDefineMetaClassAndStructors(RTW88Core, ItlHalService)
+#define super RTWCore
+OSDefineMetaClassAndStructors(RTWCore88, RTWCore)
 
 namespace {
 constexpr UInt16 kRealtekVendor = 0x10ec;
@@ -25,7 +25,7 @@ constexpr UInt16 kRtl8821CEAlternate = 0xb821;
 constexpr uint32_t kRtw88TxQueueSize = 256;
 }
 
-bool RTW88Core::rtw88_match(IOPCIDevice *device)
+bool RTWCore88::rtw88_match(IOPCIDevice *device)
 {
     if (!device)
         return false;
@@ -35,7 +35,7 @@ bool RTW88Core::rtw88_match(IOPCIDevice *device)
     return RealtekHal::family(vendor, product) == RealtekHal::Family::RTW88;
 }
 
-bool RTW88Core::attach(IOPCIDevice *device)
+bool RTWCore88::attach(IOPCIDevice *device)
 {
     IOLog("AirportRTW-RTW88: attach begin\n");
     device->setProperty("RTWHALStage", "PCI ID match");
@@ -54,7 +54,7 @@ bool RTW88Core::attach(IOPCIDevice *device)
 
     device->setProperty("RTWHALStage", "scan dwell timer");
     scanDwellTimer = IOTimerEventSource::timerEventSource(
-        this, &RTW88Core::scanDwellExpired);
+        this, &RTWCore88::scanDwellExpired);
     if (!scanDwellTimer)
         goto fail;
     if (getMainWorkLoop()->addEventSource(scanDwellTimer) != kIOReturnSuccess) {
@@ -65,7 +65,7 @@ bool RTW88Core::attach(IOPCIDevice *device)
 
     device->setProperty("RTWHALStage", "association recovery timer");
     associationRecoveryTimer = IOTimerEventSource::timerEventSource(
-        this, &RTW88Core::associationRecoveryExpired);
+        this, &RTWCore88::associationRecoveryExpired);
     if (!associationRecoveryTimer)
         goto fail;
     if (getMainWorkLoop()->addEventSource(associationRecoveryTimer) !=
@@ -138,7 +138,7 @@ fail:
     return false;
 }
 
-void RTW88Core::detach(IOPCIDevice *device)
+void RTWCore88::detach(IOPCIDevice *device)
 {
     (void)device;
     IOLog("AirportRTW-RTW88: detach begin\n");
@@ -166,7 +166,7 @@ void RTW88Core::detach(IOPCIDevice *device)
     pciDevice = nullptr;
 }
 
-IOReturn RTW88Core::enable(IONetworkInterface *interface)
+IOReturn RTWCore88::enable(IONetworkInterface *interface)
 {
     (void)interface;
     IOLog("AirportRTW-RTW88: Wi-Fi enable begin\n");
@@ -208,7 +208,7 @@ IOReturn RTW88Core::enable(IONetworkInterface *interface)
     return kIOReturnSuccess;
 }
 
-IOReturn RTW88Core::disable(IONetworkInterface *interface)
+IOReturn RTWCore88::disable(IONetworkInterface *interface)
 {
     (void)interface;
     IOLog("AirportRTW-RTW88: Wi-Fi disable begin\n");
@@ -235,57 +235,40 @@ IOReturn RTW88Core::disable(IONetworkInterface *interface)
     return kIOReturnSuccess;
 }
 
-void RTW88Core::free()
+void RTWCore88::free()
 {
     detach(pciDevice);
     super::free();
 }
 
-const char *RTW88Core::getFirmwareVersion()
-{
-    return "AirportRTW 2.1.0";
-}
-
-int16_t RTW88Core::getBSSNoise()
-{
-    /* AirportRTW's Apple80211 result path negates this HAL value.  Return
-     * the positive magnitude so asr_noise is exported as -95 dBm. */
-    return 95;
-}
-
-const char *RTW88Core::getFirmwareName()
+const char *RTWCore88::getFirmwareName()
 {
     return sc.sc_fwname;
 }
 
-UInt32 RTW88Core::supportedFeatures()
-{
-    return kIONetworkFeatureMultiPages;
-}
-
-const char *RTW88Core::getFirmwareCountryCode()
+const char *RTWCore88::getFirmwareCountryCode()
 {
     return sc.sc_country;
 }
 
-uint32_t RTW88Core::getTxQueueSize()
+uint32_t RTWCore88::getTxQueueSize()
 {
     return kRtw88TxQueueSize;
 }
 
-void RTW88Core::clearScanningFlags()
+void RTWCore88::clearScanningFlags()
 {
     sc.sc_flags &= ~RTW88_FLAG_SCANNING;
 }
 
-IOReturn RTW88Core::setMulticastList(IOEthernetAddress *addresses, int count)
+IOReturn RTWCore88::setMulticastList(IOEthernetAddress *addresses, int count)
 {
     (void)addresses;
     rtw88LinuxSetAllMulticast(&linuxContext, count > 0);
     return kIOReturnSuccess;
 }
 
-bool RTW88Core::attachNet80211()
+bool RTWCore88::attachNet80211()
 {
     if (!linuxContext.hardware)
         return false;
@@ -393,14 +376,14 @@ bool RTW88Core::attachNet80211()
     return true;
 }
 
-void RTW88Core::watchdog(struct _ifnet *ifp)
+void RTWCore88::watchdog(struct _ifnet *ifp)
 {
     /* The Linux RTW88 core schedules its own periodic maintenance work.
      * AirportRTW still expects every HAL to expose a BSD watchdog hook. */
     auto *sc = ifp ? static_cast<struct rtw88_softc *>(ifp->if_softc) : nullptr;
     if (!sc)
         return;
-    auto *owner = container_of(sc, RTW88Core, sc);
+    auto *owner = container_of(sc, RTWCore88, sc);
     if (sc->sc_ic.ic_state == IEEE80211_S_RUN) {
         if (owner->associationRunWatchdogTicks < 5)
             ++owner->associationRunWatchdogTicks;
@@ -635,9 +618,9 @@ void RTW88Core::watchdog(struct _ifnet *ifp)
                             (UInt64)owner->lastReceiveSignalRaw, 8);
 }
 
-void RTW88Core::scanDwellExpired(OSObject *object, IOTimerEventSource *timer)
+void RTWCore88::scanDwellExpired(OSObject *object, IOTimerEventSource *timer)
 {
-    auto *owner = OSDynamicCast(RTW88Core, object);
+    auto *owner = OSDynamicCast(RTWCore88, object);
     if (!owner || timer != owner->scanDwellTimer ||
         !(owner->sc.sc_flags & RTW88_FLAG_ENABLED) ||
         owner->sc.sc_ic.ic_state != IEEE80211_S_SCAN)
@@ -645,10 +628,10 @@ void RTW88Core::scanDwellExpired(OSObject *object, IOTimerEventSource *timer)
     ieee80211_next_scan(&owner->sc.sc_ic.ic_if);
 }
 
-void RTW88Core::associationRecoveryExpired(OSObject *object,
+void RTWCore88::associationRecoveryExpired(OSObject *object,
                                            IOTimerEventSource *timer)
 {
-    auto *owner = OSDynamicCast(RTW88Core, object);
+    auto *owner = OSDynamicCast(RTWCore88, object);
     if (!owner || timer != owner->associationRecoveryTimer ||
         !owner->associationRecoveryPending ||
         !(owner->sc.sc_flags & RTW88_FLAG_ENABLED) ||
@@ -664,12 +647,12 @@ void RTW88Core::associationRecoveryExpired(OSObject *object,
     ieee80211_begin_scan(&owner->sc.sc_ic.ic_if);
 }
 
-void RTW88Core::start(struct _ifnet *ifp)
+void RTWCore88::start(struct _ifnet *ifp)
 {
     auto *sc = static_cast<struct rtw88_softc *>(ifp->if_softc);
     if (!sc || !(ifp->if_flags & IFF_RUNNING))
         return;
-    auto *owner = container_of(sc, RTW88Core, sc);
+    auto *owner = container_of(sc, RTWCore88, sc);
     __sync_fetch_and_add(&owner->startCallCount, 1);
     struct ieee80211com *ic = &sc->sc_ic;
 
@@ -743,9 +726,9 @@ void RTW88Core::start(struct _ifnet *ifp)
     }
 }
 
-void RTW88Core::resumeTransmit(void *opaque)
+void RTWCore88::resumeTransmit(void *opaque)
 {
-    auto *owner = static_cast<RTW88Core *>(opaque);
+    auto *owner = static_cast<RTWCore88 *>(opaque);
     if (!owner || !(owner->sc.sc_flags & RTW88_FLAG_ENABLED))
         return;
     struct _ifnet *ifp = &owner->sc.sc_ic.ic_if;
@@ -755,11 +738,11 @@ void RTW88Core::resumeTransmit(void *opaque)
     start(ifp);
 }
 
-void RTW88Core::receive(void *opaque, const uint8_t *frame, size_t length,
+void RTWCore88::receive(void *opaque, const uint8_t *frame, size_t length,
                        int32_t rssi, uint16_t frequency, bool decrypted,
                        bool ivStripped)
 {
-    auto *owner = static_cast<RTW88Core *>(opaque);
+    auto *owner = static_cast<RTWCore88 *>(opaque);
     if (!owner || !frame || length < 2)
         return;
     const bool controlFrame = (frame[0] & IEEE80211_FC0_TYPE_MASK) == IEEE80211_FC0_TYPE_CTL;
@@ -825,7 +808,7 @@ void RTW88Core::receive(void *opaque, const uint8_t *frame, size_t length,
         (frameSubtype == IEEE80211_FC0_SUBTYPE_BEACON ||
          frameSubtype == IEEE80211_FC0_SUBTYPE_PROBE_RESP)) {
         __sync_fetch_and_add(&owner->beaconProbeCount, 1);
-        IOLog("RTW88Core: scan RX subtype 0x%02x len %lu rssi %d freq %u\n",
+        IOLog("RTWCore88: scan RX subtype 0x%02x len %lu rssi %d freq %u\n",
               frameSubtype, (unsigned long)length, (int)rssi, frequency);
     }
     const int networkPriority = splnet();
@@ -891,7 +874,7 @@ void RTW88Core::receive(void *opaque, const uint8_t *frame, size_t length,
     splx(networkPriority);
 }
 
-void RTW88Core::detachNet80211()
+void RTWCore88::detachNet80211()
 {
     if (!(sc.sc_flags & RTW88_FLAG_ATTACHED))
         return;
@@ -899,13 +882,13 @@ void RTW88Core::detachNet80211()
     sc.sc_flags &= ~RTW88_FLAG_ATTACHED;
 }
 
-int RTW88Core::newstate(struct ieee80211com *ic,
+int RTWCore88::newstate(struct ieee80211com *ic,
                        enum ieee80211_state state, int arg)
 {
     auto *sc = static_cast<struct rtw88_softc *>(ic->ic_if.if_softc);
     if (!sc || !sc->sc_newstate)
         return ENXIO;
-    auto *owner = container_of(sc, RTW88Core, sc);
+    auto *owner = container_of(sc, RTWCore88, sc);
     const enum ieee80211_state previous = ic->ic_state;
     struct ieee80211_node *node = ic->ic_bss;
     bool beganScan = false;
@@ -935,7 +918,7 @@ int RTW88Core::newstate(struct ieee80211com *ic,
         node && node->ni_chan && node->ni_chan != IEEE80211_CHAN_ANYC) {
         const uint16_t channel = ieee80211_chan2ieee(ic, node->ni_chan);
         __sync_fetch_and_add(&owner->scanChannelCount, 1);
-        IOLog("RTW88Core: scan channel %u\n", channel);
+        IOLog("RTWCore88: scan channel %u\n", channel);
         if (channel && !rtw88LinuxSetChannel(&owner->linuxContext, channel)) {
             if (beganScan) {
                 rtw88LinuxScanEnd(&owner->linuxContext);
@@ -1071,7 +1054,7 @@ int RTW88Core::newstate(struct ieee80211com *ic,
     return 0;
 }
 
-int RTW88Core::setKey(struct ieee80211com *ic, struct ieee80211_node *node,
+int RTWCore88::setKey(struct ieee80211com *ic, struct ieee80211_node *node,
                      struct ieee80211_key *key)
 {
     if (!ic || !key)
@@ -1084,7 +1067,7 @@ int RTW88Core::setKey(struct ieee80211com *ic, struct ieee80211_node *node,
     auto *sc = static_cast<struct rtw88_softc *>(ic->ic_if.if_softc);
     if (!sc)
         return ENXIO;
-    auto *owner = container_of(sc, RTW88Core, sc);
+    auto *owner = container_of(sc, RTWCore88, sc);
     Rtw88NativeCipher cipher;
     switch (key->k_cipher) {
     case IEEE80211_CIPHER_WEP40: cipher = Rtw88CipherWEP40; break;
@@ -1101,7 +1084,7 @@ int RTW88Core::setKey(struct ieee80211com *ic, struct ieee80211_node *node,
     return 0;
 }
 
-void RTW88Core::deleteKey(struct ieee80211com *ic, struct ieee80211_node *node,
+void RTWCore88::deleteKey(struct ieee80211com *ic, struct ieee80211_node *node,
                          struct ieee80211_key *key)
 {
     if (!ic || !key)
@@ -1113,26 +1096,26 @@ void RTW88Core::deleteKey(struct ieee80211com *ic, struct ieee80211_node *node,
     auto *sc = static_cast<struct rtw88_softc *>(ic->ic_if.if_softc);
     if (!sc)
         return;
-    auto *owner = container_of(sc, RTW88Core, sc);
+    auto *owner = container_of(sc, RTWCore88, sc);
     rtw88LinuxDeleteKey(&owner->linuxContext, key->k_id,
                         (key->k_flags & IEEE80211_KEY_GROUP) == 0);
 }
 
-void RTW88Core::updateSlot(struct ieee80211com *ic)
+void RTWCore88::updateSlot(struct ieee80211com *ic)
 {
     if (!ic)
         return;
     auto *sc = static_cast<struct rtw88_softc *>(ic->ic_if.if_softc);
-    auto *owner = container_of(sc, RTW88Core, sc);
+    auto *owner = container_of(sc, RTWCore88, sc);
     rtw88LinuxUpdateSlot(&owner->linuxContext,
                          (ic->ic_flags & IEEE80211_F_SHSLOT) != 0);
 }
-void RTW88Core::updateEdca(struct ieee80211com *ic)
+void RTWCore88::updateEdca(struct ieee80211com *ic)
 {
     if (!ic)
         return;
     auto *sc = static_cast<struct rtw88_softc *>(ic->ic_if.if_softc);
-    auto *owner = container_of(sc, RTW88Core, sc);
+    auto *owner = container_of(sc, RTWCore88, sc);
     /* OpenBSD order is BE/BK/VI/VO; mac80211 order is VO/VI/BE/BK. */
     static const uint8_t linuxAccessClass[EDCA_NUM_AC] = {
         2, 3, 1, 0
@@ -1146,48 +1129,48 @@ void RTW88Core::updateEdca(struct ieee80211com *ic)
     }
 }
 
-int RTW88Core::ampduRxStart(struct ieee80211com *ic,
+int RTWCore88::ampduRxStart(struct ieee80211com *ic,
                            struct ieee80211_node *node, uint8_t tid)
 {
     if (!ic || !node || tid >= IEEE80211_NUM_TID)
         return EINVAL;
     auto *sc = static_cast<struct rtw88_softc *>(ic->ic_if.if_softc);
-    auto *owner = container_of(sc, RTW88Core, sc);
+    auto *owner = container_of(sc, RTWCore88, sc);
     struct ieee80211_rx_ba *ba = &node->ni_rx_ba[tid];
     return rtw88LinuxAmpduStart(&owner->linuxContext, tid, true,
                                 ba->ba_winstart, ba->ba_winsize) ? 0 : EIO;
 }
 
-void RTW88Core::ampduRxStop(struct ieee80211com *ic,
+void RTWCore88::ampduRxStop(struct ieee80211com *ic,
                            struct ieee80211_node *node, uint8_t tid)
 {
     (void)node;
     if (!ic)
         return;
     auto *sc = static_cast<struct rtw88_softc *>(ic->ic_if.if_softc);
-    auto *owner = container_of(sc, RTW88Core, sc);
+    auto *owner = container_of(sc, RTWCore88, sc);
     rtw88LinuxAmpduStop(&owner->linuxContext, tid, true);
 }
 
-int RTW88Core::ampduTxStart(struct ieee80211com *ic,
+int RTWCore88::ampduTxStart(struct ieee80211com *ic,
                            struct ieee80211_node *node, uint8_t tid)
 {
     if (!ic || !node || tid >= IEEE80211_NUM_TID)
         return EINVAL;
     auto *sc = static_cast<struct rtw88_softc *>(ic->ic_if.if_softc);
-    auto *owner = container_of(sc, RTW88Core, sc);
+    auto *owner = container_of(sc, RTWCore88, sc);
     struct ieee80211_tx_ba *ba = &node->ni_tx_ba[tid];
     return rtw88LinuxAmpduStart(&owner->linuxContext, tid, false,
                                 ba->ba_winstart, 64) ? 0 : EIO;
 }
 
-void RTW88Core::ampduTxStop(struct ieee80211com *ic,
+void RTWCore88::ampduTxStop(struct ieee80211com *ic,
                            struct ieee80211_node *node, uint8_t tid)
 {
     (void)node;
     if (!ic)
         return;
     auto *sc = static_cast<struct rtw88_softc *>(ic->ic_if.if_softc);
-    auto *owner = container_of(sc, RTW88Core, sc);
+    auto *owner = container_of(sc, RTWCore88, sc);
     rtw88LinuxAmpduStop(&owner->linuxContext, tid, false);
 }

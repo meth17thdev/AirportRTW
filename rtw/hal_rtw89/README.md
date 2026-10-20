@@ -2,7 +2,7 @@
 
 This backend follows the `iwn`/`iwm`/`iwx` ownership model. Its embedded
 `rtw89_softc.sc_ic` is the authoritative OpenBSD `ieee80211com`.
-Its class and files are now named `RTWCore`. The standalone Ethernet frontend
+Its class and files are named `RTWCore89`. The standalone Ethernet frontend
 is `RTWEthernetController`, while its product remains `RTWCore.kext`.
 
 The Linux-derived rtw89 code below this boundary is a hardware and firmware

@@ -2,8 +2,8 @@
 #ifndef AIRPORTRTW_REALTEK_HAL_FACTORY_HPP
 #define AIRPORTRTW_REALTEK_HAL_FACTORY_HPP
 #include "RealtekPciIds.hpp"
-#include "../../rtw/hal_rtw89/RTWCore.hpp"
-#include "../../rtw/hal_rtw88/RTW88Core.hpp"
+#include "../../rtw/hal_rtw89/RTWCore89.hpp"
+#include "../../rtw/hal_rtw88/RTWCore88.hpp"
 
 inline ItlHalService *createRealtekHal(IOPCIDevice *device)
 {
@@ -14,10 +14,10 @@ inline ItlHalService *createRealtekHal(IOPCIDevice *device)
     switch (family) {
     case RealtekHal::Family::RTW88:
         device->setProperty("RTWHALFamily", "RTW88");
-        return new RTW88Core;
+        return new RTWCore88;
     case RealtekHal::Family::RTW89:
         device->setProperty("RTWHALFamily", "RTW89");
-        return new RTWCore;
+        return new RTWCore89;
     default: return nullptr;
     }
 }

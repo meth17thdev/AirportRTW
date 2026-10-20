@@ -881,7 +881,7 @@ getRSSI(OSObject *object,
         rd->rssi[0] = rd->aggregate_rssi
         = rd->rssi_ext[0]
         = rd->aggregate_rssi_ext
-        = -(0 - RTW89_MIN_DBM - ic->ic_bss->ni_rssi);
+        = -(0 - RTW_MIN_DBM - ic->ic_bss->ni_rssi);
         return kIOReturnSuccess;
     }
     return 6;
@@ -1497,7 +1497,7 @@ getSCAN_RESULT(OSObject *object, struct apple80211_scan_result **sr)
     result->asr_channel.flags = ieeeChanFlag2appleScanFlagVentura(fNextNodeToSend->ni_chan->ic_flags);
 #endif
     result->asr_noise = -fHalService->getDriverInfo()->getBSSNoise();
-    result->asr_rssi = -(0 - RTW89_MIN_DBM - fNextNodeToSend->ni_rssi);
+    result->asr_rssi = -(0 - RTW_MIN_DBM - fNextNodeToSend->ni_rssi);
     memcpy(result->asr_bssid, fNextNodeToSend->ni_bssid, IEEE80211_ADDR_LEN);
     result->asr_ssid_len = fNextNodeToSend->ni_esslen;
     if (result->asr_ssid_len != 0)
@@ -1616,7 +1616,7 @@ getLINK_CHANGED_EVENT_DATA(OSObject *object, struct apple80211_link_changed_even
         ed->voluntary = disassocIsVoluntary;
         ed->reason = APPLE80211_LINK_DOWN_REASON_DEAUTH;
     } else
-        ed->rssi = -(0 - RTW89_MIN_DBM - ic->ic_bss->ni_rssi);
+        ed->rssi = -(0 - RTW_MIN_DBM - ic->ic_bss->ni_rssi);
     XYLog("Link %s, reason: %d, voluntary: %d\n", ed->isLinkDown ? "down" : "up", ed->reason, ed->voluntary);
     return kIOReturnSuccess;
 }

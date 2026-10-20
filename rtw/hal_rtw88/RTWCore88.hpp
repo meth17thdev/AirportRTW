@@ -1,32 +1,27 @@
 /* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
-#ifndef RTW88Core_hpp
-#define RTW88Core_hpp
+#ifndef RTWCore88_hpp
+#define RTWCore88_hpp
 
 #include <compat.h>
 #include <IOKit/network/IOEthernetInterface.h>
 #include <IOKit/pci/IOPCIDevice.h>
 #include <IOKit/IOTimerEventSource.h>
 
-#include <HAL/ItlDriverController.hpp>
-#include <HAL/ItlDriverInfo.hpp>
-#include <HAL/ItlHalService.hpp>
+#include "../RTWCore.hpp"
 
 #include "if_rtw88var.h"
 #include "Rtw88LinuxBridge.hpp"
 
 class Rtw88PciTransport;
 
-constexpr int RTW88_MIN_DBM = -100;
 
 /*
  * Realtek RTW88 PCIe HAL.  This class deliberately has the same public shape as the
  * Intel HALs.  sc.sc_ic is the sole owner of scan, node, MLME and key state.
  * The imported rtw88/mac80211 objects are used only to operate hardware.
  */
-class RTW88Core : public ItlHalService,
-                 public ItlDriverInfo,
-                 public ItlDriverController {
-    OSDeclareDefaultStructors(RTW88Core)
+class RTWCore88 : public RTWCore {
+    OSDeclareDefaultStructors(RTWCore88)
 
 public:
     static bool rtw88_match(IOPCIDevice *device);
@@ -39,17 +34,11 @@ public:
     void free() override;
 
     struct ieee80211com *get80211Controller() override { return &sc.sc_ic; }
-    ItlDriverInfo *getDriverInfo() override { return this; }
-    ItlDriverController *getDriverController() override { return this; }
 
-    const char *getFirmwareVersion() override;
-    int16_t getBSSNoise() override;
-    bool is5GBandSupport() override { return true; }
     int getTxNSS() override { return pciDevice &&
         (pciDevice->configRead16(kIOPCIConfigDeviceID) == 0xc821 ||
          pciDevice->configRead16(kIOPCIConfigDeviceID) == 0xb821) ? 1 : 2; }
     const char *getFirmwareName() override;
-    UInt32 supportedFeatures() override;
     const char *getFirmwareCountryCode() override;
     uint32_t getTxQueueSize() override;
 
@@ -116,4 +105,4 @@ private:
     volatile UInt64 associationRecoverySuccessCount {0};
 };
 
-#endif /* RTW88Core_hpp */
+#endif /* RTWCore88_hpp */

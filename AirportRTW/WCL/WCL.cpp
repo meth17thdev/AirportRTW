@@ -341,7 +341,7 @@ void AirportRTWSkywalkInterface::publishWCLBeacon(const ieee80211_node *node, co
     metadata->ssidLength = node->ni_esslen;
     memcpy(metadata->ssid, node->ni_essid, node->ni_esslen);
     memcpy(metadata->bssid, node->ni_bssid, 6);
-    metadata->rssi = RTW89_MIN_DBM + node->ni_rssi;
+    metadata->rssi = RTW_MIN_DBM + node->ni_rssi;
     metadata->interval = node->ni_intval;
     metadata->capability = node->ni_capinfo;
     metadata->flags = AirportWCL::SSIDPresent | AirportWCL::RSSIValid;

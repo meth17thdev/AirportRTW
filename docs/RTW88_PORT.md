@@ -2,7 +2,7 @@
 
 Initial hardware target: **RTL8822CE**, PCI IDs `10ec:c822` and `10ec:c82f`.
 The RTW88 HAL is now included alongside RTW89 in the normal Tahoe/Sequoia
-kext. The shared frontend selects RTW88Core or RTWCore from the PCI ID.
+kext. The shared frontend selects RTWCore88 or RTWCore89 from the PCI ID.
 Earlier separate-variant build notes below are historical. Hardware tests
 remain pending. See `rtw/hal_rtw88/README.md` for build and installation details.
 

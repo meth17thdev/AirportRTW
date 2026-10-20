@@ -37,9 +37,9 @@ def main():
         target = targets[name]
         modern = os_name in {"Sequoia", "Tahoe"}
         sources = source_paths(project, target)
-        for backend in ["RTWCore.cpp", "Rtw89LinuxBridge.cpp", "Rtw89PciTransport.cpp"]:
+        for backend in ["RTWCore.cpp", "RTWCore89.cpp", "Rtw89LinuxBridge.cpp", "Rtw89PciTransport.cpp"]:
             require(sum(Path(s).name == backend for s in sources) == 1, f"{name}: missing/duplicate {backend}")
-        for backend in ["RTW88Core.cpp", "Rtw88LinuxBridge.cpp", "Rtw88PciTransport.cpp"]:
+        for backend in ["RTWCore88.cpp", "Rtw88LinuxBridge.cpp", "Rtw88PciTransport.cpp"]:
             require(sum(Path(s).name == backend for s in sources) == 1, f"{name}: missing/duplicate RTW88 {backend}")
         require(("AirportRTW/WCL/WCL.cpp" in sources) == modern, f"{name}: WCL source isolation")
         for frontend in ["AirportRTWV2.cpp", "AirportRTWSkywalkInterface.cpp"]:
@@ -102,6 +102,13 @@ def main():
         if re.search(r'\bclass RTWCore\s*:', path.read_text(encoding="utf-8")):
             classes.append(path)
     require(len(classes) == 1, "RTWCore HAL name collides with another class")
+    for family in ['88', '89']:
+        header = (ROOT / f"rtw/hal_rtw{family}/RTWCore{family}.hpp").read_text()
+        require(f'class RTWCore{family} : public RTWCore' in header,
+                f'RTW{family} must inherit the shared Realtek HAL')
+    shared = (ROOT / 'rtw/RTWCore.hpp').read_text()
+    require('hal_rtw88/' not in shared and 'hal_rtw89/' not in shared,
+            'Shared RTWCore must not depend on concrete hardware backends')
     print(f"OK: {len(names)} OS targets; frontend isolation; schemes; archive inputs; {firmware_count} firmware blobs")
 
 

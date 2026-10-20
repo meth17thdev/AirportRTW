@@ -58,8 +58,10 @@ def main():
             require('com.apple.iokit.IO80211FamilyLegacy' not in plist['OSBundleLibraries'], 'Unexpected legacy stack')
             binary=bundle/'Contents/MacOS/AirportRTW'
             symbols=subprocess.check_output(['nm',str(binary)],text=True)
-            require('_rtw8822c_hw_spec' in symbols and 'RTW88Core' in symbols, 'Missing RTW88 implementation')
-            require('_rtw89_pci_probe' in symbols and 'RTWCore' in symbols, 'RTW89 backend missing from combined kext')
+            require('_ZN7RTWCore10gMetaClassE' in symbols,
+                    'Missing shared RTWCore base class')
+            require('_rtw8822c_hw_spec' in symbols and 'RTWCore88' in symbols, 'Missing RTW88 implementation')
+            require('_rtw89_pci_probe' in symbols and 'RTWCore89' in symbols, 'RTW89 backend missing from combined kext')
             require('_airportrtw88_rtw_pci_probe' in symbols, 'RTW88 probe is not isolated')
             unresolved=subprocess.check_output(['nm','-u',str(binary)],text=True)
             require(not any(line.strip().startswith(('_rtw','_airportrtw88')) for line in unresolved.splitlines()), 'Unresolved backend symbols')

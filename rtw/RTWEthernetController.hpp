@@ -26,7 +26,7 @@
 #include <libkern/c++/OSMetaClass.h>
 #include <IOKit/IOFilterInterruptEventSource.h>
 
-#include "hal_rtw89/RTWCore.hpp"
+#include "RTWCore.hpp"
 
 enum
 {

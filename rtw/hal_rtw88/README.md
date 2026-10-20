@@ -9,7 +9,7 @@ RTL8821CE (10ec:c821/b821). Existing RTW89 matching remains available. Unknown
 IDs and other PCI vendors are rejected. This does not add every RTW88 chipset;
 USB and SDIO are outside this PCIe backend.
 
-`RTW88Core` owns its net80211 controller and forwards hardware operations through
+`RTWCore88` owns its net80211 controller and forwards hardware operations through
 `Rtw88LinuxBridge` and `Rtw88PciTransport`. The existing net80211 scan, MLME,
 security and replay logic and native frontend are retained. The donor's
 independent `RTW88IEEE80211` state machine is not imported.

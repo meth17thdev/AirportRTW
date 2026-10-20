@@ -56,7 +56,10 @@ does not implement off-channel background scans; private MAC changes are wired t
 HE/Wi-Fi 6 is not advertised by the new frontend. WPA3-only,
 mandatory PMF and AWDL/AirDrop are not established features of this port.
 
-The shared frontend selects `RTWCore` (RTW89) or `RTW88Core` (RTW88).
+The shared frontend selects `RTWCore89` (RTW89) or `RTWCore88` (RTW88).
+`rtw/RTWCore.hpp/.cpp` contains the shared abstract HAL, driver interfaces,
+firmware version label, noise reporting and common network features. Chip state
+and hardware callbacks stay in the family directories.
 Both backends are included in each OS-specific kext; RTW88 C symbols are private
 to avoid collisions with RTW89. The standalone Ethernet controller class is
 `RTWEthernetController`, retaining the `RTWCore.kext` product name.
