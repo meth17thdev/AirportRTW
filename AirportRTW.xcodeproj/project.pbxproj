@@ -785,8 +785,8 @@
 		F8D94CDC2B9ABFE20081A3C4 /* ItlHalService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F8D364F624F93AFD0029340B /* ItlHalService.cpp */; };
 		F8D94CED2B9ABFE20081A3C4 /* IOPCIEDeviceWrapper.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F8A0287D2A4A80EA00C6DE90 /* IOPCIEDeviceWrapper.cpp */; };
 		F8D94CF02B9ABFE20081A3C4 /* libkmod.a in Frameworks */ = {isa = PBXBuildFile; fileRef = 5088ECBC252884870068A63D /* libkmod.a */; };
-		F8E49A14249B923500BE6868 /* ItlNetworkUserClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F8E49A12249B923500BE6868 /* ItlNetworkUserClient.cpp */; };
-		F8E49A15249B923500BE6868 /* ItlNetworkUserClient.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F8E49A13249B923500BE6868 /* ItlNetworkUserClient.hpp */; };
+		F8E49A14249B923500BE6868 /* RTWNetworkUserClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F8E49A12249B923500BE6868 /* RTWNetworkUserClient.cpp */; };
+		F8E49A15249B923500BE6868 /* RTWNetworkUserClient.hpp in Headers */ = {isa = PBXBuildFile; fileRef = F8E49A13249B923500BE6868 /* RTWNetworkUserClient.hpp */; };
 		F8F7EA3A252D834600520FD4 /* IO80211VirtualInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = F8F7EA34252D834500520FD4 /* IO80211VirtualInterface.h */; };
 		F8F7EA3B252D834600520FD4 /* IO80211VirtualInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = F8F7EA34252D834500520FD4 /* IO80211VirtualInterface.h */; };
 		F8F7EA3C252D834600520FD4 /* IO80211VirtualInterface.h in Headers */ = {isa = PBXBuildFile; fileRef = F8F7EA34252D834500520FD4 /* IO80211VirtualInterface.h */; };
@@ -1447,8 +1447,8 @@
 		F8D76361244F21BB00DEA040 /* pm.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = pm.cpp; sourceTree = "<group>"; };
 		F8D94CF52B9ABFE20081A3C4 /* AirportRTW.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AirportRTW.kext; sourceTree = BUILT_PRODUCTS_DIR; };
 		F8E3806526D533D400568FEB /* iwlwifi-ty-a0-gf-a0.pnvm */ = {isa = PBXFileReference; lastKnownFileType = file; path = "iwlwifi-ty-a0-gf-a0.pnvm"; sourceTree = "<group>"; };
-		F8E49A12249B923500BE6868 /* ItlNetworkUserClient.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = ItlNetworkUserClient.cpp; sourceTree = "<group>"; };
-		F8E49A13249B923500BE6868 /* ItlNetworkUserClient.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = ItlNetworkUserClient.hpp; sourceTree = "<group>"; };
+		F8E49A12249B923500BE6868 /* RTWNetworkUserClient.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = RTWNetworkUserClient.cpp; sourceTree = "<group>"; };
+		F8E49A13249B923500BE6868 /* RTWNetworkUserClient.hpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.h; path = RTWNetworkUserClient.hpp; sourceTree = "<group>"; };
 		F8EE4D1A241786B0002FA666 /* FwData.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = FwData.h; sourceTree = "<group>"; };
 		F8F7EA34252D834500520FD4 /* IO80211VirtualInterface.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IO80211VirtualInterface.h; sourceTree = "<group>"; };
 		F8F7EA35252D834500520FD4 /* IO80211Controller.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = IO80211Controller.h; sourceTree = "<group>"; };
@@ -1651,8 +1651,8 @@
 				024A07B123FCBC3C009FBA6C /* RTWEthernetController.cpp */,
 				024A07B323FCBC3C009FBA6C /* Info.plist */,
 				F8D76361244F21BB00DEA040 /* pm.cpp */,
-				F8E49A12249B923500BE6868 /* ItlNetworkUserClient.cpp */,
-				F8E49A13249B923500BE6868 /* ItlNetworkUserClient.hpp */,
+				F8E49A12249B923500BE6868 /* RTWNetworkUserClient.cpp */,
+				F8E49A13249B923500BE6868 /* RTWNetworkUserClient.hpp */,
 			);
 			path = rtw;
 			sourceTree = "<group>";
@@ -2026,7 +2026,7 @@
 				024A084C23FCBC6C009FBA6C /* chacha_private.h in Headers */,
 				024A083B23FCBC6C009FBA6C /* arc4.h in Headers */,
 				024A084623FCBC6C009FBA6C /* aes.h in Headers */,
-				F8E49A15249B923500BE6868 /* ItlNetworkUserClient.hpp in Headers */,
+				F8E49A15249B923500BE6868 /* RTWNetworkUserClient.hpp in Headers */,
 				F8C2EC632408031A007A9422 /* ieee80211.h in Headers */,
 				024A085623FCBC6C009FBA6C /* cmac.h in Headers */,
 				F8F9257E240974EF0088B8D5 /* bitfield.h in Headers */,
@@ -2334,6 +2334,7 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = 024A07B623FCBC3C009FBA6C /* Build configuration list for PBXNativeTarget "RTWCore" */;
 			buildPhases = (
+				A89C00012F00000000000001 /* Build RTW89 C Archive */,
 				024A07A723FCBC3C009FBA6C /* Headers */,
 				024A07A823FCBC3C009FBA6C /* Sources */,
 				024A07A923FCBC3C009FBA6C /* Frameworks */,
@@ -2851,7 +2852,7 @@
 				024A084E23FCBC6C009FBA6C /* chachapoly.c in Sources */,
 				F8F9EDE1240B7415009CB8E7 /* _task.cpp in Sources */,
 				024A085523FCBC6C009FBA6C /* key_wrap.c in Sources */,
-				F8E49A14249B923500BE6868 /* ItlNetworkUserClient.cpp in Sources */,
+				F8E49A14249B923500BE6868 /* RTWNetworkUserClient.cpp in Sources */,
 				F8C2EC6D2408031A007A9422 /* ieee80211_pae_output.c in Sources */,
 				F8C2EC5E2408031A007A9422 /* ieee80211_pae_input.c in Sources */,
 				024A083123FCBC6C009FBA6C /* rijndael.c in Sources */,

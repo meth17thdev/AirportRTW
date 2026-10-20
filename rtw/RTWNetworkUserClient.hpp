@@ -12,8 +12,8 @@
 * GNU General Public License for more details.
 */
 
-#ifndef ItlNetworkUserClient_hpp
-#define ItlNetworkUserClient_hpp
+#ifndef RTWNetworkUserClient_hpp
+#define RTWNetworkUserClient_hpp
 
 #include <IOKit/IOLib.h>
 #include <IOKit/IOUserClient.h>
@@ -24,9 +24,9 @@
 
 typedef IOReturn (*IOControlMethodAction)(OSObject * target, void *data, bool isSet);
 
-class ItlNetworkUserClient : public IOUserClient {
+class RTWNetworkUserClient : public IOUserClient {
     
-    OSDeclareDefaultStructors( ItlNetworkUserClient );
+    OSDeclareDefaultStructors( RTWNetworkUserClient );
     
 public:
     
@@ -68,4 +68,4 @@ protected:
 };
 
 
-#endif /* ItlNetworkUserClient_hpp */
+#endif /* RTWNetworkUserClient_hpp */

@@ -12,13 +12,13 @@
 * GNU General Public License for more details.
 */
 
-#include "ItlNetworkUserClient.hpp"
+#include "RTWNetworkUserClient.hpp"
 #include <sys/_netstat.h>
 
 #define super IOUserClient
-OSDefineMetaClassAndStructors( ItlNetworkUserClient, IOUserClient );
+OSDefineMetaClassAndStructors( RTWNetworkUserClient, IOUserClient );
 
-const IOControlMethodAction ItlNetworkUserClient::sMethods[IOCTL_ID_MAX] {
+const IOControlMethodAction RTWNetworkUserClient::sMethods[IOCTL_ID_MAX] {
     sDRIVER_INFO,
     sSTA_INFO,
     sPOWER,
@@ -34,13 +34,13 @@ const IOControlMethodAction ItlNetworkUserClient::sMethods[IOCTL_ID_MAX] {
     sNW_BSSID,
 };
 
-bool ItlNetworkUserClient::initWithTask(task_t owningTask, void *securityID, UInt32 type, OSDictionary *properties)
+bool RTWNetworkUserClient::initWithTask(task_t owningTask, void *securityID, UInt32 type, OSDictionary *properties)
 {
     fTask = owningTask;
     return super::initWithTask(owningTask, securityID, type, properties);
 }
 
-bool ItlNetworkUserClient::start(IOService *provider)
+bool RTWNetworkUserClient::start(IOService *provider)
 {
 //    IOLog("start\n");
     if( !super::start( provider ))
@@ -56,7 +56,7 @@ bool ItlNetworkUserClient::start(IOService *provider)
     return true;
 }
 
-IOReturn ItlNetworkUserClient::clientClose()
+IOReturn RTWNetworkUserClient::clientClose()
 {
 //    IOLog("clientClose\n");
     if( !isInactive())
@@ -64,19 +64,19 @@ IOReturn ItlNetworkUserClient::clientClose()
     return kIOReturnSuccess;
 }
 
-IOReturn ItlNetworkUserClient::clientDied()
+IOReturn RTWNetworkUserClient::clientDied()
 {
 //    IOLog("clientDied\n");
     return super::clientDied();
 }
 
-void ItlNetworkUserClient::stop(IOService *provider)
+void RTWNetworkUserClient::stop(IOService *provider)
 {
 //    IOLog("stop\n");
     super::stop( provider );
 }
 
-IOReturn ItlNetworkUserClient::externalMethod(uint32_t selector, IOExternalMethodArguments * arguments, IOExternalMethodDispatch * dispatch, OSObject * target, void * reference)
+IOReturn RTWNetworkUserClient::externalMethod(uint32_t selector, IOExternalMethodArguments * arguments, IOExternalMethodDispatch * dispatch, OSObject * target, void * reference)
 {
     bool isSet = selector & IOCTL_MASK;
     selector &= ~IOCTL_MASK;
@@ -91,10 +91,10 @@ IOReturn ItlNetworkUserClient::externalMethod(uint32_t selector, IOExternalMetho
     return sMethods[selector](this, data, isSet);
 }
 
-IOReturn ItlNetworkUserClient::
+IOReturn RTWNetworkUserClient::
 sDRIVER_INFO(OSObject* target, void* data, bool isSet)
 {
-    ItlNetworkUserClient *that = OSDynamicCast(ItlNetworkUserClient, target);
+    RTWNetworkUserClient *that = OSDynamicCast(RTWNetworkUserClient, target);
     ioctl_driver_info *drv_info = (ioctl_driver_info *)data;
     memset(drv_info, 0, sizeof(*drv_info));
     drv_info->version = IOCTL_VERSION;
@@ -104,10 +104,10 @@ sDRIVER_INFO(OSObject* target, void* data, bool isSet)
     return kIOReturnSuccess;
 }
 
-IOReturn ItlNetworkUserClient::
+IOReturn RTWNetworkUserClient::
 sSTA_INFO(OSObject* target, void* data, bool isSet)
 {
-    ItlNetworkUserClient *that = OSDynamicCast(ItlNetworkUserClient, target);
+    RTWNetworkUserClient *that = OSDynamicCast(RTWNetworkUserClient, target);
     struct ioctl_sta_info *st = (struct ioctl_sta_info *)data;
     struct ieee80211com *ic = that->fDriver->fHalService->get80211Controller();
     struct ieee80211_node *ic_bss = ic->ic_bss;
@@ -195,10 +195,10 @@ sSTA_INFO(OSObject* target, void* data, bool isSet)
     return kIOReturnSuccess;
 }
 
-IOReturn ItlNetworkUserClient::
+IOReturn RTWNetworkUserClient::
 sPOWER(OSObject* target, void* data, bool isSet)
 {
-    ItlNetworkUserClient *that = OSDynamicCast(ItlNetworkUserClient, target);
+    RTWNetworkUserClient *that = OSDynamicCast(RTWNetworkUserClient, target);
     struct ioctl_power *ip = (struct ioctl_power *)data;
     if (isSet) {
         if (ip->enabled) {
@@ -215,10 +215,10 @@ sPOWER(OSObject* target, void* data, bool isSet)
     return kIOReturnSuccess;
 }
 
-IOReturn ItlNetworkUserClient::
+IOReturn RTWNetworkUserClient::
 sSTATE(OSObject* target, void* data, bool isSet)
 {
-    ItlNetworkUserClient *that = OSDynamicCast(ItlNetworkUserClient, target);
+    RTWNetworkUserClient *that = OSDynamicCast(RTWNetworkUserClient, target);
     struct ioctl_state *st = (struct ioctl_state *)data;
     if (isSet) {
         return kIOReturnError;
@@ -229,10 +229,10 @@ sSTATE(OSObject* target, void* data, bool isSet)
     return kIOReturnSuccess;
 }
 
-IOReturn ItlNetworkUserClient::
+IOReturn RTWNetworkUserClient::
 sNW_BSSID(OSObject* target, void* data, bool isSet)
 {
-    ItlNetworkUserClient *that = OSDynamicCast(ItlNetworkUserClient, target);
+    RTWNetworkUserClient *that = OSDynamicCast(RTWNetworkUserClient, target);
     struct ioctl_nw_bssid *nwid = (struct ioctl_nw_bssid *)data;
     struct ieee80211com *ic = that->fDriver->fHalService->get80211Controller();
     
@@ -270,10 +270,10 @@ sNW_BSSID(OSObject* target, void* data, bool isSet)
     return kIOReturnSuccess;
 }
 
-IOReturn ItlNetworkUserClient::
+IOReturn RTWNetworkUserClient::
 sNW_ID(OSObject* target, void* data, bool isSet)
 {
-    ItlNetworkUserClient *that = OSDynamicCast(ItlNetworkUserClient, target);
+    RTWNetworkUserClient *that = OSDynamicCast(RTWNetworkUserClient, target);
     struct ioctl_nw_id *nwid = (struct ioctl_nw_id *)data;
     struct ieee80211com *ic = that->fDriver->fHalService->get80211Controller();
     
@@ -312,25 +312,25 @@ sNW_ID(OSObject* target, void* data, bool isSet)
     return kIOReturnSuccess;
 }
 
-IOReturn ItlNetworkUserClient::
+IOReturn RTWNetworkUserClient::
 sWPA_KEY(OSObject* target, void* data, bool isSet)
 {
     return kIOReturnSuccess;
 }
 
-IOReturn ItlNetworkUserClient::
+IOReturn RTWNetworkUserClient::
 sASSOCIATE(OSObject* target, void* data, bool isSet)
 {
-    ItlNetworkUserClient *that = OSDynamicCast(ItlNetworkUserClient, target);
+    RTWNetworkUserClient *that = OSDynamicCast(RTWNetworkUserClient, target);
     struct ioctl_associate *as = (struct ioctl_associate *)data;
     that->fDriver->associateSSID(as->nwid.nwid, as->wpa_key.key);
     return kIOReturnSuccess;
 }
 
-IOReturn ItlNetworkUserClient::
+IOReturn RTWNetworkUserClient::
 sDISASSOCIATE(OSObject* target, void* data, bool isSet)
 {
-    ItlNetworkUserClient *that = OSDynamicCast(ItlNetworkUserClient, target);
+    RTWNetworkUserClient *that = OSDynamicCast(RTWNetworkUserClient, target);
     struct ioctl_disassociate *dis = (struct ioctl_disassociate *)data;
     struct ieee80211com *ic = that->fDriver->fHalService->get80211Controller();
     if (ic->ic_state > IEEE80211_S_AUTH && ic->ic_bss != NULL)
@@ -344,27 +344,27 @@ sDISASSOCIATE(OSObject* target, void* data, bool isSet)
     return kIOReturnSuccess;
 }
 
-IOReturn ItlNetworkUserClient::
+IOReturn RTWNetworkUserClient::
 sJOIN(OSObject* target, void* data, bool isSet)
 {
-    ItlNetworkUserClient *that = OSDynamicCast(ItlNetworkUserClient, target);
+    RTWNetworkUserClient *that = OSDynamicCast(RTWNetworkUserClient, target);
     struct ioctl_join *join = (struct ioctl_join *)data;
     that->fDriver->joinSSID(join->nwid.nwid, join->wpa_key.key);
     return kIOReturnSuccess;
 }
 
-IOReturn ItlNetworkUserClient::
+IOReturn RTWNetworkUserClient::
 sSCAN(OSObject* target, void* data, bool isSet)
 {
-    ItlNetworkUserClient *that = OSDynamicCast(ItlNetworkUserClient, target);
+    RTWNetworkUserClient *that = OSDynamicCast(RTWNetworkUserClient, target);
     ieee80211_begin_cache_bgscan(that->fIfp);
     return kIOReturnSuccess;
 }
 
-IOReturn ItlNetworkUserClient::
+IOReturn RTWNetworkUserClient::
 sSCAN_RESULT(OSObject* target, void* data, bool isSet)
 {
-    ItlNetworkUserClient *that = OSDynamicCast(ItlNetworkUserClient, target);
+    RTWNetworkUserClient *that = OSDynamicCast(RTWNetworkUserClient, target);
     struct ioctl_network_info *ni = (struct ioctl_network_info *)data;
     ieee80211com *ic = that->fDriver->fHalService->get80211Controller();
     if (that->fNextNodeToSend == NULL) {
@@ -400,7 +400,7 @@ sSCAN_RESULT(OSObject* target, void* data, bool isSet)
     return kIOReturnSuccess;
 }
 
-IOReturn ItlNetworkUserClient::
+IOReturn RTWNetworkUserClient::
 sTX_POWER_LEVEL(OSObject* target, void* data, bool isSet)
 {
     return kIOReturnSuccess;

@@ -12,7 +12,6 @@
 * GNU General Public License for more details.
 */
 #include <compat.h>
-#include "itlhdr.h"
 #include <linux/kernel.h>
 
 #include <IOKit/network/IOEthernetController.h>
