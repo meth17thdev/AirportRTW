@@ -619,6 +619,11 @@ ieee80211_inputm(struct _ifnet *ifp, mbuf_t m, struct ieee80211_node *ni,
                 bpf_mtap(ic->ic_rawbpf, m, BPF_DIRECTION_IN);
 #endif
             
+#ifdef AIRPORT_WCL
+            if (ic->ic_opmode == IEEE80211_M_STA)
+                __sync_fetch_and_add(&ic->ic_wcl_rx_packets[
+                    hasqos ? ieee80211_wcl_ac(tid) : EDCA_AC_BE], 1);
+#endif
             if ((ni->ni_flags & IEEE80211_NODE_HT) &&
                 hasqos && (qos & IEEE80211_QOS_AMSDU))
                 ieee80211_amsdu_decap(ic, m, ni, hdrlen, ml);

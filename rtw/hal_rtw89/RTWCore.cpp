@@ -46,6 +46,7 @@ bool RTWCore::rtw89_match(IOPCIDevice *device)
 bool RTWCore::attach(IOPCIDevice *device)
 {
     IOLog("AirportRTW-RTW89: attach begin\n");
+    device->setProperty("RTWHALStage", "PCI ID match");
     if (!rtw89_match(device))
         return false;
 
@@ -54,10 +55,12 @@ bool RTWCore::attach(IOPCIDevice *device)
     const char *chipName = "embedded RTL8852A";
 
     pciDevice = device;
+    device->setProperty("RTWHALStage", "PCI transport initialization");
     transport = Rtw89PciTransport::withDevice(device, getMainWorkLoop());
     if (!transport)
         goto fail;
 
+    device->setProperty("RTWHALStage", "scan dwell timer");
     scanDwellTimer = IOTimerEventSource::timerEventSource(
         this, &RTWCore::scanDwellExpired);
     if (!scanDwellTimer)
@@ -68,6 +71,7 @@ bool RTWCore::attach(IOPCIDevice *device)
         goto fail;
     }
 
+    device->setProperty("RTWHALStage", "association recovery timer");
     associationRecoveryTimer = IOTimerEventSource::timerEventSource(
         this, &RTWCore::associationRecoveryExpired);
     if (!associationRecoveryTimer)
@@ -79,6 +83,7 @@ bool RTWCore::attach(IOPCIDevice *device)
         goto fail;
     }
 
+    device->setProperty("RTWHALStage", "Linux PCI probe/context");
     if (!rtw89LinuxAttach(transport, &linuxContext))
         goto fail;
     IOLog("AirportRTW-RTW89: Linux PCI probe complete\n");
@@ -120,11 +125,15 @@ bool RTWCore::attach(IOPCIDevice *device)
     strlcpy(sc.sc_country, "00", sizeof(sc.sc_country));
     sc.sc_noise = -95;
 
+    device->setProperty("RTWHALStage", "net80211 attach");
     if (!attachNet80211())
         goto fail_linux;
+    device->setProperty("RTWHALStage", "interrupt enable");
     transport->enableInterrupts();
+    getController()->setProperty("RTW89SoftwareCCMP", kOSBooleanFalse);
     sc.sc_flags |= RTW89_FLAG_ATTACHED;
     IOLog("AirportRTW-RTW89: attach complete\n");
+    device->setProperty("RTWHALStage", "HAL attach complete");
     return true;
 
 fail_linux:
@@ -266,7 +275,7 @@ void RTWCore::free()
 
 const char *RTWCore::getFirmwareVersion()
 {
-    return sc.sc_fwver;
+    return "AirportRTW 2.1.0";
 }
 
 int16_t RTWCore::getBSSNoise()
@@ -330,6 +339,28 @@ bool RTWCore::attachNet80211()
                     IEEE80211_HTCAP_LDPC |
                     (IEEE80211_HTCAP_SMPS_DIS << IEEE80211_HTCAP_SMPS_SHIFT);
     ic->ic_ampdu_params = IEEE80211_AMPDU_PARAM_SS_4 | 0x3;
+    Rtw89NativeCapabilities caps2 = {}, caps5 = {};
+    rtw89LinuxGetCapabilities(&linuxContext, false, caps2);
+    rtw89LinuxGetCapabilities(&linuxContext, true, caps5);
+    const auto &htCaps = caps5.ht ? caps5 : caps2;
+    if (htCaps.ht) {
+        ic->ic_htcaps = htCaps.htCaps;
+        ic->ic_ampdu_params = htCaps.ampduParams;
+        memcpy(ic->ic_sup_mcs, htCaps.htMCS, sizeof(htCaps.htMCS));
+        ic->ic_tx_mcs_set = IEEE80211_TX_MCS_SET_DEFINED;
+    }
+    if (caps5.vht) {
+        // The current native channel bridge supports contiguous widths to 80.
+        ic->ic_vhtcaps = caps5.vhtCaps &
+            ~(IEEE80211_VHTCAP_SUPP_CHAN_WIDTH_MASK | IEEE80211_VHTCAP_SHORT_GI_160);
+        ic->ic_vht_rx_mcs_map = htole16(caps5.vhtRxMCS);
+        ic->ic_vht_tx_mcs_map = htole16(caps5.vhtTxMCS);
+        for (unsigned ss = 0; ss < 8; ++ss) {
+            unsigned mcs = (caps5.vhtRxMCS >> (2 * ss)) & 3;
+            ic->ic_vht_sup_mcs[ss] = mcs == 3 ? 0 : (1U << (8 + mcs)) - 1;
+        }
+        ic->ic_flags |= IEEE80211_F_VHTON;
+    }
     ic->ic_max_rssi = 100;
     ic->ic_sup_rates[IEEE80211_MODE_11A] = ieee80211_std_rateset_11a;
     ic->ic_sup_rates[IEEE80211_MODE_11B] = ieee80211_std_rateset_11b;
@@ -352,6 +383,19 @@ bool RTWCore::attachNet80211()
             ? IEEE80211_CHAN_2GHZ | IEEE80211_CHAN_DYN |
               IEEE80211_CHAN_CCK | IEEE80211_CHAN_OFDM | IEEE80211_CHAN_HT20
             : IEEE80211_CHAN_5GHZ | IEEE80211_CHAN_OFDM | IEEE80211_CHAN_HT20;
+        const auto &bandCaps = channel <= 14 ? caps2 : caps5;
+        if (bandCaps.ht && (bandCaps.htCaps & IEEE80211_HTCAP_CBW20_40)) {
+            if (channel <= 13) {
+                if (channel <= 9) entry->ic_flags |= IEEE80211_CHAN_HT40U;
+                if (channel >= 5) entry->ic_flags |= IEEE80211_CHAN_HT40D;
+            } else if (channel != 165) {
+                entry->ic_flags |= (channel <= 144 ? (channel / 4) % 2 :
+                    ((channel - 149) / 4 + 1) % 2)
+                    ? IEEE80211_CHAN_HT40U : IEEE80211_CHAN_HT40D;
+            }
+        }
+        if (channel > 14 && channel != 165 && bandCaps.vht)
+            entry->ic_flags |= IEEE80211_CHAN_VHT80;
     }
     ic->ic_ibss_chan = &ic->ic_channels[1];
 
@@ -534,6 +578,29 @@ void RTWCore::watchdog(struct _ifnet *ifp)
     controller->setProperty("RTW89LastAssocResponseFirstIE",
                             owner->lastAssocResponseFirstIE, 16);
     controller->setProperty("RTW89AssocStatus", owner->sc.sc_ic.ic_assoc_status, 16);
+    controller->setProperty("RTW89RxCCMPReplays", owner->sc.sc_ic.ic_stats.is_ccmp_replays, 32);
+    controller->setProperty("RTW89RxCCMPIntegrityFailures", owner->sc.sc_ic.ic_stats.is_ccmp_dec_errs, 32);
+    controller->setProperty("RTW89RxHardwareDecrypted", owner->linuxContext.rxHardwareDecryptedCount, 64);
+    controller->setProperty("RTW89RxProtectedSoftware", owner->linuxContext.rxProtectedSoftwareCount, 64);
+    controller->setProperty("RTW89RxCCMPMICStripped", owner->linuxContext.rxCCMPMICStrippedCount, 64);
+    controller->setProperty("RTW89RxConnectionProtected", owner->linuxContext.rxConnectionProtectedCount, 64);
+    controller->setProperty("RTW89RxConnectionUndecrypted", owner->linuxContext.rxConnectionUndecryptedCount, 64);
+    controller->setProperty("RTW89RxConnectionInvalid", owner->linuxContext.rxConnectionInvalidCount, 64);
+    controller->setProperty("RTW89RxConnectionSNAP", owner->linuxContext.rxConnectionSNAPCount, 64);
+    controller->setProperty("RTW89RxConnectionDHCP", owner->linuxContext.rxConnectionDHCPCount, 64);
+    controller->setProperty("RTW89TxAddressMismatch", owner->linuxContext.txAddressMismatchCount, 64);
+    controller->setProperty("RTW89RxUnauthorized", owner->sc.sc_ic.ic_stats.is_rx_unauth, 32);
+    controller->setProperty("RTW89RxProtectionOff", owner->sc.sc_ic.ic_stats.is_rx_nowep, 32);
+    controller->setProperty("RTW89PortValid", owner->sc.sc_ic.ic_bss && owner->sc.sc_ic.ic_bss->ni_port_valid);
+#ifdef AIRPORT_WCL
+    uint64_t decryptedData = 0;
+    for (unsigned ac = 0; ac < 4; ++ac)
+        decryptedData += owner->sc.sc_ic.ic_wcl_rx_packets[ac];
+    controller->setProperty("RTW89RxDataAfterDecrypt", decryptedData, 64);
+#endif
+    controller->setProperty("RTW89RxDecryptFailures", owner->sc.sc_ic.ic_stats.is_rx_wepfail, 32);
+    controller->setProperty("RTW89RxUnencrypted", owner->sc.sc_ic.ic_stats.is_rx_unencrypted, 32);
+    controller->setProperty("RTW89RxDecapFailures", owner->sc.sc_ic.ic_stats.is_rx_decap, 32);
     controller->setProperty("RTW89RxMgmtDiscard",
                             owner->sc.sc_ic.ic_stats.is_rx_mgtdiscard, 32);
     controller->setProperty("RTW89RxElementTooSmall",
@@ -662,14 +729,43 @@ void RTWCore::start(struct _ifnet *ifp)
             }
         }
 
+        bool softwareEncrypted = false;
+        const auto header = mtod(m, const struct ieee80211_frame *);
+        if (header->i_fc[1] & IEEE80211_FC1_PROTECTED) {
+            auto key = node ? ieee80211_get_txkey(ic, header, node) : nullptr;
+            if (!key) {
+                ++ifp->netStat->outputErrors;
+                mbuf_freem(m);
+                if (node) ieee80211_release_node(ic, node);
+                continue;
+            }
+            if (key->k_flags & IEEE80211_KEY_SWCRYPTO) {
+                m = ieee80211_encrypt(ic, m, key);
+                if (!m) {
+                    ++ifp->netStat->outputErrors;
+                    ieee80211_release_node(ic, node);
+                    continue;
+                }
+                softwareEncrypted = true;
+            }
+        }
         const size_t length = mbuf_pkthdr_len(m);
         uint8_t *frame = static_cast<uint8_t *>(IOMalloc(length));
         if (!frame || mbuf_copydata(m, 0, length, frame) != 0 ||
             !rtw89LinuxTransmit(&owner->linuxContext, frame, length,
-                                management)) {
+                                management, softwareEncrypted)) {
             ifp->netStat->outputErrors++;
         } else {
             ifp->netStat->outputPackets++;
+#ifdef AIRPORT_WCL
+            const auto wh = reinterpret_cast<const ieee80211_frame *>(frame);
+            if (!management && !(wh->i_fc[0] & IEEE80211_FC0_SUBTYPE_NODATA)) {
+                unsigned ac = ieee80211_has_qos(wh)
+                    ? ieee80211_wcl_ac(ieee80211_get_qos(wh) & IEEE80211_QOS_TID)
+                    : EDCA_AC_BE;
+                __sync_fetch_and_add(&ic->ic_wcl_tx_packets[ac], 1);
+            }
+#endif
         }
         if (frame)
             IOFree(frame, length);
@@ -789,6 +885,20 @@ void RTWCore::receive(void *opaque, const uint8_t *frame, size_t length,
     ml_init(&list);
     const bool assocResponse = frameType == IEEE80211_FC0_TYPE_MGT &&
         frameSubtype == IEEE80211_FC0_SUBTYPE_ASSOC_RESP;
+    // Native raw-management listeners can consume Block Ack actions before
+    // net80211 sees them, just like association responses. Only dispatch
+    // ordinary, unfragmented BA actions from our associated AP here. Frames
+    // requiring management protection retain the normal validation path.
+    const bool blockAckAction = frameType == IEEE80211_FC0_TYPE_MGT &&
+        frameSubtype == IEEE80211_FC0_SUBTYPE_ACTION && length >= 26 &&
+        frame[24] == IEEE80211_CATEG_BA && (wh->i_fc[0] & 3) == 0 &&
+        wh->i_fc[1] == IEEE80211_FC1_DIR_NODS && (wh->i_seq[0] & 15) == 0 &&
+        ic->ic_state == IEEE80211_S_RUN && node == ic->ic_bss &&
+        (!(ic->ic_flags & IEEE80211_F_RSNON) || node->ni_port_valid) &&
+        !(node->ni_flags & (IEEE80211_NODE_MFP | IEEE80211_NODE_RXMGMTPROT)) &&
+        IEEE80211_ADDR_EQ(wh->i_addr1, ic->ic_myaddr) &&
+        IEEE80211_ADDR_EQ(wh->i_addr2, node->ni_bssid) &&
+        IEEE80211_ADDR_EQ(wh->i_addr3, node->ni_bssid);
     if (assocResponse) {
         owner->assocStateBeforeInput = (UInt32)ic->ic_state;
         /* IO80211's raw 802.11 BPF listener consumes this valid MLME frame
@@ -799,6 +909,9 @@ void RTWCore::receive(void *opaque, const uint8_t *frame, size_t length,
         mbuf_freem(m);
         owner->assocStateAfterInput = (UInt32)ic->ic_state;
         owner->assocStatusAfterInput = (UInt32)ic->ic_assoc_status;
+    } else if (blockAckAction) {
+        ic->ic_recv_mgmt(ic, m, node, &rxi, frameSubtype);
+        mbuf_freem(m);
     } else {
         ieee80211_inputm(&ic->ic_if, m, node, &rxi, &list);
         if_input(&ic->ic_if, &list);
@@ -844,7 +957,11 @@ int RTWCore::newstate(struct ieee80211com *ic,
         beganScan = true;
     }
 
-    if (state == IEEE80211_S_SCAN && node && node->ni_chan) {
+    // The first SCAN transition calls ieee80211_begin_scan(), which selects
+    // a channel and re-enters this wrapper. Before that, ni_chan may be ANYC.
+    // Program RF only for the per-channel SCAN -> SCAN transitions.
+    if (state == IEEE80211_S_SCAN && previous == IEEE80211_S_SCAN &&
+        node && node->ni_chan && node->ni_chan != IEEE80211_CHAN_ANYC) {
         const uint16_t channel = ieee80211_chan2ieee(ic, node->ni_chan);
         __sync_fetch_and_add(&owner->scanChannelCount, 1);
         IOLog("RTWCore: scan channel %u\n", channel);
@@ -919,9 +1036,20 @@ int RTWCore::newstate(struct ieee80211com *ic,
             qos = true;
         }
         const uint8_t nss = node->ni_rxmcs[1] ? 2 : 1;
+        Rtw89NativePeer peer = {};
+        peer.caps.htCaps = node->ni_htcaps;
+        peer.caps.ampduParams = node->ni_ampdu_param;
+        memcpy(peer.caps.htMCS, node->ni_rxmcs, sizeof(peer.caps.htMCS));
+        peer.caps.vhtCaps = node->ni_vhtcaps;
+        peer.caps.vhtRxMCS = le16toh(node->ni_vht_mcsinfo.rx_mcs_map);
+        peer.caps.vhtTxMCS = le16toh(node->ni_vht_mcsinfo.tx_mcs_map);
+        peer.widthMHz = node->ni_chw == IEEE80211_CHAN_WIDTH_80 ? 80 :
+            node->ni_chw == IEEE80211_CHAN_WIDTH_40 ? 40 : 20;
+        peer.centerFrequency = peer.widthMHz == 20 ? node->ni_chan->ic_freq :
+            node->ni_chan->ic_center_freq1;
         if (!rtw89LinuxAssociate(&owner->linuxContext, node->ni_bssid, aid,
                                  node->ni_capinfo, channel, node->ni_intval,
-                                 node->ni_dtimperiod, qos, ht, vht, nss)) {
+                                 node->ni_dtimperiod, qos, ht, vht, nss, peer)) {
             if (endedScan) {
                 rtw89LinuxScanBegin(&owner->linuxContext);
                 sc->sc_flags |= RTW89_FLAG_SCANNING;
@@ -977,9 +1105,9 @@ int RTWCore::setKey(struct ieee80211com *ic, struct ieee80211_node *node,
 {
     if (!ic || !key)
         return EINVAL;
-    /* RTL8852A advertises no hardware TKIP crypto.  Keep CCMP in the RTW89
-     * security CAM, but let net80211 encrypt/decrypt TKIP group traffic in
-     * software instead of passing a key the hardware will reject. */
+    // TKIP is not supported by RTL8852A hardware; CCMP uses security CAM.
+    // The Linux bridge normalizes hardware-decrypted CCMP to net80211's
+    // IV/replay/MIC contract without changing the shared crypto stack.
     if (key->k_cipher == IEEE80211_CIPHER_TKIP)
         return ieee80211_set_key(ic, node, key);
     auto *sc = static_cast<struct rtw89_softc *>(ic->ic_if.if_softc);

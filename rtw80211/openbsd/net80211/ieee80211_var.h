@@ -441,6 +441,8 @@ struct ieee80211com {
 #ifdef AIRPORT_WCL
     bool ic_wcl_mac_reconfig;
     bool ic_wcl_enterprise;
+    uint64_t ic_wcl_tx_packets[4];
+    uint64_t ic_wcl_rx_packets[4];
     bool ic_wcl_join_requested;
     bool ic_wcl_scan_requested;
     bool ic_wcl_scan_active;
@@ -727,5 +729,17 @@ struct ieee80211_ess *ieee80211_get_ess(struct ieee80211com *, const char *, int
 void ieee80211_begin_cache_bgscan(struct _ifnet *);
 
 extern	int ieee80211_cache_size;
+
+
+#ifdef AIRPORT_WCL
+static inline unsigned ieee80211_wcl_ac(unsigned tid)
+{
+    static const unsigned categories[8] = {
+        EDCA_AC_BE, EDCA_AC_BK, EDCA_AC_BK, EDCA_AC_BE,
+        EDCA_AC_VI, EDCA_AC_VI, EDCA_AC_VO, EDCA_AC_VO
+    };
+    return tid < 8 ? categories[tid] : EDCA_AC_BE;
+}
+#endif
 
 #endif /* _NET80211_IEEE80211_VAR_H_ */

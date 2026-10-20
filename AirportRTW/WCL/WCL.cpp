@@ -79,7 +79,12 @@ bool AirportRTWSkywalkInterface::initWCL()
     joinTimer = IOTimerEventSource::timerEventSource(this, wclJoinTimeout);
     if (!joinTimer)
         return false;
-    return instance->getWorkQueue()->addEventSource(joinTimer) == kIOReturnSuccess;
+    if (instance->getWorkQueue()->addEventSource(joinTimer) != kIOReturnSuccess)
+        return false;
+    wclJoinLock = IOSimpleLockAlloc();
+    wclJoinMessageTimer = IOTimerEventSource::timerEventSource(this, drainWCLJoinMessages);
+    return wclJoinLock && wclJoinMessageTimer &&
+        instance->getWorkQueue()->addEventSource(wclJoinMessageTimer) == kIOReturnSuccess;
 }
 
 void AirportRTWSkywalkInterface::stopWCL()
@@ -93,6 +98,17 @@ void AirportRTWSkywalkInterface::stopWCL()
         if (joinTimer->getWorkLoop())
             joinTimer->getWorkLoop()->removeEventSource(joinTimer);
         OSSafeReleaseNULL(joinTimer);
+    }
+    if (wclJoinLock) IOSimpleLockLock(wclJoinLock);
+    auto messageTimer = wclJoinMessageTimer;
+    wclJoinMessageTimer = nullptr;
+    wclJoinCount = 0;
+    if (wclJoinLock) IOSimpleLockUnlock(wclJoinLock);
+    if (messageTimer) {
+        messageTimer->cancelTimeout();
+        if (messageTimer->getWorkLoop())
+            messageTimer->getWorkLoop()->removeEventSource(messageTimer);
+        messageTimer->release();
     }
     if (scanSource)
         scanSource->cancelTimeout();
@@ -118,6 +134,10 @@ void AirportRTWSkywalkInterface::free()
 {
     if (joinTimer)
         stopWCL();
+    if (wclJoinLock) {
+        IOSimpleLockFree(wclJoinLock);
+        wclJoinLock = nullptr;
+    }
     IO80211InfraProtocol::free();
 }
 
@@ -127,6 +147,8 @@ IOReturn AirportRTWSkywalkInterface::wclCommand(OSObject *, void *a0, void *a1, 
     if (self->wclStopping)
         return kIOReturnNotReady;
     switch (uintptr_t(a1)) {
+        case 13: return self->copyWCLChannels(a2);
+        case 14: return self->copyWCLTrafficCounters(a2);
         case 12:
             self->handleWCLEvent(int(uintptr_t(a2)), nullptr);
             return kIOReturnSuccess;
@@ -187,9 +209,13 @@ IOReturn AirportRTWSkywalkInterface::setWCL_LEAVE_NETWORK(apple80211_leave_netwo
 
 IOReturn AirportRTWSkywalkInterface::beginWCLScan(apple80211ScanRequest *request)
 {
+    instance->setProperty("RTWWCLScanRequestCount", ++wclScanRequestCount, 64);
     AirportWCL::ScanRequest scan;
-    if (!AirportWCL::decodeScan(request, 0x1550, scan))
+    if (!AirportWCL::decodeScan(request, 0x1550, scan)) {
+        instance->setProperty("RTWWCLScanDecodeFailed", kOSBooleanTrue);
         return kIOReturnBadArgument;
+    }
+    instance->setProperty("RTWWCLScanDecodeFailed", kOSBooleanFalse);
     ieee80211com *ic = fHalService->get80211Controller();
     if (!(ic->ic_if.if_flags & IFF_RUNNING))
         return kIOReturnNotReady;
@@ -220,11 +246,6 @@ IOReturn AirportRTWSkywalkInterface::beginWCLScan(apple80211ScanRequest *request
     scanSource->setTimeoutMS(20000);
     if (ic->ic_state == IEEE80211_S_RUN) {
         if (!ic->ic_bgscan_start) {
-            ieee80211_node *node;
-            RB_FOREACH(node, ieee80211_tree, &ic->ic_tree) {
-                if (node->ni_rsnie_tlv && node->ni_rsnie_tlv_len)
-                    publishWCLBeacon(node, node->ni_rsnie_tlv, node->ni_rsnie_tlv_len);
-            }
             scanCompleted = true;
             finishWCLScan(kIOReturnSuccess);
             return kIOReturnSuccess;
@@ -255,8 +276,36 @@ void AirportRTWSkywalkInterface::finishWCLScan(IOReturn status)
     scanPending = false;
     scanCompleted = false;
     scanSource->cancelTimeout();
-    fHalService->get80211Controller()->ic_wcl_scan_requested = false;
-    instance->postMessage(this, AirportWCL::ScanDone, &status, sizeof(status), true);
+    auto ic = fHalService->get80211Controller();
+    // RX callbacks run outside the native PostOffice gate. Replay the retained
+    // scan cache here, in the same gated context that accepts ScanDone, and
+    // always publish the results before the completion message.
+    if (status == kIOReturnSuccess) {
+        ieee80211_node *node;
+        RB_FOREACH(node, ieee80211_tree, &ic->ic_tree) {
+            if (!node->ni_chan || node->ni_chan == IEEE80211_CHAN_ANYC ||
+                !node->ni_rsnie_tlv || !node->ni_rsnie_tlv_len)
+                continue;
+            unsigned channel = ieee80211_chan2ieee(ic, node->ni_chan);
+            if (!AirportWCL::scanChannelSelected(ic->ic_wcl_scan_channels,
+                                                ic->ic_wcl_scan_restricted, channel))
+                continue;
+            if (ic->ic_wcl_scan_ssid_length &&
+                (node->ni_esslen != ic->ic_wcl_scan_ssid_length ||
+                 memcmp(node->ni_essid, ic->ic_wcl_scan_ssid, node->ni_esslen)))
+                continue;
+            publishWCLBeacon(node, node->ni_rsnie_tlv, node->ni_rsnie_tlv_len);
+        }
+    }
+    ic->ic_wcl_scan_requested = false;
+    instance->setProperty("RTWWCLBeaconEventCount", wclBeaconEventCount, 64);
+    instance->setProperty("RTWWCLScanPublishCount", wclScanPublishCount, 64);
+    instance->setProperty("RTWWCLScanInvalidIECount", wclScanInvalidIECount, 64);
+    instance->setProperty("RTWWCLScanInvalidChannelCount", wclScanInvalidChannelCount, 64);
+    instance->setProperty("RTWWCLScanLastPostStatus", uint64_t(wclLastScanPostStatus), 32);
+    instance->setProperty("RTWWCLScanCompletionStatus", uint64_t(status), 32);
+    IOReturn posted = instance->postMessage(this, AirportWCL::ScanDone, &status, sizeof(status), true);
+    instance->setProperty("RTWWCLScanDonePostStatus", uint64_t(posted), 32);
 }
 
 void AirportRTWSkywalkInterface::completeWCLScan()
@@ -267,14 +316,20 @@ void AirportRTWSkywalkInterface::completeWCLScan()
 
 void AirportRTWSkywalkInterface::publishWCLBeacon(const ieee80211_node *node, const uint8_t *ies, size_t length)
 {
-    if (!node || node->ni_esslen > 32 || !AirportWCL::validIEs(ies, length))
+    if (!node || node->ni_esslen > 32 || !AirportWCL::validIEs(ies, length)) {
+        ++wclScanInvalidIECount;
         return;
+    }
     ieee80211com *ic = fHalService->get80211Controller();
-    if (!node->ni_chan || node->ni_chan == IEEE80211_CHAN_ANYC)
+    if (!node->ni_chan || node->ni_chan == IEEE80211_CHAN_ANYC) {
+        ++wclScanInvalidChannelCount;
         return;
+    }
     unsigned channel = ieee80211_chan2ieee(ic, node->ni_chan);
-    if (!channel || channel > 196)
+    if (!channel || channel > 196) {
+        ++wclScanInvalidChannelCount;
         return;
+    }
     size_t size = sizeof(AirportWCL::BeaconMetadata) + length;
     auto metadata = static_cast<AirportWCL::BeaconMetadata *>(IOMalloc(size));
     if (!metadata)
@@ -301,7 +356,13 @@ void AirportRTWSkywalkInterface::publishWCLBeacon(const ieee80211_node *node, co
             memcpy(wclBssInfo, metadata, messageSize);
         }
     }
-    instance->postMessage(this, AirportWCL::ScanResult, metadata, messageSize, true);
+    // Keep associated BSS snapshots above up to date on RX, but defer scan
+    // delivery until the native gate is held. finishWCLScan replays the cache.
+    if (instance->getWorkQueue()->inGate()) {
+        ++wclScanPublishCount;
+        wclLastScanPostStatus = instance->postMessage(this, AirportWCL::ScanResult,
+                                                    metadata, messageSize, true);
+    }
     IOFree(metadata, size);
 }
 
@@ -512,6 +573,72 @@ void AirportRTWSkywalkInterface::resumeWCLJoin()
     }
 }
 
+// RX callbacks may hold net80211 locks. Copy into a bounded preallocated
+// FIFO instead of synchronously acquiring the native gate from that context.
+// Periodic LQM/beacon-health updates need the same gate as join events.
+IOReturn AirportRTWSkywalkInterface::postWCLJoinMessage(unsigned message, void *data, size_t size)
+{
+    if (!wclJoinLock || wclStopping)
+        return kIOReturnNotReady;
+    if (size > sizeof(wclJoinMessages[0].payload) || (size && !data))
+        return kIOReturnBadArgument;
+    IOSimpleLockLock(wclJoinLock);
+    if (wclJoinCount == 32 || wclStopping || !wclJoinMessageTimer) {
+        IOSimpleLockUnlock(wclJoinLock);
+        return kIOReturnNoResources;
+    }
+    auto &entry = wclJoinMessages[(wclJoinHead + wclJoinCount) % 32];
+    entry.type = message;
+    entry.length = size;
+    if (size) memcpy(entry.payload, data, size);
+    ++wclJoinCount;
+    auto timer = wclJoinMessageTimer;
+    timer->retain();
+    IOSimpleLockUnlock(wclJoinLock);
+    timer->setTimeoutMS(0);
+    timer->release();
+    return kIOReturnSuccess;
+}
+
+void AirportRTWSkywalkInterface::drainWCLJoinMessages(OSObject *owner, IOTimerEventSource *)
+{
+    auto self = static_cast<AirportRTWSkywalkInterface *>(owner);
+    while (!self->wclStopping) {
+        JoinMessage entry;
+        IOSimpleLockLock(self->wclJoinLock);
+        if (!self->wclJoinCount) {
+            IOSimpleLockUnlock(self->wclJoinLock);
+            break;
+        }
+        entry = self->wclJoinMessages[self->wclJoinHead];
+        self->wclJoinHead = (self->wclJoinHead + 1) % 32;
+        --self->wclJoinCount;
+        IOSimpleLockUnlock(self->wclJoinLock);
+        self->deliverWCLJoinMessage(entry.type, entry.payload, entry.length);
+    }
+}
+
+IOReturn AirportRTWSkywalkInterface::deliverWCLJoinMessage(unsigned message, void *data, size_t size)
+{
+    IOReturn status = instance->postMessage(this, message, data, size, true);
+    const char *property = nullptr;
+    switch (message) {
+        case AirportWCL::AssocComplete: property = "RTWWCLAssocPostStatus"; break;
+        case AirportWCL::FirstBeacon: property = "RTWWCLFirstBeaconPostStatus"; break;
+        case AirportWCL::ConnectComplete: property = "RTWWCLConnectPostStatus"; break;
+        case AirportWCL::LinkStatus: property = "RTWWCLLinkPostStatus"; break;
+        case AirportWCL::Deauth: property = "RTWWCLDeauthPostStatus"; break;
+        case AirportWCL::LqmUpdate:
+            property = "RTWWCLLqmPostStatus";
+            if (status == kIOReturnSuccess) ++wclLqmPostCount;
+            instance->setProperty("RTWWCLLqmPostCount", wclLqmPostCount, 64);
+            break;
+    }
+    if (property) instance->setProperty(property, uint64_t(status), 32);
+    instance->setProperty("RTWWCLJoinPostInGate", instance->getWorkQueue()->inGate());
+    return status;
+}
+
 void AirportRTWSkywalkInterface::finishWCLJoin(uint16_t status, uint16_t reason, IOReturn driverStatus)
 {
     if (!joinPending)
@@ -525,7 +652,7 @@ void AirportRTWSkywalkInterface::finishWCLJoin(uint16_t status, uint16_t reason,
     joinDeferred = false;
     explicit_bzero(&deferredJoin, sizeof(deferredJoin));
     joinTimer->cancelTimeout();
-    instance->postMessage(this, AirportWCL::ConnectComplete, &event, sizeof(event), true);
+    postWCLJoinMessage(AirportWCL::ConnectComplete, &event, sizeof(event));
     if (status) {
         ieee80211com *ic = fHalService->get80211Controller();
         ic->ic_wcl_join_requested = false;
@@ -587,7 +714,7 @@ void AirportRTWSkywalkInterface::handleWCLLink(bool up)
         event.reason = 255;
         wclLinkIndicated = false;
         wclBssValid = false;
-        instance->postMessage(this, AirportWCL::LinkStatus, &event, sizeof(event), true);
+        postWCLJoinMessage(AirportWCL::LinkStatus, &event, sizeof(event));
     }
     if (up && joinPending && firstBeaconNotified)
         finishWCLJoin(0, 0, kIOReturnSuccess);
@@ -652,6 +779,7 @@ void AirportRTWSkywalkInterface::handleWCLEvent(int code, void *data)
             break;
         }
         case IEEE80211_EVT_BEACON: {
+            ++wclBeaconEventCount;
             auto beacon = static_cast<ieee80211_beacon_event *>(data);
             if (!beacon)
                 break;
@@ -677,16 +805,16 @@ void AirportRTWSkywalkInterface::handleWCLEvent(int code, void *data)
                         AirportWCL::SequoiaLqmUpdate update = {};
                         update.rssiValid = 1;
                         update.rssi = rssi.aggregate_rssi;
-                        instance->postMessage(this, AirportWCL::LqmUpdate,
-                            &update, sizeof(update), true);
+                        postWCLJoinMessage(AirportWCL::LqmUpdate,
+                            &update, sizeof(update));
                     }
 #else
                     AirportWCL::LqmBeaconUpdate update;
                     if (AirportWCL::makeBeaconUpdate(
                             wclLqmBeacons - wclLqmReportedBeacons, update)) {
-                        instance->postMessage(this, AirportWCL::LqmUpdate,
-                            &update, sizeof(update), true);
-                        wclLqmReportedBeacons = wclLqmBeacons;
+                        if (postWCLJoinMessage(AirportWCL::LqmUpdate,
+                                &update, sizeof(update)) == kIOReturnSuccess)
+                            wclLqmReportedBeacons = wclLqmBeacons;
                     }
 #endif
                 }
@@ -706,8 +834,8 @@ void AirportRTWSkywalkInterface::handleWCLEvent(int code, void *data)
                 link.up = 1;
                 link.reason = 255;
                 wclLinkIndicated = true;
-                instance->postMessage(this, AirportWCL::LinkStatus, &link, sizeof(link), true);
-                instance->postMessage(this, AirportWCL::FirstBeacon, &event, sizeof(event), true);
+                postWCLJoinMessage(AirportWCL::LinkStatus, &link, sizeof(link));
+                postWCLJoinMessage(AirportWCL::FirstBeacon, &event, sizeof(event));
                 if (portAuthorized)
                     finishWCLJoin(0, 0, kIOReturnSuccess);
             }
@@ -730,7 +858,7 @@ void AirportRTWSkywalkInterface::handleWCLEvent(int code, void *data)
                 memcpy(event.bssid, joinBSSID, 6);
                 event.driverStatus = event.status ? kIOReturnError : kIOReturnSuccess;
                 assocNotified = !event.status;
-                instance->postMessage(this, AirportWCL::AssocComplete, &event, sizeof(event), true);
+                postWCLJoinMessage(AirportWCL::AssocComplete, &event, sizeof(event));
                 if (event.status)
                     finishWCLJoin(event.status, 0, kIOReturnError);
             }
@@ -740,7 +868,7 @@ void AirportRTWSkywalkInterface::handleWCLEvent(int code, void *data)
             event.reason = ic->ic_deauth_reason;
             if (ic->ic_bss)
                 memcpy(event.bssid, ic->ic_bss->ni_bssid, 6);
-            instance->postMessage(this, AirportWCL::Deauth, &event, sizeof(event), true);
+            postWCLJoinMessage(AirportWCL::Deauth, &event, sizeof(event));
             finishWCLJoin(1, event.reason, kIOReturnOffline);
             break;
         }
@@ -856,6 +984,56 @@ IOReturn AirportRTWSkywalkInterface::getWCL_LOW_LATENCY_INFO(apple80211_low_late
         return kIOReturnBadArgument;
     // No low-latency or P2P session is implemented by this adapter.
     bzero(data, 4);
+    return kIOReturnSuccess;
+}
+
+IOReturn AirportRTWSkywalkInterface::getCHANNELS_INFO(apple80211_channels_info *data)
+{
+    if (!data)
+        return kIOReturnBadArgument;
+    if (!_fCommandGate)
+        return kIOReturnNotReady;
+    return _fCommandGate->runAction(wclCommand, this, reinterpret_cast<void *>(13), data);
+}
+
+IOReturn AirportRTWSkywalkInterface::copyWCLChannels(void *data)
+{
+    auto info = static_cast<AirportWCL::NativeChannelInfo *>(data);
+    bzero(info, sizeof(*info));
+    ieee80211com *ic = fHalService->get80211Controller();
+    for (unsigned i = 1; i <= IEEE80211_CHAN_MAX; ++i) {
+        const ieee80211_channel *channel = &ic->ic_channels[i];
+        if (!isset(ic->ic_chan_active, i) || !channel->ic_freq)
+            continue;
+        AirportWCL::appendChannel(*info, i, IEEE80211_IS_CHAN_5GHZ(channel),
+            channel->ic_flags & IEEE80211_CHAN_DFS,
+            channel->ic_flags & IEEE80211_CHAN_PASSIVE,
+            IEEE80211_IS_CHAN_HT40(channel) || IEEE80211_IS_CHAN_VHT40(channel),
+            IEEE80211_IS_CHAN_VHT80(channel));
+    }
+    apple80211_country_code_data country = {};
+    if (instance->getCOUNTRY_CODE(static_cast<OSObject *>(this), &country) == kIOReturnSuccess)
+        memcpy(info->country, country.cc, sizeof(country.cc));
+    return info->count ? kIOReturnSuccess : kIOReturnNotReady;
+}
+
+IOReturn AirportRTWSkywalkInterface::getWCL_TRAFFIC_COUNTERS(apple80211_wcl_traffic_counters *data)
+{
+    if (!data)
+        return kIOReturnBadArgument;
+    if (!_fCommandGate)
+        return kIOReturnNotReady;
+    return _fCommandGate->runAction(wclCommand, this, reinterpret_cast<void *>(14), data);
+}
+
+IOReturn AirportRTWSkywalkInterface::copyWCLTrafficCounters(void *data)
+{
+    ieee80211com *ic = fHalService->get80211Controller();
+    uint64_t timestamp;
+    absolutetime_to_nanoseconds(mach_absolute_time(), &timestamp);
+    const auto counters = AirportWCL::makeTrafficCounters(
+        ic->ic_wcl_tx_packets, ic->ic_wcl_rx_packets, timestamp);
+    memcpy(data, &counters, sizeof(counters));
     return kIOReturnSuccess;
 }
 

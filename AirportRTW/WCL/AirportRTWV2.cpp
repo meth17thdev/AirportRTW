@@ -184,17 +184,22 @@ initCCLogs()
     driverLogPipe = CCPipe::withOwnerNameCapacity(this, "com.zxystd.AirportRTW", "DriverLogs", &driverLogOptions);
     XYLog("%s driverLogPipeRet %d\n", __FUNCTION__, driverLogPipe != NULL);
 #ifdef AIRPORT_WCL
-    if (!driverLogPipe || !getWorkLoop())
+    if (!driverLogPipe || !getWorkLoop()) {
+        IOLog("AirportRTW: CoreCapture DriverLogs allocation/workloop failed\n");
         return false;
+    }
     // The factory only initializes the pipe. startPipe creates its event sources.
     // Qualify the native method: do not dispatch through the legacy CCPipe header.
     driverLogPipeStarted = driverLogPipe->CCPipe::startPipe();
-    if (!driverLogPipeStarted)
+    if (!driverLogPipeStarted) {
+        IOLog("AirportRTW: CoreCapture DriverLogs startPipe failed\n");
         return false;
+    }
     CCStreamOptions loggerOptions = {};
     CCStream *logger = CCStream::withPipeAndName(driverLogPipe, "AirportRTW", &loggerOptions);
     driverLogger = OSDynamicCast(CCLogStream, logger);
     if (!driverLogger) {
+        IOLog("AirportRTW: CoreCapture DriverLogs stream cast failed\n");
         OSSafeReleaseNULL(logger);
         return false;
     }
@@ -215,11 +220,15 @@ initCCLogs()
     driverDataPathPipe = CCPipe::withOwnerNameCapacity(this, "com.zxystd.AirportRTW", "DatapathEvents", &driverLogOptions);
     XYLog("%s driverDataPathPipeRet %d\n", __FUNCTION__, driverDataPathPipe != NULL);
 #ifdef AIRPORT_WCL
-    if (!driverDataPathPipe)
+    if (!driverDataPathPipe) {
+        IOLog("AirportRTW: CoreCapture DatapathEvents allocation failed\n");
         return false;
+    }
     driverDataPathPipeStarted = driverDataPathPipe->CCPipe::startPipe();
-    if (!driverDataPathPipeStarted)
+    if (!driverDataPathPipeStarted) {
+        IOLog("AirportRTW: CoreCapture DatapathEvents startPipe failed\n");
         return false;
+    }
 #endif
 
     memset(&driverLogOptions, 0, sizeof(driverLogOptions));
@@ -232,11 +241,15 @@ initCCLogs()
     driverSnapshotsPipe = CCPipe::withOwnerNameCapacity(this, "com.zxystd.AirportRTW", "StateSnapshots", &driverLogOptions);
     XYLog("%s driverSnapshotsPipeRet %d\n", __FUNCTION__, driverSnapshotsPipe != NULL);
 #ifdef AIRPORT_WCL
-    if (!driverSnapshotsPipe)
+    if (!driverSnapshotsPipe) {
+        IOLog("AirportRTW: CoreCapture StateSnapshots allocation failed\n");
         return false;
+    }
     driverSnapshotsPipeStarted = driverSnapshotsPipe->CCPipe::startPipe();
-    if (!driverSnapshotsPipeStarted)
+    if (!driverSnapshotsPipeStarted) {
+        IOLog("AirportRTW: CoreCapture StateSnapshots startPipe failed\n");
         return false;
+    }
 #endif
 
     CCStreamOptions faultReportOptions = { 0 };
@@ -246,31 +259,48 @@ initCCLogs()
     driverFaultStream = CCStream::withPipeAndName(driverSnapshotsPipe, "FaultReporter", &faultReportOptions);
     CCDataStream *dataStream = OSDynamicCast(CCDataStream, driverFaultStream);
     if (!dataStream || !_fWorkloop) {
+        IOLog("AirportRTW: CoreCapture FaultReporter data stream/workloop failed\n");
         return false;
     }
     driverCoreFaultReporter = CCFaultReporter::withStreamWorkloop(dataStream, _fWorkloop);
     if (!driverCoreFaultReporter) {
+        IOLog("AirportRTW: CoreCapture CCFaultReporter factory failed\n");
         return false;
     }
     driverFaultReporter = IO80211FaultReporter::allocWithParams(driverCoreFaultReporter);
     if (!OSDynamicCast(CommonFaultReporter, driverFaultReporter)) {
+        IOLog("AirportRTW: CoreCapture IO80211FaultReporter factory/cast failed\n");
         return false;
     }
 #else
     driverFaultReporter = CCStream::withPipeAndName(driverSnapshotsPipe, "FaultReporter", &faultReportOptions);
 #endif
+    IOLog("AirportRTW: CoreCapture setup complete\n");
     XYLog("%s driverFaultReporterRet %d\n", __FUNCTION__, driverFaultReporter != NULL);
     return driverLogPipe && driverDataPathPipe && driverSnapshotsPipe && driverFaultReporter;
 }
 
 bool AirportRTW::start(IOService *provider)
 {
+    // Record progress on the PCI wrapper: it survives controller start failure,
+    // unlike properties on this controller or the finite kernel log buffer.
+    auto stage = [provider](const char *name) {
+        provider->setProperty("RTWStartupStage", name);
+        IOLog("AirportRTW: startup stage: %s\n", name);
+    };
+    provider->setProperty("RTWStartupDiagnostics", "Tahoe-startup-v2");
+    provider->setProperty("RTWStartupFailed", kOSBooleanFalse);
+    stage("OS version check");
 #if __IO80211_TARGET == __MAC_15_2
-    if (version_major != 24 || version_minor < 2)
+    if (version_major != 24 || version_minor < 2) {
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
+    }
 #elif __IO80211_TARGET == __MAC_26_0
-    if (version_major != 25)
+    if (version_major != 25) {
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
+    }
 #endif
     XYLog("%s\n", __PRETTY_FUNCTION__);
     struct IOSkywalkEthernetInterface::RegistrationInfo registInfo;
@@ -280,53 +310,70 @@ bool AirportRTW::start(IOService *provider)
     setProperty("built-in", OSData::withBytes(&builtIn, sizeof(builtIn)));
     setProperty("DriverKitDriver", kOSBooleanFalse);
 #ifdef AIRPORT_WCL
+    stage("CoreCapture setup");
     if (!initCCLogs()) {
+        IOLog("AirportRTW: controller startup stopped by CoreCapture failure\n");
         releaseAll();
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
 #endif
+    stage("IO80211Controller::start");
     if (!super::start(provider)) {
 #ifdef AIRPORT_WCL
         releaseAll();
 #endif
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
+    stage("PCI device setup");
     pciNub->setBusMasterEnable(true);
     pciNub->setIOEnable(true);
     pciNub->setMemoryEnable(true);
     pciNub->configWrite8(0x41, 0);
+    stage("PCI power domain");
     if (pciNub->requestPowerDomainState(kIOPMPowerOn,
                                         (IOPowerConnection *) getParentEntry(gIOPowerPlane), IOPMLowestState) != IOPMNoErr) {
         super::stop(provider);
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
+    stage("PCI power management");
     if (initPCIPowerManagment(pciNub) == false) {
         super::stop(pciNub);
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
+    stage("workqueue availability");
     if (_fWorkloop == NULL) {
         XYLog("No _fWorkloop!!\n");
         super::stop(pciNub);
         releaseAll();
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
+    stage("command gate creation");
     _fCommandGate = IOCommandGate::commandGate(this, (IOCommandGate::Action)AirportRTW::tsleepHandler);
     if (_fCommandGate == 0) {
         XYLog("No command gate!!\n");
         super::stop(pciNub);
         releaseAll();
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
+    stage("command gate registration");
     _fWorkloop->addEventSource(_fCommandGate);
     const IONetworkMedium *primaryMedium;
+    stage("network medium setup");
     if (!createMediumTables(&primaryMedium) ||
         !setCurrentMedium(primaryMedium) || !setSelectedMedium(primaryMedium)) {
         XYLog("setup medium fail\n");
         releaseAll();
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
+    stage("HAL controller initialization");
     fHalService->initWithController(this, _fWorkloop, _fCommandGate);
-    fHalService->get80211Controller()->ic_event_handler = eventHandler;
 
     if (PE_parse_boot_argn("-novht", &boot_value, sizeof(boot_value)))
         fHalService->get80211Controller()->ic_userflags |= IEEE80211_F_NOVHT;
@@ -338,34 +385,47 @@ bool AirportRTW::start(IOService *provider)
     fHalService->get80211Controller()->ic_userflags &= ~IEEE80211_F_HEON;
 #endif
 
+    stage("Realtek HAL attach");
     if (!fHalService->attach(pciNub)) {
         XYLog("attach fail\n");
         super::stop(pciNub);
         releaseAll();
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
+    // attachNet80211() zeroes ieee80211com during HAL attach. Install the
+    // native event bridge afterwards or beacon/scan-done and lifecycle events
+    // are silently lost even though hardware scanning populates the cache.
+    fHalService->get80211Controller()->ic_event_handler = eventHandler;
+    setProperty("RTWWCLEventBridgeInstalled", kOSBooleanTrue);
+    stage("watchdog workloop");
     fWatchdogWorkLoop = IOWorkLoop::workLoop();
     if (fWatchdogWorkLoop == NULL) {
         XYLog("init watchdog workloop fail\n");
         fHalService->detach(pciNub);
         super::stop(pciNub);
         releaseAll();
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
+    stage("watchdog timer");
     watchdogTimer = IOTimerEventSource::timerEventSource(this, OSMemberFunctionCast(IOTimerEventSource::Action, this, &AirportRTW::watchdogAction));
     if (!watchdogTimer) {
         XYLog("init watchdog fail\n");
         fHalService->detach(pciNub);
         super::stop(pciNub);
         releaseAll();
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
     fWatchdogWorkLoop->addEventSource(watchdogTimer);
+    stage("scan timer");
     scanSource = IOTimerEventSource::timerEventSource(this, &fakeScanDone);
 #ifdef AIRPORT_WCL
     if (!scanSource || _fWorkloop->addEventSource(scanSource) != kIOReturnSuccess) {
         super::stop(provider);
         releaseAll();
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
 #else
@@ -373,6 +433,7 @@ bool AirportRTW::start(IOService *provider)
 #endif
     scanSource->enable();
 
+    stage("Skywalk interface allocation/init");
     fNetIf = new AirportRTWSkywalkInterface;
 #ifdef AIRPORT_WCL
     if (!fNetIf || !static_cast<AirportRTWSkywalkInterface *>(fNetIf)->init(this)) {
@@ -382,31 +443,40 @@ bool AirportRTW::start(IOService *provider)
         XYLog("Skywalk interface init fail\n");
         super::stop(provider);
         releaseAll();
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
+    stage("Skywalk interface role");
     fNetIf->setInterfaceRole(1);
     fNetIf->setInterfaceId(1);
 
 #ifndef AIRPORT_WCL
+    stage("CoreCapture setup");
     if (!initCCLogs()) {
         XYLog("CCLog init fail\n");
         super::stop(provider);
         releaseAll();
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
 #endif
+    stage("Skywalk service attach");
     if (!fNetIf->attach(this)) {
         XYLog("attach to service fail\n");
         super::stop(provider);
         releaseAll();
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
+    stage("IO80211 interface attach");
     if (!attachInterface(fNetIf, this)) {
         XYLog("attach to interface fail\n");
         super::stop(provider);
         releaseAll();
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
+    stage("BSD interface attach");
     if (!IONetworkController::attachInterface((IONetworkInterface **)&bsdInterface,
 #ifdef AIRPORT_WCL
                                              false
@@ -417,40 +487,50 @@ bool AirportRTW::start(IOService *provider)
         XYLog("attach to IONetworkController interface fail\n");
         super::stop(provider);
         releaseAll();
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
     memset(&registInfo, 0, sizeof(registInfo));
+    stage("Skywalk registration info");
     if (!fNetIf->initRegistrationInfo(&registInfo, 1, sizeof(registInfo))) {
         XYLog("initRegistrationInfo fail\n");
         super::stop(provider);
         releaseAll();
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
 #ifdef AIRPORT_WCL
+    stage("Skywalk registration storage");
     fNetIf->mExpansionData->fRegistrationInfo = (struct IOSkywalkNetworkInterface::RegistrationInfo *)IOMalloc(sizeof(struct IOSkywalkNetworkInterface::RegistrationInfo));
     fNetIf->mExpansionData2->fRegistrationInfo = (struct IOSkywalkEthernetInterface::RegistrationInfo *)IOMalloc(sizeof(struct IOSkywalkEthernetInterface::RegistrationInfo));
     if (!fNetIf->mExpansionData->fRegistrationInfo || !fNetIf->mExpansionData2->fRegistrationInfo) {
         super::stop(provider);
         releaseAll();
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
     memcpy(fNetIf->mExpansionData->fRegistrationInfo, &registInfo, sizeof(registInfo));
     memcpy(fNetIf->mExpansionData2->fRegistrationInfo, &registInfo, sizeof(registInfo));
     if (fNetIf->getInterfaceRole() == 1)
         fNetIf->deferBSDAttach(true);
+    stage("Skywalk interface start");
     if (!fNetIf->start(this)) {
         super::stop(provider);
         releaseAll();
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
 
 #else
+    stage("Skywalk registration info");
     if (!fNetIf->initRegistrationInfo(&registInfo, 1, sizeof(registInfo))) {
         XYLog("initRegistrationInfo fail\n");
         super::stop(provider);
         releaseAll();
+        provider->setProperty("RTWStartupFailed", kOSBooleanTrue);
         return false;
     }
+    stage("Skywalk registration storage");
     fNetIf->mExpansionData->fRegistrationInfo = (struct IOSkywalkNetworkInterface::RegistrationInfo *)IOMalloc(sizeof(struct IOSkywalkNetworkInterface::RegistrationInfo));
     fNetIf->mExpansionData2->fRegistrationInfo = (struct IOSkywalkEthernetInterface::RegistrationInfo *)IOMalloc(sizeof(struct IOSkywalkEthernetInterface::RegistrationInfo));
     memcpy(fNetIf->mExpansionData->fRegistrationInfo, &registInfo, sizeof(registInfo));
@@ -460,13 +540,17 @@ bool AirportRTW::start(IOService *provider)
     fNetIf->start(this);
 
 #endif
+    stage("link status initialization");
     setLinkStatus(kIONetworkLinkValid);
     if (TAILQ_EMPTY(&fHalService->get80211Controller()->ic_ess))
         fHalService->get80211Controller()->ic_flags |= IEEE80211_F_AUTO_JOIN;
 #ifdef AIRPORT_WCL
+    stage("BSD interface publication");
     bsdInterface->registerService();
 #endif
+    stage("controller publication");
     registerService();
+    stage("controller startup complete");
     return true;
 }
 
@@ -820,6 +904,9 @@ IOReturn AirportRTW::setHardwareAddress(const void *addrP, UInt32 addrBytes)
 
     bool running = (ic->ic_if.if_flags & IFF_RUNNING) != 0;
     if_setlladdr(&ic->ic_if, address);
+    // if_setlladdr updates arpcom's Ethernet address, not ic_myaddr.
+    // MLME and HAL enable() must use the same private address as data TX.
+    memcpy(ic->ic_myaddr, address, ETHER_ADDR_LEN);
     if (!running)
         return kIOReturnSuccess; // enable() programs the new vif address.
 
@@ -832,6 +919,7 @@ IOReturn AirportRTW::setHardwareAddress(const void *addrP, UInt32 addrBytes)
 
     // Never report a successful address change if firmware failed to start.
     if_setlladdr(&ic->ic_if, previous);
+    memcpy(ic->ic_myaddr, previous, ETHER_ADDR_LEN);
     ifnet_set_lladdr(bsdInterface->getIfnet(), previous, sizeof(previous));
     bsdInterface->setProperty(kIOMACAddress, previous, sizeof(previous));
     ic->ic_wcl_mac_reconfig = false;

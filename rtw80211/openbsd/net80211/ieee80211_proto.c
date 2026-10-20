@@ -1494,6 +1494,13 @@ justcleanup:
 			ic->ic_mgt_timer = 0;
 			mq_purge(&ic->ic_mgtq);
 			mq_purge(&ic->ic_pwrsaveq);
+#ifdef AIRPORT_WCL
+            /* Keep discovery results for WCL's subsequent join request.
+             * Other INIT transitions still discard the node cache.
+             */
+            if (!(ostate == IEEE80211_S_SCAN &&
+                  ic->ic_wcl_scan_requested && !ic->ic_wcl_join_requested))
+#endif
 			ieee80211_free_allnodes(ic, 1);
 			break;
 		}

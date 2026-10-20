@@ -54,9 +54,15 @@ def main():
                 if ref and ref in resolved:
                     source = resolved[ref]
                     require(source.is_file() or source.name == "FwBinary.cpp", f"{name}: missing source {source}")
-        require(any("build_rtw89_c_archive.sh" in p.get("shellScript", "") for p in phases), f"{name}: no C archive phase")
+        archive_phases = [p for p in phases if "build_rtw89_c_archive.sh" in p.get("shellScript", "")]
+        require(archive_phases, f"{name}: no C archive phase")
+        for phase in archive_phases:
+            require(str(phase.get("alwaysOutOfDate")) == "1",
+                    f"{name}: C archive may reuse stale driver sources")
         for config_id in objects[target["buildConfigurationList"]]["buildConfigurations"]:
             settings = objects[config_id]["buildSettings"]
+            require("rtw80211/openbsd" in str(settings.get("HEADER_SEARCH_PATHS", "")),
+                    f"{name}: project headers must participate in dependency tracking")
             definitions = settings.get("GCC_PREPROCESSOR_DEFINITIONS", [])
             require(("AIRPORT_WCL" in definitions) == modern, f"{name}: incorrect WCL flag")
             require("librtw89_c.a" in str(settings.get("OTHER_LDFLAGS", [])), f"{name}: archive not linked")

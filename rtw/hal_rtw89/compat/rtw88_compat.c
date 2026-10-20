@@ -377,11 +377,17 @@ thread_call_t g_irq_thread_call = NULL;
  * rtw88's internal callbacks (e.g. rtw_build_rsvd_page_iter). */
 static struct ieee80211_vif *g_rtw88_vif = NULL;
 static struct ieee80211_sta *g_rtw88_sta = NULL;
+static IORecursiveLock *g_station_lock;
 
 void rtw88_register_vif(struct ieee80211_vif *vif)   { g_rtw88_vif = vif; }
 void rtw88_unregister_vif(void)                       { g_rtw88_vif = NULL; }
-void rtw88_register_sta(struct ieee80211_sta *sta)   { g_rtw88_sta = sta; }
-void rtw88_unregister_sta(void)                       { g_rtw88_sta = NULL; }
+void rtw88_register_sta(struct ieee80211_sta *sta)
+{
+    IORecursiveLockLock(g_station_lock);
+    g_rtw88_sta = sta;
+    IORecursiveLockUnlock(g_station_lock);
+}
+void rtw88_unregister_sta(void) { rtw88_register_sta(NULL); }
 
 /* Kext-registered hook fired after the IRQ bottom-half (tx_isr) has run and
  * freed TX descriptors.  Runs on the thread_call thread with no rtw88 locks
@@ -616,7 +622,14 @@ void ieee80211_iterate_active_interfaces(
 void ieee80211_iterate_stations_atomic(
     struct ieee80211_hw *hw,
     void (*iterator)(void *data, struct ieee80211_sta *sta),
-    void *data) {}
+    void *data)
+{
+    if (!g_station_lock || hw != g_rtw88_hw || !iterator) return;
+    // Unregister waits for in-flight iterators before the bridge frees sta.
+    IORecursiveLockLock(g_station_lock);
+    if (g_rtw88_sta) iterator(data, g_rtw88_sta);
+    IORecursiveLockUnlock(g_station_lock);
+}
 
 void ieee80211_iter_keys(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
     void (*iter)(struct ieee80211_hw *, struct ieee80211_vif *,
@@ -978,10 +991,11 @@ int timer_delete_sync(struct timer_list *timer)
 
 int rtw88_compat_init(void)
 {
+    g_station_lock = IORecursiveLockAlloc();
     rtw88_log_lock = IOSimpleLockAlloc();
     system_wq      = alloc_workqueue("rtw88_system_wq", 0, 0);
     system_long_wq = alloc_workqueue("rtw88_long_wq",   0, 0);
-    if (!system_wq || !system_long_wq || !rtw88_log_lock) return -ENOMEM;
+    if (!system_wq || !system_long_wq || !rtw88_log_lock || !g_station_lock) return -ENOMEM;
 
     return 0;
 }
@@ -1004,6 +1018,10 @@ void rtw88_compat_exit(void)
     g_kext_hw       = NULL;
     g_rtw88_vif     = NULL;
     g_rtw88_sta     = NULL;
+    if (g_station_lock) {
+        IORecursiveLockFree(g_station_lock);
+        g_station_lock = NULL;
+    }
     if (rtw88_log_lock) {
         IOSimpleLockFree(rtw88_log_lock);
         rtw88_log_lock = NULL;

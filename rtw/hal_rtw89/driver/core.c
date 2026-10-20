@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
 /* Copyright(c) 2019-2020  Realtek Corporation
  */
+#include "macos_probe.h"
 #include <linux/ip.h>
 #include <linux/sort.h>
 #include <linux/udp.h>
@@ -6659,18 +6660,22 @@ static int rtw89_chip_efuse_info_setup(struct rtw89_dev *rtwdev)
 	const struct rtw89_mac_gen_def *mac = rtwdev->chip->mac_def;
 	int ret;
 
+	RTW89_CHIP_STAGE("efuse-MAC-partial-init");
 	ret = rtw89_mac_partial_init(rtwdev, false);
 	if (ret)
 		return ret;
 
+	RTW89_CHIP_STAGE("efuse-map");
 	ret = mac->parse_efuse_map(rtwdev);
 	if (ret)
 		return ret;
 
+	RTW89_CHIP_STAGE("phycap-map");
 	ret = mac->parse_phycap_map(rtwdev);
 	if (ret)
 		return ret;
 
+	RTW89_CHIP_STAGE("phycap-setup");
 	ret = rtw89_mac_setup_phycap(rtwdev);
 	if (ret)
 		return ret;
@@ -6759,36 +6764,43 @@ int rtw89_chip_info_setup(struct rtw89_dev *rtwdev)
 	struct rtw89_hal *hal = &rtwdev->hal;
 	int ret;
 
+	RTW89_CHIP_STAGE("read-chip-version");
 	rtw89_read_chip_ver(rtwdev);
 
+	RTW89_CHIP_STAGE("power-on");
 	ret = rtw89_mac_pwr_on(rtwdev);
 	if (ret) {
 		rtw89_err(rtwdev, "failed to power on\n");
 		return ret;
 	}
 
+	RTW89_CHIP_STAGE("firmware-completion");
 	ret = rtw89_wait_firmware_completion(rtwdev);
 	if (ret) {
 		rtw89_err(rtwdev, "failed to wait firmware completion\n");
 		goto out;
 	}
 
+	RTW89_CHIP_STAGE("firmware-recognition");
 	ret = rtw89_fw_recognize(rtwdev);
 	if (ret) {
 		rtw89_err(rtwdev, "failed to recognize firmware\n");
 		goto out;
 	}
 
+	RTW89_CHIP_STAGE("efuse-info");
 	ret = rtw89_chip_efuse_info_setup(rtwdev);
 	if (ret)
 		goto out;
 
+	RTW89_CHIP_STAGE("firmware-elements");
 	ret = rtw89_fw_recognize_elements(rtwdev);
 	if (ret) {
 		rtw89_err(rtwdev, "failed to recognize firmware elements\n");
 		goto out;
 	}
 
+	RTW89_CHIP_STAGE("board-info");
 	ret = rtw89_chip_board_info_setup(rtwdev);
 	if (ret)
 		goto out;

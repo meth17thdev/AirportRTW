@@ -34,6 +34,12 @@ jobs:
               tests/wcl_protocol_test.cpp -o build/tests/wcl-$abi
             build/tests/wcl-$abi
           done
+          xcrun clang++ -std=c++14 -Wall -Wextra -Werror \
+            tests/rtw89_rx_layout_test.cpp -o build/tests/rtw89-rx-layout
+          build/tests/rtw89-rx-layout
+          xcrun clang++ -std=c++14 -Wall -Wextra -Werror \
+            tests/rtw89_link_policy_test.cpp -o build/tests/rtw89-link-policy
+          build/tests/rtw89-link-policy
       - name: Build target
         env:
           PLATFORM: ${{ matrix.platform }}

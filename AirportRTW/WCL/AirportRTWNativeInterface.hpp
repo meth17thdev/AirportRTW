@@ -162,7 +162,7 @@ public:
     virtual IOReturn getVHT_MCS_INDEX_SET(apple80211_vht_mcs_index_set_data *) AIRPORT_SKYWALK_OVERRIDE;
     virtual IOReturn getMCS_VHT(apple80211_mcs_vht_data *) AIRPORT_SKYWALK_OVERRIDE;
     virtual IOReturn getGAS_RESULTS(apple80211_gas_result_t *) AIRPORT_SKYWALK_OVERRIDE { return kIOReturnUnsupported; }
-    virtual IOReturn getCHANNELS_INFO(apple80211_channels_info *) AIRPORT_SKYWALK_OVERRIDE { return kIOReturnUnsupported; }
+    IOReturn getCHANNELS_INFO(apple80211_channels_info *) override;
     virtual IOReturn getVHT_CAPABILITY(apple80211_vht_capability *) AIRPORT_SKYWALK_OVERRIDE { return kIOReturnUnsupported; }
     virtual IOReturn getBGSCAN_CACHE_RESULTS(apple80211_bgscan_cached_network_data_list *) AIRPORT_SKYWALK_OVERRIDE { return kIOReturnUnsupported; }
     virtual IOReturn getROAM_PROFILE(apple80211_roam_profile_band_data *) AIRPORT_SKYWALK_OVERRIDE { return kIOReturnUnsupported; }
@@ -236,7 +236,7 @@ public:
 #else
     virtual IOReturn getWCL_BSS_INFO(apple80211_beacon_msg *) AIRPORT_SKYWALK_OVERRIDE { return kIOReturnUnsupported; }
 #endif
-    virtual IOReturn getWCL_TRAFFIC_COUNTERS(apple80211_wcl_traffic_counters *) AIRPORT_SKYWALK_OVERRIDE { return kIOReturnUnsupported; }
+    IOReturn getWCL_TRAFFIC_COUNTERS(apple80211_wcl_traffic_counters *) override;
     virtual IOReturn getWCL_GET_TX_BLANKING_STATUS(uint *) AIRPORT_SKYWALK_OVERRIDE { return kIOReturnUnsupported; }
     virtual IOReturn getSSID_TRANSITION_SUPPORT(apple80211_ssid_transition_feature_enabled *) AIRPORT_SKYWALK_OVERRIDE { return kIOReturnUnsupported; }
 #ifdef AIRPORT_WCL
@@ -416,6 +416,8 @@ private:
     static IOReturn stopWCLGated(OSObject *, void *, void *, void *, void *);
     void deferWCLCountryUpdate();
     static void wclJoinTimeout(OSObject *, IOTimerEventSource *);
+    IOReturn copyWCLChannels(void *);
+    IOReturn copyWCLTrafficCounters(void *);
     IOReturn beginWCLScan(apple80211ScanRequest *);
     void clearWCLPMKSA();
     IOReturn installWCLKey(apple80211_key *);
@@ -427,9 +429,32 @@ private:
     IOReturn leaveWCLNetwork();
     void finishWCLScan(IOReturn);
     void finishWCLJoin(uint16_t, uint16_t, IOReturn);
+    IOReturn postWCLJoinMessage(unsigned, void *, size_t);
+    IOReturn deliverWCLJoinMessage(unsigned, void *, size_t);
+    static void drainWCLJoinMessages(OSObject *, IOTimerEventSource *);
+    struct JoinMessage {
+        unsigned type;
+        size_t length;
+        uint8_t payload[sizeof(AirportWCL::LqmBeaconUpdate)];
+    };
+    static_assert(sizeof(AirportWCL::ConnectionEvent) <= sizeof(JoinMessage::payload),
+                  "Connection event fits native event queue");
+    static_assert(sizeof(AirportWCL::SequoiaLqmUpdate) <= sizeof(JoinMessage::payload),
+                  "Sequoia LQM event fits native event queue");
+    JoinMessage wclJoinMessages[32];
+    unsigned wclJoinHead = 0, wclJoinCount = 0;
+    uint64_t wclLqmPostCount = 0;
+    IOSimpleLock *wclJoinLock = nullptr;
+    IOTimerEventSource *wclJoinMessageTimer = nullptr;
     void publishWCLBeacon(const ieee80211_node *, const uint8_t *, size_t);
     IOTimerEventSource *joinTimer;
     uint8_t joinBSSID[6];
+    uint64_t wclScanRequestCount = 0;
+    uint64_t wclBeaconEventCount = 0;
+    uint64_t wclScanPublishCount = 0;
+    uint64_t wclScanInvalidIECount = 0;
+    uint64_t wclScanInvalidChannelCount = 0;
+    IOReturn wclLastScanPostStatus = kIOReturnNotReady;
     bool scanPending;
     bool scanCompleted;
     bool scanSkipCompletion;

@@ -2628,6 +2628,7 @@
 /* Begin PBXShellScriptBuildPhase section */
 		A89C00012F00000000000001 /* Build RTW89 C Archive */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -2643,6 +2644,7 @@
 		};
 		A89C00012F00000000000002 /* Build RTW89 C Archive */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -2658,6 +2660,7 @@
 		};
 		A89C00012F00000000000003 /* Build RTW89 C Archive */ = {
 			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
 			buildActionMask = 2147483647;
 			files = (
 			);
@@ -3813,7 +3816,7 @@
 				MODULE_NAME = com.senmiko.RTWCore;
 				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.RTWCore;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Debug;
@@ -3841,7 +3844,7 @@
 				MODULE_NAME = com.senmiko.RTWCore;
 				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.RTWCore;
 				PRODUCT_NAME = "$(TARGET_NAME)";
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Release;
@@ -3873,7 +3876,7 @@
 				MODULE_NAME = com.zxystd.AirportRTW;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Debug;
@@ -3905,7 +3908,7 @@
 				MODULE_NAME = com.zxystd.AirportRTW;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Release;
@@ -3936,7 +3939,7 @@
 				MODULE_NAME = com.zxystd.AirportRTW;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Debug;
@@ -3967,7 +3970,7 @@
 				MODULE_NAME = com.zxystd.AirportRTW;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Release;
@@ -3998,7 +4001,7 @@
 				MODULE_NAME = com.zxystd.AirportRTW;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Debug;
@@ -4029,7 +4032,7 @@
 				MODULE_NAME = com.zxystd.AirportRTW;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Release;
@@ -4073,7 +4076,7 @@
 				MODULE_NAME = com.zxystd.AirportRTW;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Debug;
@@ -4105,7 +4108,7 @@
 				MODULE_NAME = com.zxystd.AirportRTW;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Release;
@@ -4139,7 +4142,7 @@
 				MODULE_NAME = com.zxystd.AirportRTW;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Debug;
@@ -4173,7 +4176,7 @@
 				MODULE_NAME = com.zxystd.AirportRTW;
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Release;
@@ -4209,7 +4212,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Debug;
@@ -4245,7 +4248,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Release;
@@ -4280,7 +4283,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Debug;
@@ -4315,7 +4318,7 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Release;
@@ -4351,7 +4354,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Debug;
@@ -4387,7 +4390,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Release;
@@ -4424,7 +4427,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Debug;
@@ -4461,7 +4464,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Release;
@@ -4498,7 +4501,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Debug;
@@ -4535,7 +4538,7 @@
 				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;
 				PRODUCT_NAME = AirportRTW;
-				SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
 			};
 			name = Release;
