@@ -10,7 +10,7 @@ out_c   = sys.argv[2]
 bins = sorted(f for f in os.listdir(fw_dir) if f.endswith('.bin'))
 if not bins:
     # No firmware — emit an empty table so the build still works
-    with open(out_c, 'w') as f:
+    with open(out_c, 'w', encoding='utf-8', newline='\n') as f:
         f.write('/* No firmware blobs — add *.bin to firmware/ and rebuild */\n')
         f.write('#include "fw_blobs.h"\n')
         f.write('const struct rtw88_fw_blob rtw88_fw_blobs[] = { { 0, 0, 0, 0 } };\n')
@@ -48,7 +48,7 @@ lines.append('    { 0, 0, 0, 0 }')
 lines.append('};')
 lines.append('')
 
-with open(out_c, 'w') as f:
+with open(out_c, 'w', encoding='utf-8', newline='\n') as f:
     f.write('\n'.join(lines) + '\n')
 
 total_orig = sum(e[3] for e in entries)

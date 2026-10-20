@@ -82,12 +82,12 @@ def main():
         for ref in ET.parse(path).iter("BuildableReference"):
             require(ref.attrib["ReferencedContainer"] == "container:AirportRTW.xcodeproj", f"{path.name}: stale container")
             require(ref.attrib["BlueprintIdentifier"] in objects, f"{path.name}: missing target")
-    script = (ROOT / "scripts/build_rtw89_c_archive.sh").read_text()
+    script = (ROOT / "scripts/build_rtw89_c_archive.sh").read_text(encoding="utf-8")
     driver = ROOT / "rtw/hal_rtw89/driver"
     listed = re.search(r'for file in \\\n(.*?)\ndo', script, re.S)[1]
     for name in re.findall(r'[\w]+\.c', listed) + ["Senmiko.c"]:
         require((driver / name).is_file(), f"Missing archive input {name}")
-    blobs = (ROOT / "rtw/hal_rtw89/compat/fw_blobs89.c").read_text()
+    blobs = (ROOT / "rtw/hal_rtw89/compat/fw_blobs89.c").read_text(encoding="utf-8")
     firmware_count = 0
     for symbol, body in re.findall(r'(fw_\w+)\[\]\s*=\s*\{(.*?)\};', blobs, re.S):
         compressed = bytes(int(v, 16) for v in re.findall(r'0x([0-9a-fA-F]{2})', body))
@@ -99,17 +99,17 @@ def main():
         require(decoded == candidates[0].read_bytes(), f"Firmware mismatch: {symbol}")
         firmware_count += 1
     require(firmware_count > 0, "No firmware verified")
-    core = (ROOT / "include/HAL/RTWCore.hpp").read_text()
+    core = (ROOT / "include/HAL/RTWCore.hpp").read_text(encoding="utf-8")
     require("class RTWCore : public OSObject" in core, "RTWCore is not the abstract shared HAL")
     for family in ["88", "89"]:
-        header = (ROOT / f"rtw/hal_rtw{family}/RTW{family}Hal.hpp").read_text()
+        header = (ROOT / f"rtw/hal_rtw{family}/RTW{family}Hal.hpp").read_text(encoding="utf-8")
         require(f"class RTW{family}Hal : public RTWCore" in header, f"RTW{family} is not a sibling HAL")
-    script88 = (ROOT / "scripts/build_rtw88_c_archive.sh").read_text()
+    script88 = (ROOT / "scripts/build_rtw88_c_archive.sh").read_text(encoding="utf-8")
     listed88 = re.search(r'for file in \\\n(.*?)\ndo', script88, re.S)[1]
     for name in re.findall(r'[\w]+\.c', listed88):
         require((ROOT / "rtw/hal_rtw88/driver" / name).is_file(), f"Missing RTW88 archive source {name}")
     require("nmedit" in script88 and "nm -gUj" in script88, "RTW88 symbol isolation missing")
-    blobs88 = (ROOT / "rtw/hal_rtw88/compat/fw_blobs.c").read_text()
+    blobs88 = (ROOT / "rtw/hal_rtw88/compat/fw_blobs.c").read_text(encoding="utf-8")
     count88 = 0
     for symbol, body in re.findall(r'(fw_\w+)\[\]\s*=\s*\{(.*?)\};', blobs88, re.S):
         compressed = bytes(int(v, 16) for v in re.findall(r'0x([0-9a-fA-F]{2})', body))
