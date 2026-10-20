@@ -13,6 +13,9 @@ mkdir -p "$OUT_DIR"
 COMMON=(
   -arch x86_64 "-mmacosx-version-min=${MACOSX_DEPLOYMENT_TARGET:-10.15}"
   -isysroot "$SDK_PATH" -fno-exceptions -fno-rtti -fno-stack-protector -mkernel
+  # Tentative globals must be section definitions, not common symbols, so
+  # nmedit can localize them in the private relocatable object.
+  -fno-common
   -I"$ROOT/MacKernelSDK/Headers"
   -I"$SDK_PATH/System/Library/Frameworks/Kernel.framework/Headers"
 )

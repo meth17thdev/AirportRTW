@@ -109,6 +109,7 @@ def main():
     for name in re.findall(r'[\w]+\.c', listed88):
         require((ROOT / "rtw/hal_rtw88/driver" / name).is_file(), f"Missing RTW88 archive source {name}")
     require("nmedit" in script88 and "nm -gUj" in script88, "RTW88 symbol isolation missing")
+    require("-fno-common" in script88, "RTW88 tentative globals cannot be localized")
     blobs88 = (ROOT / "rtw/hal_rtw88/compat/fw_blobs.c").read_text(encoding="utf-8")
     count88 = 0
     for symbol, body in re.findall(r'(fw_\w+)\[\]\s*=\s*\{(.*?)\};', blobs88, re.S):
