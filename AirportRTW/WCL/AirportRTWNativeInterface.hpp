@@ -477,7 +477,7 @@ private:
 
 private:
     AirportRTW *instance;
-    ItlHalService *fHalService;
+    RTWCore *fHalService;
 
     //IO80211
     struct ieee80211_node *fNextNodeToSend;

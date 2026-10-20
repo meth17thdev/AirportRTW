@@ -54,4 +54,4 @@ with open(out_c, 'w') as f:
 total_orig = sum(e[3] for e in entries)
 total_comp = sum(e[2] for e in entries)
 print(f'  GEN  {out_c}: {len(bins)} blobs, '
-      f'{total_orig//1024}KB → {total_comp//1024}KB compressed')
+      f'{total_orig//1024}KB -> {total_comp//1024}KB compressed')

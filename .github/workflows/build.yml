@@ -40,6 +40,9 @@ jobs:
           xcrun clang++ -std=c++14 -Wall -Wextra -Werror \
             tests/rtw89_link_policy_test.cpp -o build/tests/rtw89-link-policy
           build/tests/rtw89-link-policy
+          xcrun clang++ -std=c++14 -Wall -Wextra -Werror \
+            tests/rtw_family_test.cpp -o build/tests/rtw-family
+          build/tests/rtw-family
       - name: Build target
         env:
           PLATFORM: ${{ matrix.platform }}

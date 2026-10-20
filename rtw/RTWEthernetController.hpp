@@ -26,7 +26,7 @@
 #include <libkern/c++/OSMetaClass.h>
 #include <IOKit/IOFilterInterruptEventSource.h>
 
-#include "hal_rtw89/RTWCore.hpp"
+#include <HAL/RTWHalFactory.hpp>
 
 enum
 {
@@ -101,7 +101,7 @@ public:
     IONetworkStats *fpNetStats;
     IOEthernetInterface *fNetIf;
     IOWorkLoop *fWatchdogWorkLoop;
-    ItlHalService *fHalService;
+    RTWCore *fHalService;
 
     //pm
     thread_call_t powerOnThreadCall;

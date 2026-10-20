@@ -24,7 +24,7 @@ const char* hexdump(uint8_t *buf, size_t len)
 }
 
 bool AirportRTWInterface::
-init(IO80211Controller *controller, ItlHalService *halService)
+init(IO80211Controller *controller, RTWCore *halService)
 {
     if (!super::init(controller))
         return false;

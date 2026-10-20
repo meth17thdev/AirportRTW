@@ -22,7 +22,7 @@
 #include <libkern/c++/OSMetaClass.h>
 #include <IOKit/IOFilterInterruptEventSource.h>
 
-#include "RTWCore.hpp"
+#include <HAL/RTWHalFactory.hpp>
 
 #include "AirportRTWInterface.hpp"
 
@@ -241,7 +241,7 @@ public:
     IONetworkStats *fpNetStats;
     AirportRTWInterface *fNetIf;
     IOWorkLoop *fWatchdogWorkLoop;
-    ItlHalService *fHalService;
+    RTWCore *fHalService;
     
     //pm
     thread_call_t powerOnThreadCall;

@@ -9,7 +9,7 @@
 #include "IOPCIEDeviceWrapper.hpp"
 #include "Apple80211.h"
 
-#include "RTWCore.hpp"
+#include <HAL/RTWHalFactory.hpp>
 
 #define super IOService
 OSDefineMetaClassAndStructors(IOPCIEDeviceWrapper, IOService);
@@ -66,9 +66,11 @@ probe(IOService *provider, SInt32 *score)
     IOPCIDevice* device = OSDynamicCast(IOPCIDevice, provider);
     if (!device)
         return NULL;
-    if (RTWCore::rtw89_match(device)) {
+    if (RTWHalFactory::supports(device)) {
         isMatch = true;
-        fHalService = new RTWCore;
+        fHalService = RTWHalFactory::create(device);
+        if (!fHalService)
+            return NULL;
     }
     if (isMatch) {
         XYLog("%s Found\n", __FUNCTION__);

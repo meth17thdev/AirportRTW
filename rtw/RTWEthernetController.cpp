@@ -72,8 +72,8 @@ IOService* RTWEthernetController::probe(IOService *provider, SInt32 *score)
     if (!device) {
         return NULL;
     }
-    if (RTWCore::rtw89_match(device)) {
-        fHalService = new RTWCore;
+    if (RTWHalFactory::supports(device)) {
+        fHalService = RTWHalFactory::create(device);
         device->findPCICapability(PCI_CAP_ID_MSIX, &msixCap);
         if (msixCap) {
             pciMsiXClearAndSet(device, msixCap, PCI_MSIX_FLAGS_ENABLE, 0);

@@ -37,7 +37,7 @@ def main():
         target = targets[name]
         modern = os_name in {"Sequoia", "Tahoe"}
         sources = source_paths(project, target)
-        for backend in ["RTWCore.cpp", "Rtw89LinuxBridge.cpp", "Rtw89PciTransport.cpp"]:
+        for backend in ["RTW89Hal.cpp", "Rtw89LinuxBridge.cpp", "Rtw89PciTransport.cpp", "RTW88Hal.cpp", "RTWHalFactory.cpp", "RTWCore.cpp"]:
             require(sum(Path(s).name == backend for s in sources) == 1, f"{name}: missing/duplicate {backend}")
         require(("AirportRTW/WCL/WCL.cpp" in sources) == modern, f"{name}: WCL source isolation")
         for frontend in ["AirportRTWV2.cpp", "AirportRTWSkywalkInterface.cpp"]:
@@ -46,6 +46,8 @@ def main():
         if not modern:
             require(not any("/WCL/" in s for s in sources), f"{name}: modern source in old target")
         phases = [objects[p] for p in target["buildPhases"]]
+        require(not any(Path(s).name in {"Rtw88LinuxBridge.cpp", "Rtw88PciTransport.cpp"} for s in sources), f"{name}: RTW88 private sources must stay in the archive")
+        require(any("build_rtw88_c_archive.sh" in p.get("shellScript", "") for p in phases), f"{name}: no RTW88 archive phase")
         for phase in phases:
             if phase["isa"] != "PBXSourcesBuildPhase":
                 continue
@@ -66,9 +68,11 @@ def main():
             definitions = settings.get("GCC_PREPROCESSOR_DEFINITIONS", [])
             require(("AIRPORT_WCL" in definitions) == modern, f"{name}: incorrect WCL flag")
             require("librtw89_c.a" in str(settings.get("OTHER_LDFLAGS", [])), f"{name}: archive not linked")
+            require("librtw88_c.a" in str(settings.get("OTHER_LDFLAGS", [])), f"{name}: RTW88 archive not linked")
             plist = plistlib.loads((ROOT / settings["INFOPLIST_FILE"]).read_bytes())
             matches = [p["IOPCIMatch"] for p in plist["IOKitPersonalities"].values() if "IOPCIMatch" in p]
             require(any("0x885210ec" in m and "0xa85a10ec" in m for m in matches), f"{name}: missing Realtek matches")
+            require(any(all(i in m.lower() for i in ["0xb82210ec", "0xc82210ec", "0xc82f10ec", "0xc82110ec", "0xb82110ec"]) for m in matches), f"{name}: missing RTW88 matches")
             if modern:
                 require(all(all(i.lower().endswith("10ec") for i in m.split()) for m in matches), f"{name}: non-Realtek IDs")
                 require("com.apple.iokit.IO80211FamilyLegacy" not in plist["OSBundleLibraries"], f"{name}: legacy dependency")
@@ -95,11 +99,26 @@ def main():
         require(decoded == candidates[0].read_bytes(), f"Firmware mismatch: {symbol}")
         firmware_count += 1
     require(firmware_count > 0, "No firmware verified")
-    classes = []
-    for path in (ROOT / "rtw").rglob("*.hpp"):
-        if re.search(r'\bclass RTWCore\s*:', path.read_text(encoding="utf-8")):
-            classes.append(path)
-    require(len(classes) == 1, "RTWCore HAL name collides with another class")
+    core = (ROOT / "include/HAL/RTWCore.hpp").read_text()
+    require("class RTWCore : public OSObject" in core, "RTWCore is not the abstract shared HAL")
+    for family in ["88", "89"]:
+        header = (ROOT / f"rtw/hal_rtw{family}/RTW{family}Hal.hpp").read_text()
+        require(f"class RTW{family}Hal : public RTWCore" in header, f"RTW{family} is not a sibling HAL")
+    script88 = (ROOT / "scripts/build_rtw88_c_archive.sh").read_text()
+    listed88 = re.search(r'for file in \\\n(.*?)\ndo', script88, re.S)[1]
+    for name in re.findall(r'[\w]+\.c', listed88):
+        require((ROOT / "rtw/hal_rtw88/driver" / name).is_file(), f"Missing RTW88 archive source {name}")
+    require("nmedit" in script88 and "nm -gUj" in script88, "RTW88 symbol isolation missing")
+    blobs88 = (ROOT / "rtw/hal_rtw88/compat/fw_blobs.c").read_text()
+    count88 = 0
+    for symbol, body in re.findall(r'(fw_\w+)\[\]\s*=\s*\{(.*?)\};', blobs88, re.S):
+        compressed = bytes(int(v, 16) for v in re.findall(r'0x([0-9a-fA-F]{2})', body))
+        if not compressed: continue
+        candidates = [p for p in (ROOT / "rtw/hal_rtw88/firmware").glob("*.bin") if "fw_" + re.sub(r'[^a-zA-Z0-9]', '_', p.name) == symbol]
+        require(len(candidates) == 1 and zlib.decompress(compressed) == candidates[0].read_bytes(), f"RTW88 firmware mismatch: {symbol}")
+        count88 += 1
+    require(count88 == 3, "Expected three RTW88 firmware images")
+    firmware_count += count88
     print(f"OK: {len(names)} OS targets; frontend isolation; schemes; archive inputs; {firmware_count} firmware blobs")
 
 

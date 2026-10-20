@@ -147,7 +147,7 @@ sSTA_INFO(OSObject* target, void* data, bool isSet)
             st->band_width = 20;
             break;
     }
-    st->rssi = -(0 - RTW89_MIN_DBM - ic_bss->ni_rssi);
+    st->rssi = -(0 - RTW_MIN_DBM - ic_bss->ni_rssi);
     st->noise = that->fDriver->fHalService->getDriverInfo()->getBSSNoise();
     sgi = ieee80211_node_supports_sgi(ic_bss);
     if (ic->ic_curmode == IEEE80211_MODE_11AC) {
@@ -391,7 +391,7 @@ sSCAN_RESULT(OSObject* target, void* data, bool isSet)
     ni->supported_rsnakms = that->fNextNodeToSend->ni_supported_rsnakms;
     ni->supported_rsnprotos = that->fNextNodeToSend->ni_supported_rsnprotos;
     ni->noise = 0;
-    ni->rssi = -(0 - RTW89_MIN_DBM - that->fNextNodeToSend->ni_rssi);
+    ni->rssi = -(0 - RTW_MIN_DBM - that->fNextNodeToSend->ni_rssi);
     memcpy(ni->bssid, that->fNextNodeToSend->ni_bssid, 6);
     memcpy(ni->ssid, that->fNextNodeToSend->ni_essid, 32);
     that->fNextNodeToSend = RB_NEXT(ieee80211_tree, &ic->ic_tree, that->fNextNodeToSend);

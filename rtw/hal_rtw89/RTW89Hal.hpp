@@ -1,6 +1,6 @@
 /* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
-#ifndef RTWCore_hpp
-#define RTWCore_hpp
+#ifndef RTW89Hal_hpp
+#define RTW89Hal_hpp
 
 #include <compat.h>
 #include <IOKit/network/IOEthernetInterface.h>
@@ -9,7 +9,7 @@
 
 #include <HAL/ItlDriverController.hpp>
 #include <HAL/ItlDriverInfo.hpp>
-#include <HAL/ItlHalService.hpp>
+#include <HAL/RTWCore.hpp>
 
 #include "if_rtw89var.h"
 #include "Rtw89LinuxBridge.hpp"
@@ -23,10 +23,10 @@ constexpr int RTW89_MIN_DBM = -100;
  * Intel HALs.  sc.sc_ic is the sole owner of scan, node, MLME and key state.
  * The imported rtw89/mac80211 objects are used only to operate hardware.
  */
-class RTWCore : public ItlHalService,
+class RTW89Hal : public RTWCore,
                  public ItlDriverInfo,
                  public ItlDriverController {
-    OSDeclareDefaultStructors(RTWCore)
+    OSDeclareDefaultStructors(RTW89Hal)
 
 public:
     static bool rtw89_match(IOPCIDevice *device);
@@ -113,4 +113,4 @@ private:
     volatile UInt64 associationRecoverySuccessCount {0};
 };
 
-#endif /* RTWCore_hpp */
+#endif /* RTW89Hal_hpp */

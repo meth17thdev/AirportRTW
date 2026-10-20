@@ -14,7 +14,7 @@
 #include <IOKit/IOLib.h>
 #include <IOKit/IOTypes.h>
 
-#include <HAL/ItlHalService.hpp>
+#include <HAL/RTWCore.hpp>
 
 class IOPCIEDeviceWrapper : public IOService {
     OSDeclareDefaultStructors(IOPCIEDeviceWrapper)
@@ -29,7 +29,7 @@ public:
                                    IOService *   whatDevice ) override;
     
 public:
-    ItlHalService *fHalService;
+    RTWCore *fHalService;
     IOPCIDevice *pciNub;
 };
 

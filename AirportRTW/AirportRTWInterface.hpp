@@ -13,7 +13,7 @@
 #include <IOKit/IOLib.h>
 #include <libkern/OSKextLib.h>
 #include <sys/kernel_types.h>
-#include <HAL/ItlHalService.hpp>
+#include <HAL/RTWCore.hpp>
 
 class AirportRTWInterface : public IO80211Interface {
     OSDeclareDefaultStructors(AirportRTWInterface)
@@ -25,10 +25,10 @@ public:
                                  IOOptionBits    options = 0,
                                  void *          param   = 0 ) override;
 
-    bool init(IO80211Controller *controller, ItlHalService *halService);
+    bool init(IO80211Controller *controller, RTWCore *halService);
 
 private:
-    ItlHalService *fHalService;
+    RTWCore *fHalService;
 };
 
 #endif /* AirportRTWInterface_hpp */

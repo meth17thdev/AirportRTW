@@ -9,9 +9,11 @@ def main():
     objects = load_project()["objects"]
     original = PROJECT.read_text(encoding="utf-8")
     text = original
-    for name in ["RTWCore.cpp", "Rtw89LinuxBridge.cpp", "Rtw89PciTransport.cpp"]:
-        path = "rtw/hal_rtw89/" + name
-        candidates = [i for i, o in objects.items() if o["isa"] == "PBXFileReference" and o.get("path") == path]
+    paths = ["rtw/hal_rtw89/" + n for n in ["RTW89Hal.cpp", "Rtw89LinuxBridge.cpp", "Rtw89PciTransport.cpp"]]
+    paths += ["rtw/hal_rtw88/RTW88Hal.cpp", "include/HAL/RTWHalFactory.cpp", "include/HAL/RTWCore.cpp"]
+    for path in paths:
+        name = path.rsplit("/", 1)[-1]
+        candidates = [i for i, o in objects.items() if o["isa"] == "PBXFileReference" and (o.get("path") == path or o.get("path") == name)]
         if len(candidates) != 1:
             raise RuntimeError(f"Expected one file reference for {path}")
         ref = candidates[0]

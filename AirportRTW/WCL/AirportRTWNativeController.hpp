@@ -27,7 +27,7 @@
 #include <libkern/c++/OSMetaClass.h>
 #include <IOKit/IOFilterInterruptEventSource.h>
 
-#include "RTWCore.hpp"
+#include <HAL/RTWHalFactory.hpp>
 
 #include "AirportRTWEthernetInterface.hpp"
 
@@ -229,7 +229,7 @@ public:
     IO80211SkywalkInterface *fNetIf;
 #endif
     IOWorkLoop *fWatchdogWorkLoop;
-    ItlHalService *fHalService;
+    RTWCore *fHalService;
 
     //IO80211
     uint8_t power_state;
