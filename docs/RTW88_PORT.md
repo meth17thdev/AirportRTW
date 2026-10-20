@@ -1,9 +1,9 @@
 # RTW88 HAL reference and integration boundary
 
 Initial hardware target: **RTL8822CE**, PCI IDs `10ec:c822` and `10ec:c82f`.
-The RTW88 HAL and separate native Tahoe/Sequoia variants are now implemented.
-The normal build remains RTW89; the RTW88 build recompiles the shared frontend
-with RTW88Core selected and generates RTW88-only PCI matching. Hardware tests
+The RTW88 HAL is now included alongside RTW89 in the normal Tahoe/Sequoia
+kext. The shared frontend selects RTW88Core or RTWCore from the PCI ID.
+Earlier separate-variant build notes below are historical. Hardware tests
 remain pending. See `rtw/hal_rtw88/README.md` for build and installation details.
 
 ## Sources inspected
@@ -97,3 +97,23 @@ Per-TID TX queues are allocated and freed, software crypto covers ciphers
 not offloaded to CCMP CAM, and driver callbacks use synchronous cancellation.
 These are code/build checks; RTL8822CE scan/join/DHCP, aggregation and lifecycle
 behavior are not yet hardware-validated. No EFI files were changed.
+
+## Combined RTW88/RTW89 kext
+
+The separate-variant build described above is superseded by a single kext per
+macOS version. Normal Xcode targets compile both HAL classes and link both
+hardware archives. `RealtekHalFactory.hpp` selects the backend using the common
+PCI ID classifier in `RealtekPciIds.hpp`; neither family is sent through the
+other's hardware probe. The factory publishes `RTWHALFamily` for verification.
+
+All 431 RTW88 driver/compatibility C exports are isolated under `airportrtw88_`,
+including independent hardware, IRQ, workqueue and firmware globals. RTW89
+retains its existing interfaces. Archive validation rejects colliding exports,
+and native bundle validation requires both HALs and both hardware probes with
+no unresolved backend symbols. PCI matching includes the union of supported
+IDs, and the firmware notice is copied by Xcode's resources phase.
+
+Use `scripts/build_release_kexts.sh` and the normal `build/releases/Release`
+bundles. The old RTW88-specific Python build command now delegates to the normal
+combined build. No standalone RTW88 variant is needed. Hardware validation is
+still required on RTL8822CE and after installing the combined build on RTW89.

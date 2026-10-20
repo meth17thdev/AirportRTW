@@ -65,17 +65,11 @@ jobs:
           plutil -lint "$bundle/Contents/Info.plist"
           mkdir -p artifacts
           ditto -c -k --keepParent "$bundle" "artifacts/AirportRTW-$PLATFORM-$CONFIGURATION.zip"
-      - name: Build RTW88 native variant
+      - name: Check combined native HALs
         if: matrix.configuration == 'Release' && (matrix.platform == 'Tahoe' || matrix.platform == 'Sequoia')
         env:
           PLATFORM: ${{ matrix.platform }}
-        run: |
-          python3 scripts/build_rtw88_kexts.py "$PLATFORM" > logs/rtw88-build.log 2>&1 || {
-            tail -100 logs/rtw88-build.log
-            exit 1
-          }
-          python3 tools/validate_rtw88_backend.py --bundles --platforms "$PLATFORM"
-          cp "build/rtw88/Release/$PLATFORM/AirportRTW88-$PLATFORM.zip" artifacts/
+        run: python3 tools/validate_rtw88_backend.py --bundles --platforms "$PLATFORM"
       - uses: actions/upload-artifact@v4
         with:
           name: AirportRTW-${{ matrix.platform }}-${{ matrix.configuration }}

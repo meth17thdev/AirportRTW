@@ -20,6 +20,12 @@ def main():
     parser.add_argument('--bundles', action='store_true')
     parser.add_argument('--platforms', nargs='+', choices=['Tahoe', 'Sequoia'], default=['Tahoe', 'Sequoia'])
     opts = parser.parse_args()
+    for path in ['AirportRTW/AirportRTW.cpp', 'AirportRTW/IOPCIEDeviceWrapper.cpp',
+                 'rtw/RTWEthernetController.cpp']:
+        frontend = (ROOT/path).read_text()
+        require('#include <HAL/RealtekHalFactory.hpp>' in frontend and
+                'createRealtekHal(device)' in frontend,
+                path+': frontend must select both HALs through the shared factory')
     hardware = (HAL/'Rtw88Hardware.c').read_text()
     ids = {int(s,16) for s in re.findall(r'case (0x[0-9a-f]+):', hardware)}
     require(ids == EXPECTED, 'Probe IDs differ from supported PCIe cards')
@@ -44,18 +50,28 @@ def main():
                 'Imported donor file changed without provenance update: '+path)
     if opts.bundles:
         for platform in opts.platforms:
-            bundle=ROOT/f'build/rtw88/Release/{platform}/AirportRTW.kext'
+            bundle=ROOT/f'build/releases/Release/{platform}/AirportRTW.kext'
             plist=plistlib.loads((bundle/'Contents/Info.plist').read_bytes())
             matches={int(x,16)>>16 for p in plist['IOKitPersonalities'].values() for x in p.get('IOPCIMatch','').split()}
-            require(matches==EXPECTED, platform+': incorrect PCI matches')
+            rtw89={0x8852,0xa85a,0xb852,0xb85b,0xb851,0xb520,0xc852,0x8922,0x892b}
+            require(matches==EXPECTED | rtw89, platform+': incorrect combined PCI matches')
             require('com.apple.iokit.IO80211FamilyLegacy' not in plist['OSBundleLibraries'], 'Unexpected legacy stack')
             binary=bundle/'Contents/MacOS/AirportRTW'
             symbols=subprocess.check_output(['nm',str(binary)],text=True)
             require('_rtw8822c_hw_spec' in symbols and 'RTW88Core' in symbols, 'Missing RTW88 implementation')
-            require('_rtw89_pci_probe' not in symbols, 'RTW89 hardware linked into RTW88 variant')
+            require('_rtw89_pci_probe' in symbols and 'RTWCore' in symbols, 'RTW89 backend missing from combined kext')
+            require('_airportrtw88_rtw_pci_probe' in symbols, 'RTW88 probe is not isolated')
             unresolved=subprocess.check_output(['nm','-u',str(binary)],text=True)
             require(not any(line.strip().startswith(('_rtw','_airportrtw88')) for line in unresolved.splitlines()), 'Unresolved backend symbols')
             require((bundle/'Contents/Resources/LICENCE.rtlwifi_firmware.txt').is_file(), 'Packaged firmware notice missing')
-    print('OK: RTW88 PCI matching, source provenance, firmware, isolation'+(' and both native bundles' if opts.bundles else ''))
+            derived=ROOT/f'build/releases-obj/AirportRTW.build/Release/AirportRTW-{platform}.build/DerivedSources'
+            exports=[]
+            for archive in ['librtw88_c.a', 'librtw89_c.a']:
+                output=subprocess.check_output(['nm','-gU',str(derived/archive)],text=True,stderr=subprocess.DEVNULL)
+                exports.append(set(re.findall(r'^[0-9a-fA-F]+\s+[A-Z]\s+_(\w+)$',output,re.M)))
+            require(exports[0] and all(n.startswith('airportrtw88_') for n in exports[0]),
+                    'RTW88 compatibility exports must all remain private')
+            require(not exports[0] & exports[1], 'RTW88/RTW89 archives have colliding exports')
+    print('OK: RTW88 PCI matching, source provenance, firmware, isolation'+(' and combined native bundles' if opts.bundles else ''))
 
 if __name__=='__main__': main()

@@ -7,10 +7,11 @@ DRIVER="$HAL/driver"
 OUT="${DERIVED_FILE_DIR:?DERIVED_FILE_DIR is required}"
 SDK_PATH="${SDKROOT:?SDKROOT is required}"
 mkdir -p "$OUT/rtw88-c"
-flags=(-arch x86_64 -mmacosx-version-min=13.0 -isysroot "$SDK_PATH"
+MINOS="${MACOSX_DEPLOYMENT_TARGET:-10.15}"
+flags=(-arch x86_64 "-mmacosx-version-min=$MINOS" -isysroot "$SDK_PATH"
  -mkernel -fno-exceptions -fno-rtti -fno-stack-protector -O2
  -I"$ROOT/MacKernelSDK/Headers" -I"$COMPAT" -I"$COMPAT/linux" -I"$HAL"
- -I"$DRIVER" -include "$COMPAT/rtw88_compat.h"
+ -I"$DRIVER" -include "$HAL/Rtw88Namespace.h" -include "$COMPAT/rtw88_compat.h"
  -DRTW88_MACOS=1 -D__KERNEL__ -DCONFIG_RTW88_PCI=1
  -DCONFIG_RTW88_8822C=1 -DCONFIG_RTW88_8822CE=1
  -DCONFIG_RTW88_8822B=1 -DCONFIG_RTW88_8822BE=1
@@ -30,7 +31,7 @@ done
 python3 "$ROOT/scripts/gen_fw_blobs.py" "$HAL/firmware" "$OUT/rtw88-c/fw_blobs.c"
 for file in "$COMPAT/rtw88_firmware.c" "$OUT/rtw88-c/fw_blobs.c"; do
  name="$(basename "$file" .c)"
- xcrun clang -arch x86_64 -mkernel -O2 -isysroot "$SDK_PATH" -I"$ROOT/MacKernelSDK/Headers" -I"$COMPAT" -c "$file" -o "$OUT/rtw88-c/$name.o"
+ xcrun clang -arch x86_64 "-mmacosx-version-min=$MINOS" -mkernel -O2 -include "$HAL/Rtw88Namespace.h" -isysroot "$SDK_PATH" -I"$ROOT/MacKernelSDK/Headers" -I"$COMPAT" -c "$file" -o "$OUT/rtw88-c/$name.o"
  objects+=("$OUT/rtw88-c/$name.o")
 done
 xcrun libtool -static -o "$OUT/librtw88_c.a" "${objects[@]}"

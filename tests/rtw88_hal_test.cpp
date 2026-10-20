@@ -1,8 +1,17 @@
 #include "../rtw/hal_rtw88/Rtw88RxLayout.hpp"
 #include "../rtw/hal_rtw88/Rtw88LinkPolicy.hpp"
+#include "../include/HAL/RealtekPciIds.hpp"
 #include <assert.h>
 int main()
 {
+    using RealtekHal::Family;
+    const uint16_t rtw88[] = {0xc822, 0xc82f, 0xb822, 0xc821, 0xb821};
+    for (auto id : rtw88)
+        assert(RealtekHal::family(0x10ec, id) == Family::RTW88);
+    const uint16_t rtw89[] = {0x8852, 0xa85a, 0xb852, 0xb85b, 0xb851, 0xb520, 0xc852, 0x8922, 0x892b};
+    for (auto id : rtw89) assert(RealtekHal::family(0x10ec, id) == Family::RTW89);
+    assert(RealtekHal::family(0x8086, 0xc822) == Family::None);
+    assert(RealtekHal::family(0x10ec, 0xffff) == Family::None);
     uint8_t frame[64] = {};
     Rtw88Rx::CCMPLayout layout;
     frame[0] = 0x88; // QoS data

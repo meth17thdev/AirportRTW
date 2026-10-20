@@ -1,6 +1,7 @@
 # AirportRTW
 
-macOS Wi-Fi driver for supported Realtek RTW89 PCIe cards.
+macOS Wi-Fi driver for supported Realtek RTW88 and RTW89 PCIe cards.
+One kext contains both HALs and selects the backend automatically by PCI ID.
 
 ## Compatibility
 
@@ -9,7 +10,11 @@ experimental native Wi-Fi frontend for Sequoia 15.2+ and Tahoe 26.x on x86_64.
 The new targets require macOS/Xcode builds and hardware validation before
 their compatibility can be considered established.
 
-Supported cards:
+Included cards (RTW88 hardware validation is pending):
+
+- RTL8821CE (RTW88)
+- RTL8822BE (RTW88)
+- RTL8822CE (RTW88)
 
 - RTL8851BE
 - RTL8852AE
@@ -25,6 +30,7 @@ Install Xcode command-line tools and check out MacKernelSDK commit
 
 ```sh
 python3 tools/validate_rtw89_backend.py
+python3 tools/validate_rtw88_backend.py
 bash scripts/build_release_kexts.sh
 # Or select one target:
 bash scripts/build_release_kexts.sh AirportRTW-Sequoia
@@ -39,7 +45,8 @@ The older targets keep their existing frontend implementations; only the new
 targets define `AIRPORT_WCL` and compile `AirportRTW/WCL/`.
 
 The new frontend is intended to use the installed OS Wi-Fi stack without OCLP's
-userspace Wi-Fi root patches. This has not yet been verified on hardware. Do not
+userspace Wi-Fi root patches. RTW89 scanning and joining have been tested on
+Tahoe; the combined build still needs hardware testing. Do not
 mix native and legacy-stack instructions. Restrict Sequoia to Darwin
 24.2.0–24.99.99 and Tahoe to 25.0.0–25.99.99 when sharing an OpenCore configuration.
 The Sequoia ABI starts at 15.2; 15.0/15.1 are not covered by the new target.
@@ -49,7 +56,9 @@ does not implement off-channel background scans; private MAC changes are wired t
 HE/Wi-Fi 6 is not advertised by the new frontend. WPA3-only,
 mandatory PMF and AWDL/AirDrop are not established features of this port.
 
-The backend class is `RTWCore`; the standalone Ethernet controller class is
+The shared frontend selects `RTWCore` (RTW89) or `RTW88Core` (RTW88).
+Both backends are included in each OS-specific kext; RTW88 C symbols are private
+to avoid collisions with RTW89. The standalone Ethernet controller class is
 `RTWEthernetController`, retaining the `RTWCore.kext` product name.
 
 See [port status and AppleVTD review](docs/NATIVE_WIFI_PORT.md) for validation

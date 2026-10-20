@@ -1,4 +1,5 @@
 /* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
+#include "Rtw88Namespace.h"
 #include "Rtw88LinuxBridge.hpp"
 #include "Rtw88PciTransport.hpp"
 #include "Rtw88RxLayout.hpp"

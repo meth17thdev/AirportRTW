@@ -9,7 +9,7 @@
 #include "IOPCIEDeviceWrapper.hpp"
 #include "Apple80211.h"
 
-#include "RTWCore.hpp"
+#include <HAL/RealtekHalFactory.hpp>
 
 #define super IOService
 OSDefineMetaClassAndStructors(IOPCIEDeviceWrapper, IOService);
@@ -66,13 +66,12 @@ probe(IOService *provider, SInt32 *score)
     IOPCIDevice* device = OSDynamicCast(IOPCIDevice, provider);
     if (!device)
         return NULL;
-    if (RTWCore::rtw_match(device)) {
+    if ((fHalService = createRealtekHal(device))) {
         isMatch = true;
-        fHalService = new RTWCore;
     }
     if (isMatch) {
         XYLog("%s Found\n", __FUNCTION__);
-        /* RTW89 configures and owns its interrupt source in the transport. */
+        /* The selected HAL configures and owns its interrupt source in the transport. */
         this->pciNub = device;
         return this;
     }

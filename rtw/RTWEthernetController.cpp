@@ -12,6 +12,7 @@
 * GNU General Public License for more details.
 */
 #include "RTWEthernetController.hpp"
+#include <HAL/RealtekHalFactory.hpp>
 #include <linux/types.h>
 #include <linux/kernel.h>
 
@@ -72,8 +73,7 @@ IOService* RTWEthernetController::probe(IOService *provider, SInt32 *score)
     if (!device) {
         return NULL;
     }
-    if (RTWCore::rtw_match(device)) {
-        fHalService = new RTWCore;
+    if ((fHalService = createRealtekHal(device))) {
         device->findPCICapability(PCI_CAP_ID_MSIX, &msixCap);
         if (msixCap) {
             pciMsiXClearAndSet(device, msixCap, PCI_MSIX_FLAGS_ENABLE, 0);

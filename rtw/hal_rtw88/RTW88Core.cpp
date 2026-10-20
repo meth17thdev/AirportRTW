@@ -3,6 +3,7 @@
 #include "Rtw88PciTransport.hpp"
 
 #include <IOKit/IOLib.h>
+#include <HAL/RealtekPciIds.hpp>
 
 /* net80211 sources are compiled as C++ in this target. */
 void ieee80211_recv_assoc_resp(struct ieee80211com *, mbuf_t,
@@ -31,10 +32,7 @@ bool RTW88Core::rtw88_match(IOPCIDevice *device)
 
     const UInt16 vendor = device->configRead16(kIOPCIConfigVendorID);
     const UInt16 product = device->configRead16(kIOPCIConfigDeviceID);
-    return vendor == kRealtekVendor &&
-           (product == kRtl8822CE || product == kRtl8822CEAlternate ||
-            product == kRtl8822BE || product == kRtl8821CE ||
-            product == kRtl8821CEAlternate);
+    return RealtekHal::family(vendor, product) == RealtekHal::Family::RTW88;
 }
 
 bool RTW88Core::attach(IOPCIDevice *device)

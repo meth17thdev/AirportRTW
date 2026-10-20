@@ -12,6 +12,7 @@
 * GNU General Public License for more details.
 */
 #include "AirportRTW.hpp"
+#include <HAL/RealtekHalFactory.hpp>
 
 #include <crypto/sha1.h>
 #include <net80211/ieee80211_priv.h>
@@ -72,11 +73,10 @@ IOService* AirportRTW::probe(IOService *provider, SInt32 *score)
     IOLog("AirportRTW: probe PCI %04x:%04x\n",
           device->configRead16(kIOPCIConfigVendorID),
           device->configRead16(kIOPCIConfigDeviceID));
-    if (RTWCore::rtw_match(device)) {
-        fHalService = new RTWCore;
+    if ((fHalService = createRealtekHal(device))) {
         device->findPCICapability(PCI_CAP_ID_MSIX, &msixCap);
         device->findPCICapability(PCI_CAP_ID_MSI, &msiCap);
-        IOLog("AirportRTW-RTW89: probe accepted (MSI=%u MSI-X=%u); "
+        IOLog("AirportRTW: Realtek probe accepted (MSI=%u MSI-X=%u); "
               "transport will configure interrupts\n", msiCap, msixCap);
         return this;
     }

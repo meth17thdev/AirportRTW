@@ -1,46 +1,53 @@
-# RTW88 PCIe HAL
+# RTW88 PCIe HAL in the combined AirportRTW kext
 
-This backend implements `ItlHalService` for RTL8822CE (10ec:c822/c82f),
-RTL8822BE (10ec:b822), and RTL8821CE (10ec:c821/b821). RTL8822CE is the initial
-hardware-validation target. Builds are available for native Tahoe and Sequoia.
-They have not yet been validated on physical RTW88 hardware.
+The normal AirportRTW kext now includes **both RTW88 and RTW89 HALs**. The shared
+factory selects the hardware backend from the PCI vendor/device ID, before
+attaching it. The networking frontend and net80211 architecture are shared.
 
-`RTW88Core` owns the net80211 controller and forwards hardware operations through
+RTW88 matching covers RTL8822CE (10ec:c822/c82f), RTL8822BE (10ec:b822), and
+RTL8821CE (10ec:c821/b821). Existing RTW89 matching remains available. Unknown
+IDs and other PCI vendors are rejected. This does not add every RTW88 chipset;
+USB and SDIO are outside this PCIe backend.
+
+`RTW88Core` owns its net80211 controller and forwards hardware operations through
 `Rtw88LinuxBridge` and `Rtw88PciTransport`. The existing net80211 scan, MLME,
-security and replay logic and the existing native frontend are retained. The
-donor's independent `RTW88IEEE80211` state machine is not imported.
+security and replay logic and native frontend are retained. The donor's
+independent `RTW88IEEE80211` state machine is not imported.
 
 Implemented paths include probe/unwind, enable/disable, firmware and private
 MAC programming, software-driven scans, peer/channel setup, key installation
 and removal, hardware CCMP with RX normalization, software crypto for other
 net80211-supported ciphers, TX backpressure, RX delivery, per-TID queues,
 Block Ack callbacks, multicast filters, EDCA and lifecycle cleanup. HT/VHT data
-channel widths are negotiated up to 80 MHz. Hardware-level behavior, reconnect,
-sleep/wake and sustained throughput require testing; compilation does not prove
-them working. USB, SDIO, WoWLAN and HE/802.11ax are not implemented here.
+channel widths are negotiated up to 80 MHz. Physical RTW88 operation, reconnect,
+sleep/wake and sustained throughput remain unverified. WoWLAN and HE/802.11ax
+are not implemented by this RTW88 HAL.
 
-## Build
-
-First generate the shared frontend's native Xcode build recipes:
+## Build and install
 
 ```sh
 bash scripts/build_release_kexts.sh AirportRTW-Tahoe AirportRTW-Sequoia
-python3 scripts/build_rtw88_kexts.py Tahoe Sequoia
 python3 tools/validate_rtw88_backend.py --bundles
 ```
 
-The RTW88 build compiles its own C archive and recompiles the shared native
-sources against the RTW88 HAL headers, then links isolated bundles under
-`build/rtw88/Release/{Tahoe,Sequoia}/AirportRTW.kext`. It never replaces the
-ordinary RTW89 release output. Normal builds recompile all native sources;
-`--incremental` can reuse native objects after source-only edits. Use a full
-build after changing compiler flags or build recipes.
+The ordinary Xcode targets compile both native HALs and both hardware archives.
+One bundle per OS is produced at
+`build/releases/Release/{Tahoe,Sequoia}/AirportRTW.kext`. Install the same bundle
+on either supported card family; PCI matching chooses the HAL automatically.
+The old `scripts/build_rtw88_kexts.py` command delegates to this combined build
+for CLI compatibility. Historical `build/rtw88` outputs are obsolete and are
+not the combined release.
 
-The RTW88 and RTW89 variants share the native frontend's bundle identifier and
-classes. Install **one matching variant**, replacing the existing kext. They
-are not a combined universal binary and must not be loaded together. The RTW88
-variant's plist and HAL match only RTW88 IDs; it will not attach to an RTW89 card.
-Do not install it on the existing RTL8852 machine as a replacement for its driver.
+## Runtime isolation
+
+The two HALs have distinct C++ classes, contexts and transport instances.
+`Rtw88Namespace.h` isolates all RTW88 driver/compatibility C exports, including
+IRQ state, workqueues, hardware registration, DMA operations and firmware
+loading, under `airportrtw88_`. Its bridge and transport use those private APIs;
+the RTW89 backend retains its existing APIs. The validator checks both archives
+for unisolated/colliding exports and verifies that both probes and HAL classes
+are present in each linked native binary with no unresolved backend symbols.
+`RTWHALFamily` on the PCI device records which backend the factory selected.
 
 ## Provenance
 

@@ -39,6 +39,8 @@ def main():
         sources = source_paths(project, target)
         for backend in ["RTWCore.cpp", "Rtw89LinuxBridge.cpp", "Rtw89PciTransport.cpp"]:
             require(sum(Path(s).name == backend for s in sources) == 1, f"{name}: missing/duplicate {backend}")
+        for backend in ["RTW88Core.cpp", "Rtw88LinuxBridge.cpp", "Rtw88PciTransport.cpp"]:
+            require(sum(Path(s).name == backend for s in sources) == 1, f"{name}: missing/duplicate RTW88 {backend}")
         require(("AirportRTW/WCL/WCL.cpp" in sources) == modern, f"{name}: WCL source isolation")
         for frontend in ["AirportRTWV2.cpp", "AirportRTWSkywalkInterface.cpp"]:
             if modern:
