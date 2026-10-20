@@ -2,9 +2,11 @@
 /* PCI-family selection for AirportRTW; not a second network state machine. */
 #include "main.h"
 #include "pci.h"
-#include "rtw8821c.h"
-#include "rtw8822b.h"
-#include "rtw8822c.h"
+/* Chip headers contain overlapping register macros and inline helpers; keep
+ * them in their chip translation units. Selection only needs descriptors. */
+extern const struct rtw_chip_info rtw8821c_hw_spec;
+extern const struct rtw_chip_info rtw8822b_hw_spec;
+extern const struct rtw_chip_info rtw8822c_hw_spec;
 
 int rtw88_native_probe(struct pci_dev *device)
 {
