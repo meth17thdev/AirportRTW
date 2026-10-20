@@ -72,7 +72,7 @@ IOService* RTWEthernetController::probe(IOService *provider, SInt32 *score)
     if (!device) {
         return NULL;
     }
-    if (RTWCore::rtw89_match(device)) {
+    if (RTWCore::rtw_match(device)) {
         fHalService = new RTWCore;
         device->findPCICapability(PCI_CAP_ID_MSIX, &msixCap);
         if (msixCap) {

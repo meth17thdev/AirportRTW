@@ -66,7 +66,7 @@ probe(IOService *provider, SInt32 *score)
     IOPCIDevice* device = OSDynamicCast(IOPCIDevice, provider);
     if (!device)
         return NULL;
-    if (RTWCore::rtw89_match(device)) {
+    if (RTWCore::rtw_match(device)) {
         isMatch = true;
         fHalService = new RTWCore;
     }

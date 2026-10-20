@@ -27,6 +27,7 @@ jobs:
       - name: Validate source and protocol layouts
         run: |
           python3 tools/validate_rtw89_backend.py
+          python3 tools/validate_rtw88_backend.py
           mkdir -p build/tests
           for abi in 150200 260000; do
             xcrun clang++ -std=c++14 -Wall -Wextra -Werror \
@@ -40,6 +41,9 @@ jobs:
           xcrun clang++ -std=c++14 -Wall -Wextra -Werror \
             tests/rtw89_link_policy_test.cpp -o build/tests/rtw89-link-policy
           build/tests/rtw89-link-policy
+          xcrun clang++ -std=c++14 -Wall -Wextra -Werror \
+            tests/rtw88_hal_test.cpp -o build/tests/rtw88-hal
+          build/tests/rtw88-hal
       - name: Build target
         env:
           PLATFORM: ${{ matrix.platform }}
@@ -61,6 +65,17 @@ jobs:
           plutil -lint "$bundle/Contents/Info.plist"
           mkdir -p artifacts
           ditto -c -k --keepParent "$bundle" "artifacts/AirportRTW-$PLATFORM-$CONFIGURATION.zip"
+      - name: Build RTW88 native variant
+        if: matrix.configuration == 'Release' && (matrix.platform == 'Tahoe' || matrix.platform == 'Sequoia')
+        env:
+          PLATFORM: ${{ matrix.platform }}
+        run: |
+          python3 scripts/build_rtw88_kexts.py "$PLATFORM" > logs/rtw88-build.log 2>&1 || {
+            tail -100 logs/rtw88-build.log
+            exit 1
+          }
+          python3 tools/validate_rtw88_backend.py --bundles --platforms "$PLATFORM"
+          cp "build/rtw88/Release/$PLATFORM/AirportRTW88-$PLATFORM.zip" artifacts/
       - uses: actions/upload-artifact@v4
         with:
           name: AirportRTW-${{ matrix.platform }}-${{ matrix.configuration }}

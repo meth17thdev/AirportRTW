@@ -30,6 +30,7 @@ class RTWCore : public ItlHalService,
 
 public:
     static bool rtw89_match(IOPCIDevice *device);
+    static bool rtw_match(IOPCIDevice *device) { return rtw89_match(device); }
 
     bool attach(IOPCIDevice *device) override;
     void detach(IOPCIDevice *device) override;
