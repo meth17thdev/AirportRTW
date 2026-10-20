@@ -3873,8 +3873,8 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MODULE_NAME = com.zxystd.AirportRTW;
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
@@ -3905,8 +3905,8 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MODULE_NAME = com.zxystd.AirportRTW;
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
@@ -3936,8 +3936,8 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MODULE_NAME = com.zxystd.AirportRTW;
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
@@ -3967,8 +3967,8 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.14;
-				MODULE_NAME = com.zxystd.AirportRTW;
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
@@ -3998,8 +3998,8 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MODULE_NAME = com.zxystd.AirportRTW;
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
@@ -4029,8 +4029,8 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.13;
-				MODULE_NAME = com.zxystd.AirportRTW;
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
@@ -4073,8 +4073,8 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MODULE_NAME = com.zxystd.AirportRTW;
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
@@ -4105,8 +4105,8 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MODULE_NAME = com.zxystd.AirportRTW;
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
@@ -4139,8 +4139,8 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MODULE_NAME = com.zxystd.AirportRTW;
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
@@ -4173,8 +4173,8 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MODULE_NAME = com.zxystd.AirportRTW;
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
@@ -4276,12 +4276,12 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MODULE_NAME = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"$(DERIVED_FILE_DIR)/librtw89_c.a",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
@@ -4311,12 +4311,12 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MODULE_NAME = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"$(DERIVED_FILE_DIR)/librtw89_c.a",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
 				WRAPPER_EXTENSION = kext;
@@ -4346,12 +4346,12 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MODULE_NAME = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"$(DERIVED_FILE_DIR)/librtw89_c.a",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
@@ -4382,12 +4382,12 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 10.15;
-				MODULE_NAME = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"$(DERIVED_FILE_DIR)/librtw89_c.a",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
@@ -4419,12 +4419,12 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
-				MODULE_NAME = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"$(DERIVED_FILE_DIR)/librtw89_c.a",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
@@ -4456,12 +4456,12 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 15.2;
-				MODULE_NAME = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"$(DERIVED_FILE_DIR)/librtw89_c.a",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
@@ -4493,12 +4493,12 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MODULE_NAME = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"$(DERIVED_FILE_DIR)/librtw89_c.a",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
@@ -4530,12 +4530,12 @@
 					"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
 				);
 				MACOSX_DEPLOYMENT_TARGET = 26.0;
-				MODULE_NAME = com.zxystd.AirportRTW;
+				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
 					"$(DERIVED_FILE_DIR)/librtw89_c.a",
 				);
-				PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.AirportRTW;
+				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;
 				PRODUCT_NAME = AirportRTW;
 				HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";

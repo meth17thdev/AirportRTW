@@ -1,4 +1,4 @@
-sudo kextunload -b com.zxystd.itlwm
-sudo chown -R root:wheel ./../Build/Products/Debug/itlwm.kext
-sudo kextutil -v 6 ./../Build/Products/Debug/itlwm.kext
+sudo kextunload -b com.senmiko.RTWCore
+sudo chown -R root:wheel ./../Build/Products/Debug/RTWCore.kext
+sudo kextutil -v 6 ./../Build/Products/Debug/RTWCore.kext
 

@@ -142,7 +142,7 @@ initCCLogs()
     driverLogOptions.pad10 = 2;
     driverLogOptions.file_options = 0;
     driverLogOptions.log_policy = 0;
-    driverLogPipe = CCPipe::withOwnerNameCapacity(this, "com.zxystd.AirportRTW", "DriverLogs", &driverLogOptions);
+    driverLogPipe = CCPipe::withOwnerNameCapacity(this, "com.senmiko.AirportRTW", "DriverLogs", &driverLogOptions);
     XYLog("%s driverLogPipeRet %d\n", __FUNCTION__, driverLogPipe != NULL);
     
     memset(&driverLogOptions, 0, sizeof(driverLogOptions));
@@ -157,7 +157,7 @@ initCCLogs()
     driverLogOptions.pad10 = LOWER32(0x202800000);
     driverLogOptions.file_options = 0;
     driverLogOptions.log_policy = 0;
-    driverDataPathPipe = CCPipe::withOwnerNameCapacity(this, "com.zxystd.AirportRTW", "DatapathEvents", &driverLogOptions);
+    driverDataPathPipe = CCPipe::withOwnerNameCapacity(this, "com.senmiko.AirportRTW", "DatapathEvents", &driverLogOptions);
     XYLog("%s driverDataPathPipeRet %d\n", __FUNCTION__, driverDataPathPipe != NULL);
     
     memset(&driverLogOptions, 0, sizeof(driverLogOptions));
@@ -167,7 +167,7 @@ initCCLogs()
     strlcpy(driverLogOptions.name, "0", sizeof(driverLogOptions.name));
     strlcpy(driverLogOptions.directory_name, "WiFi", sizeof(driverLogOptions.directory_name));
     driverLogOptions.pipe_size = 128;
-    driverSnapshotsPipe = CCPipe::withOwnerNameCapacity(this, "com.zxystd.AirportRTW", "StateSnapshots", &driverLogOptions);
+    driverSnapshotsPipe = CCPipe::withOwnerNameCapacity(this, "com.senmiko.AirportRTW", "StateSnapshots", &driverLogOptions);
     XYLog("%s driverSnapshotsPipeRet %d\n", __FUNCTION__, driverSnapshotsPipe != NULL);
     
     CCStreamOptions faultReportOptions = { 0 };
