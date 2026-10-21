@@ -40,7 +40,7 @@ bool RTWCore88::rtw88_match(IOPCIDevice *device)
 
 bool RTWCore88::attach(IOPCIDevice *device)
 {
-    IOLog("AirportRTW-RTW88: attach begin\n");
+    IOLog("AirportRTW: attach begin\n");
     device->setProperty("RTWHALStage", "PCI ID match");
     if (!rtw88_match(device))
         return false;
@@ -81,7 +81,7 @@ bool RTWCore88::attach(IOPCIDevice *device)
     device->setProperty("RTWHALStage", "Linux PCI probe/context");
     if (!rtw88LinuxAttach(transport, &linuxContext))
         goto fail;
-    IOLog("AirportRTW-RTW88: Linux PCI probe complete\n");
+    IOLog("AirportRTW: Linux PCI probe complete\n");
     linuxContext.nativeOwner = this;
     linuxContext.receive = receive;
     linuxContext.txResume = resumeTransmit;
@@ -105,7 +105,7 @@ bool RTWCore88::attach(IOPCIDevice *device)
     transport->enableInterrupts();
     getController()->setProperty("RTW88SoftwareCCMP", kOSBooleanFalse);
     sc.sc_flags |= RTW88_FLAG_ATTACHED;
-    IOLog("AirportRTW-RTW88: attach complete\n");
+    IOLog("AirportRTW: attach complete\n");
     device->setProperty("RTWHALStage", "HAL attach complete");
     return true;
 
@@ -113,7 +113,7 @@ fail_linux:
     transport->disableInterrupts();
     rtw88LinuxDetach(transport, &linuxContext);
 fail:
-    IOLog("AirportRTW-RTW88: attach failed\n");
+    IOLog("AirportRTW: attach failed\n");
     if (associationRecoveryTimer) {
         associationRecoveryTimer->cancelTimeout();
         getMainWorkLoop()->removeEventSource(associationRecoveryTimer);
@@ -146,7 +146,7 @@ fail:
 void RTWCore88::detach(IOPCIDevice *device)
 {
     (void)device;
-    IOLog("AirportRTW-RTW88: detach begin\n");
+    IOLog("AirportRTW: detach begin\n");
     if (transport)
         transport->disableInterrupts();
     if (scanDwellTimer) {
@@ -174,7 +174,7 @@ void RTWCore88::detach(IOPCIDevice *device)
 IOReturn RTWCore88::enable(IONetworkInterface *interface)
 {
     (void)interface;
-    IOLog("AirportRTW-RTW88: Wi-Fi enable begin\n");
+    IOLog("AirportRTW: Wi-Fi enable begin\n");
     if (!(sc.sc_flags & RTW88_FLAG_ATTACHED))
         return kIOReturnNotReady;
     if (sc.sc_flags & RTW88_FLAG_ENABLED)
@@ -190,7 +190,7 @@ IOReturn RTWCore88::enable(IONetworkInterface *interface)
         if (sc.sc_ic.ic_event_handler)
             sc.sc_ic.ic_event_handler(&sc.sc_ic, IEEE80211_EVT_DRIVER_STOPPED, nullptr);
 #endif
-        IOLog("AirportRTW-RTW88: Wi-Fi enable failed during power-up\n");
+        IOLog("AirportRTW: Wi-Fi enable failed during power-up\n");
         return kIOReturnIOError;
     }
     sc.sc_flags |= RTW88_FLAG_ENABLED | RTW88_FLAG_FW_RUNNING |
@@ -209,14 +209,14 @@ IOReturn RTWCore88::enable(IONetworkInterface *interface)
 #else
     ieee80211_begin_scan(&sc.sc_ic.ic_if);
 #endif
-    IOLog("AirportRTW-RTW88: Wi-Fi enable complete\n");
+    IOLog("AirportRTW: Wi-Fi enable complete\n");
     return kIOReturnSuccess;
 }
 
 IOReturn RTWCore88::disable(IONetworkInterface *interface)
 {
     (void)interface;
-    IOLog("AirportRTW-RTW88: Wi-Fi disable begin\n");
+    IOLog("AirportRTW: Wi-Fi disable begin\n");
     if (associationRecoveryTimer)
         associationRecoveryTimer->cancelTimeout();
     associationRecoveryPending = 0;
@@ -236,7 +236,7 @@ IOReturn RTWCore88::disable(IONetworkInterface *interface)
     if (sc.sc_ic.ic_event_handler)
         sc.sc_ic.ic_event_handler(&sc.sc_ic, IEEE80211_EVT_DRIVER_STOPPED, nullptr);
 #endif
-    IOLog("AirportRTW-RTW88: Wi-Fi disable complete\n");
+    IOLog("AirportRTW: Wi-Fi disable complete\n");
     return kIOReturnSuccess;
 }
 
@@ -663,7 +663,7 @@ void RTWCore88::associationRecoveryExpired(OSObject *object,
     owner->associationRecoveryAttempted = 1;
     owner->associationRecoveryAttemptActive = 1;
     __sync_fetch_and_add(&owner->associationRecoveryAttemptCount, 1);
-    IOLog("AirportRTW-RTW88: retrying scan after short association\n");
+    IOLog("AirportRTW: retrying scan after short association\n");
     ieee80211_begin_scan(&owner->sc.sc_ic.ic_if);
 }
 

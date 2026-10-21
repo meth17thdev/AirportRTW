@@ -3104,7 +3104,7 @@ static void rtw89_core_bcn_track_assoc(struct rtw89_dev *rtwdev,
 	rcu_read_lock();
 	bss_conf = rtw89_vif_rcu_dereference_link(rtwvif_link, true);
 	beacon_int = bss_conf->beacon_int ?: 100;
-	/* The Feixiao kext may not know the DTIM period at assoc time;
+	/* The AirportRTW kext may not know the DTIM period at assoc time;
 	 * 0 here means a divide-by-zero below. */
 	dtim = bss_conf->dtim_period ?: 1;
 	rcu_read_unlock();
@@ -6070,7 +6070,7 @@ int rtw89_core_start(struct rtw89_dev *rtwdev)
 	rtw89_chip_bb_postinit(rtwdev);
 	rtw89_phy_init_rf_reg(rtwdev, false);
 
-	/* Feixiao: no macOS driver feeds the BT half.  BTC_MODE_WL runs the
+	/* AirportRTW: no macOS driver feeds the BT half.  BTC_MODE_WL runs the
 	 * coex engine in its designed wifi-only policy — antenna/GNT granted
 	 * to WLAN, no TDMA slot cycling against a silent BT firmware (which
 	 * previously wedged the register-H2C pipe). */

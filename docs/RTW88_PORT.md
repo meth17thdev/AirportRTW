@@ -71,7 +71,7 @@ not a linked AirportRTW RTW88 backend or working RTL8822CE hardware.
 
 The subsequently added `Realtek88LegacyAirport` folder contains both
 `rtw88-stable/drivers/net/wireless/realtek/rtw88` and the macOS transport/shims
-under `Feixiao/src`. It therefore supplies a local copy of the previously
+in its legacy macOS subproject. It therefore supplies a local copy of the previously
 missing hardware dependency. The top-level Github directory also contains the
 Realtek AirPort Family README and project/third-party licensing notices.
 
@@ -82,7 +82,7 @@ watchdog rearming and disables runtime power-saving transitions when the
 compatibility layer cannot provide full station iteration. Those are donor
 behavior differences to review, not changes to copy unconditionally.
 
-`Feixiao/README_LEGACY.md` also describes reconnect/STA/Block Ack teardown,
+The donor’s legacy README also describes reconnect/STA/Block Ack teardown,
 deferred TX ADDBA until data after port authorization, and bounded TX queue
 watermarks. These are relevant comparison points for the new HAL. Its legacy
 Apple frontend and independent MLME remain outside the integration boundary.

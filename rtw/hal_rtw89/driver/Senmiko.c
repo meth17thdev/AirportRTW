@@ -52,22 +52,22 @@ bool rtw89_disable_track_work = true;
  * RTW89_MACOS.  Each table is zero-terminated and its driver_data
  * carries the chip's rtw89_driver_info, exactly as the Linux PCI core
  * would pass it. */
-extern const struct pci_device_id *rtw89_8852ae_feixiao_ids;
-extern const struct pci_device_id *rtw89_8852be_feixiao_ids;
-extern const struct pci_device_id *rtw89_8851be_feixiao_ids;
-extern const struct pci_device_id *rtw89_8852bte_feixiao_ids;
-extern const struct pci_device_id *rtw89_8852ce_feixiao_ids;
-extern const struct pci_device_id *rtw89_8922ae_feixiao_ids;
+extern const struct pci_device_id *rtw89_8852ae_airportrtw_ids;
+extern const struct pci_device_id *rtw89_8852be_airportrtw_ids;
+extern const struct pci_device_id *rtw89_8851be_airportrtw_ids;
+extern const struct pci_device_id *rtw89_8852bte_airportrtw_ids;
+extern const struct pci_device_id *rtw89_8852ce_airportrtw_ids;
+extern const struct pci_device_id *rtw89_8922ae_airportrtw_ids;
 
-static const struct pci_device_id *rtw89_feixiao_match(u16 device)
+static const struct pci_device_id *rtw89_airportrtw_match(u16 device)
 {
 	const struct pci_device_id **tables[] = {
-		&rtw89_8852ae_feixiao_ids,
-		&rtw89_8852be_feixiao_ids,
-		&rtw89_8851be_feixiao_ids,
-		&rtw89_8852bte_feixiao_ids,
-		&rtw89_8852ce_feixiao_ids,
-		&rtw89_8922ae_feixiao_ids,
+		&rtw89_8852ae_airportrtw_ids,
+		&rtw89_8852be_airportrtw_ids,
+		&rtw89_8851be_airportrtw_ids,
+		&rtw89_8852bte_airportrtw_ids,
+		&rtw89_8852ce_airportrtw_ids,
+		&rtw89_8922ae_airportrtw_ids,
 	};
 	const struct pci_device_id *id;
 	unsigned int i;
@@ -85,7 +85,7 @@ static const struct pci_device_id *rtw89_feixiao_match(u16 device)
  * caller's driver_data. */
 int rtw_pci_probe(struct pci_dev *pdev, const struct pci_device_id *id)
 {
-	const struct pci_device_id *real_id = rtw89_feixiao_match(pdev->device);
+	const struct pci_device_id *real_id = rtw89_airportrtw_match(pdev->device);
 
 	if (!real_id) {
 		pr_err("rtw89: no chip info for PCI device %04x\n",
@@ -182,7 +182,7 @@ void rtw88_debug_dump_tx_state(void)
 /* ------------------------------------------------------------------ */
 /*  A-MPDU BlockAck hardware setup                                      */
 /*                                                                     */
-/*  The Feixiao kext runs the ADDBA/DELBA handshake over the air but    */
+/*  The AirportRTW kext runs the ADDBA/DELBA handshake over the air but    */
 /*  cannot call mac80211's ampdu_action op: rtw89_ops_ampdu_action      */
 /*  dereferences sta->txq[tid]->drv_priv, and this port never           */
 /*  allocates per-TID txqs.  We instead call the rtw89 H2C helpers      */
@@ -362,13 +362,13 @@ void rtw88_sw_scan_complete(struct ieee80211_hw *hw, struct ieee80211_vif *vif)
  * efuse.btcoex flag; the equivalent is BTC manual control, which stops
  * the periodic coex algorithm from reacting to (never-arriving) BT
  * firmware replies.  Same mechanism as debugfs' btc_manual node. */
-static bool feixiao_wifi_only;
+static bool airportrtw_wifi_only;
 
 /* core.c boots BTC in BTC_MODE_WL (wifi-only policy) at every
  * ops->start while this reads true. */
 bool rtw88_btc_wifi_only(void)
 {
-	return feixiao_wifi_only;
+	return airportrtw_wifi_only;
 }
 
 void rtw88_force_wifi_only(void)
@@ -378,7 +378,7 @@ void rtw88_force_wifi_only(void)
 	/* Sticky: the kext may call this before rtw_pci_probe registers the
 	 * hw; record the request first, rtw89_core_start applies it via
 	 * rtw89_btc_ntfy_init(BTC_MODE_WL). */
-	feixiao_wifi_only = true;
+	airportrtw_wifi_only = true;
 
 	if (hw && hw->priv &&
 	    test_bit(RTW89_FLAG_RUNNING, to_rtw89(hw->priv)->flags))
@@ -389,8 +389,8 @@ void rtw88_force_wifi_only(void)
 
 /* Single STA chanctx emulating mac80211's add/assign flow (the kext
  * never calls the chanctx ops itself). */
-static struct ieee80211_chanctx_conf *feixiao_chanctx;
-static bool feixiao_chanctx_added;
+static struct ieee80211_chanctx_conf *airportrtw_chanctx;
+static bool airportrtw_chanctx_added;
 
 /* Set channel + BSSID for the kext's connect flow (it bypasses mac80211's
  * bss_info_changed path).  Caller populates hw->conf.chandef first, same
@@ -422,31 +422,31 @@ void rtw88_connect_hw_setup(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 	 * The chanctx is pinned to RTW89_CHANCTX_0 (single-vif kext), which
 	 * also keeps rtw89_chanctx_ops_add()'s find_first_zero_bit from
 	 * tripping over a bit the sw-scan bridge may already have set. */
-	if (!feixiao_chanctx) {
-		feixiao_chanctx = kzalloc(sizeof(*feixiao_chanctx) +
+	if (!airportrtw_chanctx) {
+		airportrtw_chanctx = kzalloc(sizeof(*airportrtw_chanctx) +
 					  hw->chanctx_data_size, GFP_KERNEL);
-		if (!feixiao_chanctx) {
+		if (!airportrtw_chanctx) {
 			rtw89_err(rtwdev, "connect: no mem for chanctx\n");
 			return;
 		}
 	}
-	feixiao_chanctx->def = hw->conf.chandef;
+	airportrtw_chanctx->def = hw->conf.chandef;
 
-	if (!feixiao_chanctx_added) {
+	if (!airportrtw_chanctx_added) {
 		struct rtw89_chanctx_cfg *cfg =
-			(struct rtw89_chanctx_cfg *)feixiao_chanctx->drv_priv;
+			(struct rtw89_chanctx_cfg *)airportrtw_chanctx->drv_priv;
 
 		cfg->idx = RTW89_CHANCTX_0;
 		cfg->ref_count = 0;
 		rtwdev->hal.chanctx[RTW89_CHANCTX_0].cfg = cfg;
-		feixiao_chanctx_added = true;
+		airportrtw_chanctx_added = true;
 	}
 	rtw89_config_entity_chandef(rtwdev, RTW89_CHANCTX_0,
-				    &feixiao_chanctx->def);
+				    &airportrtw_chanctx->def);
 
 	if (!rtwvif_link->chanctx_assigned) {
 		if (rtw89_chanctx_ops_assign_vif(rtwdev, rtwvif_link,
-						 feixiao_chanctx)) {
+						 airportrtw_chanctx)) {
 			rtw89_err(rtwdev, "connect: assign chanctx failed\n");
 			return;
 		}
@@ -488,12 +488,12 @@ void rtw88_restore_connected_hw(struct ieee80211_hw *hw,
 void rtw88_release_chanctx(struct rtw89_dev *rtwdev,
 			   struct rtw89_vif_link *rtwvif_link)
 {
-	if (!feixiao_chanctx || !rtwvif_link->chanctx_assigned)
+	if (!airportrtw_chanctx || !rtwvif_link->chanctx_assigned)
 		return;
 
-	rtw89_chanctx_ops_unassign_vif(rtwdev, rtwvif_link, feixiao_chanctx);
-	rtw89_chanctx_ops_remove(rtwdev, feixiao_chanctx);
-	feixiao_chanctx_added = false;
+	rtw89_chanctx_ops_unassign_vif(rtwdev, rtwvif_link, airportrtw_chanctx);
+	rtw89_chanctx_ops_remove(rtwdev, airportrtw_chanctx);
+	airportrtw_chanctx_added = false;
 }
 
 /* ------------------------------------------------------------------ */

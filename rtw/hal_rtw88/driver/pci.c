@@ -977,7 +977,7 @@ static void rtw_pci_tx_isr(struct rtw_dev *rtwdev, struct rtw_pci *rtwpci,
 	{
 		u32 queued = skb_queue_len(&ring->queue);
 		if (count > queued) {
-			IOLog("rtw88: TXISR DESYNC q%d: count=%u > queued=%u "
+			IOLog("AirportRTW: TXISR DESYNC q%d: count=%u > queued=%u "
 			      "(cur_rp=%u rp=%u wp=%u len=%u), clamping\n",
 			      hw_queue, count, queued,
 			      cur_rp, ring->r.rp, ring->r.wp, ring->r.len);
@@ -1858,7 +1858,7 @@ int rtw_pci_probe(struct pci_dev *pdev,
 		goto err_release_hw;
 
 	rtw_dbg(rtwdev, RTW_DBG_PCI,
-		"rtw88 pci probe: vendor=0x%4.04X device=0x%4.04X rev=%d\n",
+		"AirportRTW PCI probe: vendor=0x%4.04X device=0x%4.04X rev=%d\n",
 		pdev->vendor, pdev->device, pdev->revision);
 
 	ret = rtw_pci_claim(rtwdev, pdev);

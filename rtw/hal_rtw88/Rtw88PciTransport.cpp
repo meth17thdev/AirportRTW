@@ -115,7 +115,7 @@ bool Rtw88PciTransport::initWithDevice(IOPCIDevice *device, IOWorkLoop *loop)
     if (!interruptSource || workLoop->addEventSource(interruptSource) !=
                                 kIOReturnSuccess)
         return false;
-    IOLog("AirportRTW-RTW88: transport ready; interrupt source held disabled\n");
+    IOLog("AirportRTW: transport ready; interrupt source held disabled\n");
     recordAttachStage("transport ready");
     return true;
 }
@@ -125,7 +125,7 @@ void Rtw88PciTransport::enableInterrupts()
     if (interruptSource && !interruptsEnabled) {
         interruptSource->enable();
         interruptsEnabled = true;
-        IOLog("AirportRTW-RTW88: interrupt source enabled\n");
+        IOLog("AirportRTW: interrupt source enabled\n");
     }
 }
 
@@ -134,7 +134,7 @@ void Rtw88PciTransport::disableInterrupts()
     if (interruptSource && interruptsEnabled) {
         interruptSource->disable();
         interruptsEnabled = false;
-        IOLog("AirportRTW-RTW88: interrupt source disabled\n");
+        IOLog("AirportRTW: interrupt source disabled\n");
     }
 }
 
