@@ -1086,7 +1086,7 @@ getDRIVER_VERSION(OSObject *object,
     if (!hv)
         return kIOReturnError;
     hv->version = APPLE80211_VERSION;
-    snprintf(hv->string, sizeof(hv->string), "itlwm: %s%s fw: %s", ITLWM_VERSION, GIT_COMMIT, fHalService->getDriverInfo()->getFirmwareVersion());
+    snprintf(hv->string, sizeof(hv->string), "%s", fHalService->getDriverInfo()->getFirmwareVersion());
     hv->string_len = strlen(hv->string);
     return kIOReturnSuccess;
 }
