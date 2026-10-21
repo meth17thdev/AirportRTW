@@ -23,7 +23,7 @@
 		<key>rtw89</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
-			<string>com.zxystd.AirportRTW</string>
+			<string>com.senmiko.AirportRTW</string>
 			<key>IOClass</key>
 			<string>AirportRTW</string>
 			<key>IOMatchCategory</key>
@@ -50,7 +50,7 @@
 		<key>AirportRTW</key>
 		<dict>
 			<key>CFBundleIdentifier</key>
-			<string>com.zxystd.AirportRTW</string>
+			<string>com.senmiko.AirportRTW</string>
 			<key>IOClass</key>
 			<string>AirportRTW</string>
 			<key>IOMatchCategory</key>

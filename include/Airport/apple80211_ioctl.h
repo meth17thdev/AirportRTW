@@ -618,7 +618,7 @@ struct apple80211_scan_multiple_data
     uint16_t                  unk_2;
 };
 
-static_assert(__offsetof(struct apple80211_scan_multiple_data, bssid_count) == 0x19c, "zxystd: BSSID offset invalid");
+static_assert(__offsetof(struct apple80211_scan_multiple_data, bssid_count) == 0x19c, "senmiko: BSSID offset invalid");
 
 struct apple80211_link_changed_event_data
 {
