@@ -112,6 +112,7 @@ struct Rtw89LinuxContext {
     volatile uint32_t txReportAttempts;
     void *nativeOwner;
     ReceiveCallback receive;
+    void (*traceReceive)(void *, unsigned, const uint8_t *, size_t, unsigned);
     TxResumeCallback txResume;
 };
 

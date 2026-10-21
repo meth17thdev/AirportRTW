@@ -36,6 +36,9 @@ static void receiveFrame(void *opaque, struct sk_buff *skb)
     if (!skb)
         return;
     struct ieee80211_rx_status *status = IEEE80211_SKB_RXCB(skb);
+    if (context && context->traceReceive)
+        context->traceReceive(context->nativeOwner, 1, skb->data, skb->len,
+            (status->flag & (RX_FLAG_FAILED_FCS_CRC | RX_FLAG_FAILED_PLCP_CRC)) ? 1 : 0);
     // Linux mac80211 removes the hardware FCS before handing frames to MLME.
     // Our bridge bypasses mac80211, so perform that step here. Otherwise the
     // CRC is parsed as trailing IEs and WCL rejects valid beacon results.
@@ -157,6 +160,8 @@ static void receiveFrame(void *opaque, struct sk_buff *skb)
     }
     if (context && context->receive && skb->data && skb->len >= 10 &&
         !(status->flag & (RX_FLAG_FAILED_FCS_CRC | RX_FLAG_FAILED_PLCP_CRC))) {
+        if (context->traceReceive)
+            context->traceReceive(context->nativeOwner, 2, skb->data, skb->len, 0);
         context->receive(context->nativeOwner, skb->data, skb->len,
                          status->signal, status->freq,
                          (status->flag & RX_FLAG_DECRYPTED) != 0,
@@ -291,6 +296,12 @@ static void releaseStation(Rtw89LinuxContext *context)
     context->stationAllocationSize = 0;
     context->stationState = IEEE80211_STA_NOTEXIST;
 }
+}
+
+extern "C" void rtw89_macos_trace_rx(const uint8_t *frame, size_t length, unsigned flags)
+{
+    if (activeContext && activeContext->traceReceive)
+        activeContext->traceReceive(activeContext->nativeOwner, 0, frame, length, flags);
 }
 
 bool rtw89LinuxAttach(Rtw89PciTransport *transport,

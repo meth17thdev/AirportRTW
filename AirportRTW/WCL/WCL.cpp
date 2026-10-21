@@ -21,6 +21,8 @@ extern IOCommandGate *_fCommandGate;
 static void retainIncompleteJoin(IOService *controller, ieee80211com *ic, uint32_t auth)
 {
     if (!(ic->ic_flags & IEEE80211_F_RSNON)) return;
+    controller->setProperty("RTWLastIncompleteJoinEarlyRx", ic->ic_join_rx_early,
+                            sizeof(ic->ic_join_rx_early));
     controller->setProperty("RTWLastIncompleteJoinAuth", auth, 32);
     controller->setProperty("RTWLastIncompleteJoinStage", ic->ic_sae_stage, 32);
     controller->setProperty("RTWLastIncompleteJoinError", ic->ic_sae_error, 32);
@@ -35,6 +37,36 @@ static void retainIncompleteJoin(IOService *controller, ieee80211com *ic, uint32
         (node->ni_flags & IEEE80211_NODE_HE) ? "802.11ax" :
         (node->ni_flags & IEEE80211_NODE_VHT) ? "802.11ac" :
         (node->ni_flags & IEEE80211_NODE_HT) ? "802.11n" : "legacy");
+    // Keep each attempt, including retries. Publish a copied collection.
+    auto old = OSDynamicCast(OSArray, controller->getProperty("RTWIncompleteJoins"));
+    if (old && old->getCount()) {
+        auto last = OSDynamicCast(OSDictionary, old->getObject(old->getCount() - 1));
+        auto serial = last ? OSDynamicCast(OSNumber, last->getObject("Serial")) : nullptr;
+        if (serial && serial->unsigned32BitValue() == ic->ic_join_serial) return;
+    }
+    auto history = old ? OSArray::withArray(old) : OSArray::withCapacity(8);
+    auto record = OSDictionary::withCapacity(10);
+    if (!history || !record) {
+        if (history) history->release();
+        if (record) record->release();
+        return;
+    }
+    const char *fields[] = {"Auth", "Stage", "Error", "Data", "EAPOL", "EAPOLCalls",
+                            "Headers", "PHY", "EarlyRx"};
+    for (auto field : fields) {
+        char key[80];
+        snprintf(key, sizeof(key), "RTWLastIncompleteJoin%s", field);
+        if (auto value = controller->getProperty(key)) record->setObject(field, value);
+    }
+    if (auto serial = OSNumber::withNumber(ic->ic_join_serial, 32)) {
+        record->setObject("Serial", serial);
+        serial->release();
+    }
+    if (history->getCount() >= 8) history->removeObject(0);
+    history->setObject(record);
+    controller->setProperty("RTWIncompleteJoins", history);
+    record->release();
+    history->release();
 }
 
 
@@ -500,6 +532,8 @@ IOReturn AirportRTWSkywalkInterface::startWCLJoin(AirportWCL::JoinRequest &join)
     ic->ic_wcl_enterprise = enterprise;
 
     if (personal || enterprise || sae) {
+        ++ic->ic_join_serial;
+        bzero(ic->ic_join_rx_early, sizeof(ic->ic_join_rx_early));
         ic->ic_sae_stage = 1; ic->ic_sae_error = 0;
         ic->ic_sae_rx_data = ic->ic_sae_rx_eapol = ic->ic_sae_eapol_calls = 0;
         bzero(ic->ic_sae_rx_headers, sizeof(ic->ic_sae_rx_headers));

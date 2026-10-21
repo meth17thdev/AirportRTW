@@ -50,6 +50,7 @@ private:
     static void watchdog(struct _ifnet *);
     static void scanDwellExpired(OSObject *, IOTimerEventSource *);
     static void associationRecoveryExpired(OSObject *, IOTimerEventSource *);
+    static void traceReceive(void *, unsigned, const uint8_t *, size_t, unsigned);
     static void receive(void *, const uint8_t *, size_t, int32_t, uint16_t,
                         bool, bool);
     static void resumeTransmit(void *);

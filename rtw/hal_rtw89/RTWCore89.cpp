@@ -90,6 +90,7 @@ bool RTWCore89::attach(IOPCIDevice *device)
     IOLog("AirportRTW-RTW89: Linux PCI probe complete\n");
     linuxContext.nativeOwner = this;
     linuxContext.receive = receive;
+    linuxContext.traceReceive = traceReceive;
     linuxContext.txResume = resumeTransmit;
     sc.sc_hw = static_cast<struct ieee80211_hw *>(linuxContext.hardware);
     sc.sc_rtwdev = static_cast<struct rtw89_dev *>(linuxContext.device);
@@ -653,6 +654,8 @@ void RTWCore89::watchdog(struct _ifnet *ifp)
                             owner->associationRecoverySuccessCount, 64);
     controller->setProperty("RTW89HECapable", owner->sc.sc_ic.ic_hecaps != 0);
     controller->setProperty("RTW89HEEnabled", (owner->sc.sc_ic.ic_flags & IEEE80211_F_HEON) != 0);
+    controller->setProperty("RTWJoinEarlyRx", owner->sc.sc_ic.ic_join_rx_early,
+                            sizeof(owner->sc.sc_ic.ic_join_rx_early));
     controller->setProperty("RTWSAERxHeaders", owner->sc.sc_ic.ic_sae_rx_headers,
                             sizeof(owner->sc.sc_ic.ic_sae_rx_headers));
     controller->setProperty("RTWSAERawData", owner->sc.sc_ic.ic_sae_rx_data, 32);
@@ -806,6 +809,45 @@ void RTWCore89::resumeTransmit(void *opaque)
         return;
     ifq_clr_oactive(&ifp->if_snd);
     start(ifp);
+}
+
+// Stages: driver core before PPDU queue, bridge entry, native delivery.
+// Count only the selected RSN peer while its controlled port is closed.
+void RTWCore89::traceReceive(void *opaque, unsigned stage, const uint8_t *frame,
+                             size_t length, unsigned flags)
+{
+    auto *owner = static_cast<RTWCore89 *>(opaque);
+    if (!owner || !frame || length < 24 || stage > 2) return;
+    auto *ic = &owner->sc.sc_ic;
+    if (!(ic->ic_flags & IEEE80211_F_RSNON) || !ic->ic_bss ||
+        ic->ic_bss->ni_port_valid ||
+        !IEEE80211_ADDR_EQ(frame + 10, ic->ic_bss->ni_bssid)) return;
+    auto *counts = ic->ic_join_rx_early;
+    unsigned type = frame[0] & IEEE80211_FC0_TYPE_MASK;
+    if (type == IEEE80211_FC0_TYPE_MGT) {
+        if (stage == 0) {
+            __sync_fetch_and_add(&counts[10], 1);
+            if ((frame[0] & IEEE80211_FC0_SUBTYPE_MASK) == IEEE80211_FC0_SUBTYPE_BEACON)
+                __sync_fetch_and_add(&counts[11], 1);
+        }
+        return;
+    }
+    if (type != IEEE80211_FC0_TYPE_DATA) return;
+    unsigned offset = stage == 0 ? 0 : stage == 1 ? 5 : 8;
+    __sync_fetch_and_add(&counts[offset], 1);
+    // Never inspect ciphertext or retain key-exchange bodies.
+    auto header = Rtw89Rx::handshakeHeader(frame, length, false, false);
+    if (!(flags & 3) && header.etherType == 0x888e)
+        __sync_fetch_and_add(&counts[offset + 1], 1);
+    if (stage == 0) {
+        if (flags & 1) __sync_fetch_and_add(&counts[2], 1);
+        if (flags & 2) __sync_fetch_and_add(&counts[3], 1);
+        if (!(frame[4] & 1) && !IEEE80211_ADDR_EQ(frame + 4, ic->ic_myaddr))
+            __sync_fetch_and_add(&counts[4], 1);
+        if (flags & 4) __sync_fetch_and_add(&counts[12], 1);
+    } else if (stage == 1 && (flags & 1)) {
+        __sync_fetch_and_add(&counts[7], 1);
+    }
 }
 
 void RTWCore89::receive(void *opaque, const uint8_t *frame, size_t length,

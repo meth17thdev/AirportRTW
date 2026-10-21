@@ -4012,6 +4012,8 @@ out:
 	rcu_read_unlock();
 }
 
+extern void rtw89_macos_trace_rx(const u8 *frame, size_t length, unsigned int flags);
+
 void rtw89_core_rx(struct rtw89_dev *rtwdev,
 		   struct rtw89_rx_desc_info *desc_info,
 		   struct sk_buff *skb)
@@ -4025,6 +4027,11 @@ void rtw89_core_rx(struct rtw89_dev *rtwdev,
 		rtw89_core_rx_process_report(rtwdev, desc_info, skb);
 		return;
 	}
+
+	rtw89_macos_trace_rx(skb->data, skb->len,
+		(desc_info->crc32_err ? 1 : 0) | (desc_info->icv_err ? 2 : 0) |
+		((desc_info->long_rxdesc &&
+		  (BIT(desc_info->frame_type) & PPDU_FILTER_BITMAP)) ? 4 : 0));
 
 	if (ppdu_sts->curr_rx_ppdu_cnt[band] != ppdu_cnt) {
 		rtw89_core_flush_ppdu_rx_queue(rtwdev, desc_info);

@@ -31,14 +31,31 @@ def decode_headers(raw, count):
                 "ether_type": None if ether_type == 0xffffffff else hex(ether_type)})
     return records
 
+def decode_early(raw):
+    names = ("core_data", "core_eapol", "core_crc_errors", "core_icv_errors",
+             "core_wrong_destination", "bridge_data", "bridge_eapol", "bridge_crc_errors",
+             "delivered_data", "delivered_eapol", "core_management", "core_beacons",
+             "core_ppdu_queued_data")
+    if not isinstance(raw, bytes) or len(raw) != 52:
+        return None
+    return dict(zip(names, struct.unpack("<13I", raw)))
+
 for properties in controllers(tree):
     result = {k: v for k, v in properties.items()
               if ((k.startswith("RTWSAE") or k.startswith("RTWLastIncompleteJoin"))
-                  and not k.endswith("Headers")) or
-              k in ("RTW89HECapable", "RTW89HEEnabled", "RTW89NegotiatedPHY")}
+                  and not k.endswith(("Headers", "EarlyRx"))) or
+              k in ("RTW89HECapable", "RTW89HEEnabled", "RTW89NegotiatedPHY", "RTW89StationState")}
     result["headers"] = decode_headers(properties.get("RTWSAERxHeaders", b""),
                                         properties.get("RTWSAERawData", 0))
     result["last_incomplete_headers"] = decode_headers(
         properties.get("RTWLastIncompleteJoinHeaders", b""),
         properties.get("RTWLastIncompleteJoinData", 0))
+    result["early_rx"] = decode_early(properties.get("RTWJoinEarlyRx"))
+    result["last_incomplete_early_rx"] = decode_early(properties.get("RTWLastIncompleteJoinEarlyRx"))
+    result["incomplete_joins"] = []
+    for saved in properties.get("RTWIncompleteJoins", []):
+        record = {k: v for k, v in saved.items() if k not in ("Headers", "EarlyRx")}
+        record["headers"] = decode_headers(saved.get("Headers"), saved.get("Data", 0))
+        record["early_rx"] = decode_early(saved.get("EarlyRx"))
+        result["incomplete_joins"].append(record)
     print(json.dumps(result, indent=2))
