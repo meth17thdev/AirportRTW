@@ -512,6 +512,7 @@ IOReturn AirportRTWSkywalkInterface::startWCLJoin(AirportWCL::JoinRequest &join)
             return kIOReturnBadArgument;
         }
         if (sae) {
+            ic->ic_sae_stage = 1; ic->ic_sae_error = 0;
             ic->ic_sae_enabled = true;
             ic->ic_sae_password_len = join.keyLength;
             memcpy(ic->ic_sae_password, join.key, join.keyLength);

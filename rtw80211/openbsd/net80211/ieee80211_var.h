@@ -560,6 +560,8 @@ struct ieee80211com {
     uint32_t        ic_vhtcaps;
     uint32_t        ic_hecaps;
     void           *ic_sae;
+    uint32_t        ic_sae_stage; /* request, commit, peer commit, confirm, EAPOL, M2, M3, port */
+    uint32_t        ic_sae_error; /* numeric diagnostic only; no credential data */
     bool            ic_sae_enabled;
     uint8_t         ic_sae_password[64];
     uint8_t         ic_sae_password_len;

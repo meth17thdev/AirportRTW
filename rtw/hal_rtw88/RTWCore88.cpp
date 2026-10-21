@@ -610,6 +610,8 @@ void RTWCore88::watchdog(struct _ifnet *ifp)
                             owner->associationRecoveryAttemptCount, 64);
     controller->setProperty("RTW88AssociationRecoverySuccessCount",
                             owner->associationRecoverySuccessCount, 64);
+    controller->setProperty("RTWSAEStage", owner->sc.sc_ic.ic_sae_stage, 32);
+    controller->setProperty("RTWSAEError", owner->sc.sc_ic.ic_sae_error, 32);
     controller->setProperty("RTW88Net80211State",
                             (UInt64)owner->sc.sc_ic.ic_state, 8);
     if (owner->sc.sc_ic.ic_bss) {

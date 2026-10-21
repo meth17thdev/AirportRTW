@@ -29,6 +29,7 @@
  * OR IN CONNECTION WITH THE USE OR PERFORMANCE OF THIS SOFTWARE.
  */
 
+#include "ieee80211_ptk.hpp"
 #include <sys/param.h>
 #include <sys/systm.h>
 #include <sys/mbuf.h>
@@ -409,29 +410,9 @@ ieee80211_derive_ptk(enum ieee80211_akm akm, const u_int8_t *pmk,
     const u_int8_t *aa, const u_int8_t *spa, const u_int8_t *anonce,
     const u_int8_t *snonce, struct ieee80211_ptk *ptk)
 {
-	void (*kdf)(const u_int8_t *, size_t, const u_int8_t *, size_t,
-        const u_int8_t *, size_t, u_int8_t *, size_t);
-    u_int8_t buf[2 * IEEE80211_ADDR_LEN + 2 * EAPOL_KEY_NONCE_LEN];
-    int ret;
-
-    /* Min(AA,SPA) || Max(AA,SPA) */
-    ret = memcmp(aa, spa, IEEE80211_ADDR_LEN) < 0;
-    memcpy(&buf[ 0], ret ? aa : spa, IEEE80211_ADDR_LEN);
-    memcpy(&buf[ 6], ret ? spa : aa, IEEE80211_ADDR_LEN);
-
-    /* Min(ANonce,SNonce) || Max(ANonce,SNonce) */
-    ret = memcmp(anonce, snonce, EAPOL_KEY_NONCE_LEN) < 0;
-    memcpy(&buf[12], ret ? anonce : snonce, EAPOL_KEY_NONCE_LEN);
-    memcpy(&buf[44], ret ? snonce : anonce, EAPOL_KEY_NONCE_LEN);
-
-    kdf = ieee80211_is_sha256_akm(akm) ? ieee80211_kdf : ieee80211_prf;
-    /* SAE is restricted to CCMP-128 here: KCK16 + KEK16 + TK16.
-     * SHA-256 KDF encodes the output length, so deriving 64 then truncating
-     * would produce different keys from the AP's required 48-byte PTK. */
-    size_t length = akm == IEEE80211_AKM_SAE ? 48 : sizeof(*ptk);
-    bzero(ptk, sizeof(*ptk));
-    (*kdf)(pmk, IEEE80211_PMK_LEN, (const u_int8_t *)"Pairwise key expansion", 23,
-        buf, sizeof buf, (u_int8_t *)ptk, length);
+    auto kdf = ieee80211_is_sha256_akm(akm) ? ieee80211_kdf : ieee80211_prf;
+    Net80211PTK::derive(akm == IEEE80211_AKM_SAE, pmk, aa, spa, anonce,
+                       snonce, (u_int8_t *)ptk, sizeof(*ptk), kdf);
 }
 
 static void

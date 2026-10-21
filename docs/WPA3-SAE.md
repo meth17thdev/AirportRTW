@@ -44,3 +44,17 @@ done
 python3 tools/validate_sae_backend.py --archive build/tests/sae/librtw_sae.a
 bash scripts/build_release_kexts.sh AirportRTW-Tahoe AirportRTW-Sequoia
 ```
+
+Native controller diagnostics retain the last SAE attempt without key material:
+`RTWSAEStage` is 1 (request), 2 (commit prepared), 3 (peer commit accepted),
+4 (peer confirmed), 5 (EAPOL received), 6 (message 2 prepared), 7 (message 3
+received), or 8 (port authorized). `RTWSAEError` is 1 (message 3 MIC),
+2 (key-data decryption), 3 (RSNXE mismatch), 4 (required GTK/IGTK missing),
+0x10000 plus a commit status, 0x20000 (confirm rejection), or 0x30000 plus a
+four-way deauthentication reason. Zero means no recorded error; a stage alone
+does not prove a transmitted frame reached the AP. Values persist across a
+failed join and are reset when another SAE join begins.
+
+The PTK known-answer test checks the production MAC/nonce ordering and SAE
+48-byte SHA-256 derivation with its 22-byte label (no terminating NUL), plus
+legacy WPA2 SHA-1 derivation with its NUL separator. These label formats differ.
