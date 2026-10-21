@@ -67,3 +67,28 @@ other Realtek Wi-Fi kext that claims it. The first hardware pass should verify:
 
 This Windows checkout cannot run Xcode or load a kext, so hardware behavior
 and macOS SDK ABI still require that first Mac build/test pass.
+
+
+## HE / Wi-Fi 6 negotiation
+
+`RTWCore89` publishes the probed hardware's station HE capabilities to the
+shared net80211 controller. It chooses the capabilities for the association's
+2.4/5 GHz band and limits the advertised channel width to the bridge's 80 MHz
+maximum. The `-nohe` boot argument keeps the HT/VHT path for comparison.
+
+net80211 retains authentication, association and HE negotiation. Its HE element
+parsers validate the fixed/MCS/PPE and operation lengths before reading them;
+negotiation verifies common MCS support and the AP's basic MCS set. Wider APs
+are narrowed to the supported primary 80 MHz segment. RTW88 does not acquire
+HE mode merely because it has VHT channels.
+
+The hardware bridge passes the negotiated peer HE capabilities and intersected
+MCS/NSS maps to the Linux station, and programs HE BSS state, BSS colour,
+operation parameters and MU EDCA when advertised. HE state is cleared on
+leave. PHY reporting uses negotiated node flags and reports Auto while not
+associated; `RTW89NegotiatedPHY` provides an IORegistry diagnostic at RUN.
+
+The local `Airport_RTW89` reference informed the HE state and MCS checks, but
+its separate MLME is not imported. This does not implement SAE, 6 GHz, EHT,
+MLO or channels wider than 80 MHz. Physical ax association, fallback,
+reconnection and throughput still require tests on hardware.

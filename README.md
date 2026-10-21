@@ -55,7 +55,10 @@ The Sequoia ABI starts at 15.2; 15.0/15.1 are not covered by the new target.
 
 Initial limitations: associated scans use cached results because the Realtek HAL
 does not implement off-channel background scans; private MAC changes are wired through interface reinitialization but unverified;
-HE/Wi-Fi 6 is not advertised by the new frontend. WPA3-only,
+RTW89 now includes experimental HE/Wi-Fi 6 negotiation on 2.4/5 GHz up to
+80 MHz; hardware validation is pending. RTW88 remains HT/VHT. The active PHY
+mode reports negotiated ax/ac/n, and `-nohe` disables HE for comparison.
+6 GHz and Wi-Fi 7/EHT are not enabled. WPA3-only,
 mandatory PMF and AWDL/AirDrop are not established features of this port.
 
 The shared frontend selects `RTWCore89` (RTW89) or `RTWCore88` (RTW88).

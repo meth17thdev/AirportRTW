@@ -42,6 +42,9 @@ jobs:
             tests/rtw89_link_policy_test.cpp -o build/tests/rtw89-link-policy
           build/tests/rtw89-link-policy
           xcrun clang++ -std=c++14 -Wall -Wextra -Werror \
+            tests/rtw89_he_test.cpp -o build/tests/rtw89-he
+          build/tests/rtw89-he
+          xcrun clang++ -std=c++14 -Wall -Wextra -Werror \
             tests/rtw88_hal_test.cpp -o build/tests/rtw88-hal
           build/tests/rtw88-hal
       - name: Build target

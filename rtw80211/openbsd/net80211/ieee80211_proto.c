@@ -1,3 +1,4 @@
+#include "ieee80211_he_policy.hpp"
 /*
 * Copyright (C) 2020  钟先耀
 *
@@ -817,6 +818,16 @@ ieee80211_vht_negotiate(struct ieee80211com *ic, struct ieee80211_node *ni)
     if (ieee80211_node_supports_vht_sgi160(ni))
         ni->ni_flags |= IEEE80211_NODE_VHT_SGI160;
     
+    if ((ni->ni_chw == IEEE80211_CHAN_WIDTH_160 ||
+         ni->ni_chw == IEEE80211_CHAN_WIDTH_80P80) &&
+        (ic->ic_vhtcaps & IEEE80211_VHTCAP_SUPP_CHAN_WIDTH_MASK) == 0) {
+        uint16_t center = (ni->ni_chan->ic_flags & IEEE80211_CHAN_VHT80) ?
+            Net80211HE::center80(ni->ni_chan->ic_freq) : 0;
+        ni->ni_chw = center ? IEEE80211_CHAN_WIDTH_80 : IEEE80211_CHAN_WIDTH_20;
+        ni->ni_chan->ic_center_freq1 = center ? center : ni->ni_chan->ic_freq;
+        ni->ni_chan->ic_center_freq2 = 0;
+    }
+
     XYLog("%s chan_width=%s support_160=%d support_80_80=%d\n", __FUNCTION__, ieee80211_chan_width_name[ni->ni_chw], support_160, support_80_80);
 }
 
@@ -842,6 +853,12 @@ ieee80211_he_negotiate(struct ieee80211com *ic, struct ieee80211_node *ni)
     if ((ic->ic_flags & IEEE80211_F_HEON) == 0)
         return;
     
+    if (!Net80211HE::ratesValid(
+        le16toh(ic->ic_he_mcs_nss_supp.rx_mcs_80),
+        le16toh(ic->ic_he_mcs_nss_supp.tx_mcs_80),
+        le16toh(ni->ni_he_mcs_nss_supp.rx_mcs_80),
+        le16toh(ni->ni_he_mcs_nss_supp.tx_mcs_80), ni->ni_he_oper_nss_set))
+        return;
     ni->ni_flags |= IEEE80211_NODE_HE;
     
     if (!(htole32(ni->ni_he_oper_params) & IEEE80211_HE_OPERATION_VHT_OPER_INFO))
@@ -944,6 +961,16 @@ ieee80211_he_negotiate(struct ieee80211com *ic, struct ieee80211_node *ni)
             return;
     }
     
+    if ((ni->ni_chw == IEEE80211_CHAN_WIDTH_160 ||
+         ni->ni_chw == IEEE80211_CHAN_WIDTH_80P80) &&
+        (ic->ic_he_cap_elem.phy_cap_info[0] & 0x18) == 0) {
+        uint16_t center = (ni->ni_chan->ic_flags & IEEE80211_CHAN_VHT80) ?
+            Net80211HE::center80(ni->ni_chan->ic_freq) : 0;
+        ni->ni_chw = center ? IEEE80211_CHAN_WIDTH_80 : IEEE80211_CHAN_WIDTH_20;
+        ni->ni_chan->ic_center_freq1 = center ? center : ni->ni_chan->ic_freq;
+        ni->ni_chan->ic_center_freq2 = 0;
+    }
+
     XYLog("%s chan_width=%s\n", __FUNCTION__, ieee80211_chan_width_name[ni->ni_chw]);
 }
 

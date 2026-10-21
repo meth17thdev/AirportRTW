@@ -69,6 +69,8 @@ private:
                             uint8_t);
 
     bool attachNet80211();
+    void configureHECapabilities(bool fiveGHz);
+    bool heDisabled {false};
     void detachNet80211();
 
     struct rtw89_softc sc {};

@@ -1,3 +1,4 @@
+#include "ieee80211_he_policy.hpp"
 /*
  * Copyright (C) 2020  钟先耀
  *
@@ -2813,14 +2814,19 @@ void
 ieee80211_setup_hecaps(struct ieee80211_node *ni, const uint8_t *data,
                        uint8_t len)
 {
+    bzero(&ni->ni_he_cap_elem, sizeof(ni->ni_he_cap_elem));
+    bzero(&ni->ni_he_mcs_nss_supp, sizeof(ni->ni_he_mcs_nss_supp));
+    bzero(ni->ni_ppe_thres, sizeof(ni->ni_ppe_thres));
+    if (!Net80211HE::validCapabilities(data, len)) return;
     struct ieee80211_he_cap_elem *he_cap_ie_elem = (struct ieee80211_he_cap_elem *)data;
     uint8_t mcs_nss_size, he_ppe_size, he_total_size;
     
     mcs_nss_size = ieee80211_he_mcs_nss_size(he_cap_ie_elem);
-    he_ppe_size =
+    he_ppe_size = (he_cap_ie_elem->phy_cap_info[6] &
+        IEEE80211_HE_PHY_CAP6_PPE_THRESHOLD_PRESENT) ?
         ieee80211_he_ppe_size(data[sizeof(ni->ni_he_cap_elem) +
                         mcs_nss_size],
-                      he_cap_ie_elem->phy_cap_info);
+                      he_cap_ie_elem->phy_cap_info) : 0;
     he_total_size = sizeof(ni->ni_he_cap_elem) + mcs_nss_size +
             he_ppe_size;
     
@@ -2845,6 +2851,7 @@ int
 ieee80211_setup_heop(struct ieee80211_node *ni, const uint8_t *data,
                      uint8_t len)
 {
+    if (!Net80211HE::validOperation(data, len)) return 0;
     struct ieee80211_he_operation *he_op_ie = (struct ieee80211_he_operation *)data;
     
     ni->ni_he_oper_params = le32toh(he_op_ie->he_oper_params);

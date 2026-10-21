@@ -16,12 +16,20 @@ struct Rtw89NativeCapabilities {
     uint16_t vhtTxMCS;
     bool ht;
     bool vht;
+    bool he;
+    uint8_t heMAC[6];
+    uint8_t hePHY[11];
+    uint16_t heRxMCS80;
+    uint16_t heTxMCS80;
+    uint8_t hePPE[25];
 };
 
 struct Rtw89NativePeer {
     Rtw89NativeCapabilities caps;
     uint16_t widthMHz;
     uint16_t centerFrequency;
+    uint32_t heOperation;
+    uint16_t heBasicMCS;
 };
 
 struct Rtw89LinuxContext {
@@ -152,7 +160,7 @@ void rtw89LinuxAmpduStop(Rtw89LinuxContext *context, uint8_t tid,
                          bool receive);
 bool rtw89LinuxConfigureQueue(Rtw89LinuxContext *context, uint8_t accessClass,
                               uint16_t cwMin, uint16_t cwMax, uint8_t aifs,
-                              uint16_t txop);
+                              uint16_t txop, const uint8_t *muEdca = nullptr);
 void rtw89LinuxUpdateSlot(Rtw89LinuxContext *context, bool shortSlot);
 void rtw89LinuxSetAllMulticast(Rtw89LinuxContext *context, bool enabled);
 

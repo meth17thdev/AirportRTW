@@ -1,3 +1,4 @@
+#include <HAL/RealtekPhyMode.hpp>
 //
 //  AirportRTWSkywalkInterface.cpp
 //  AirportRTW-Sonoma
@@ -423,36 +424,22 @@ getPHY_MODE(struct apple80211_phymode_data *pd)
     if (ic->ic_flags & IEEE80211_F_VHTON)
         pd->phy_mode |= APPLE80211_MODE_11AC;
 
-    if (ic->ic_flags & IEEE80211_F_HEON)
+    if (ic->ic_hecaps)
         pd->phy_mode |= APPLE80211_MODE_11AX;
 
-    switch (fHalService->get80211Controller()->ic_curmode) {
-        case IEEE80211_MODE_AUTO:
-            pd->active_phy_mode = APPLE80211_MODE_AUTO;
-            break;
-        case IEEE80211_MODE_11A:
-            pd->active_phy_mode = APPLE80211_MODE_11A;
-            break;
-        case IEEE80211_MODE_11B:
-            pd->active_phy_mode = APPLE80211_MODE_11B;
-            break;
-        case IEEE80211_MODE_11G:
-            pd->active_phy_mode = APPLE80211_MODE_11G;
-            break;
-        case IEEE80211_MODE_11N:
-            pd->active_phy_mode = APPLE80211_MODE_11N;
-            break;
-        case IEEE80211_MODE_11AC:
-            pd->active_phy_mode = APPLE80211_MODE_11AC;
-            break;
-        case IEEE80211_MODE_11AX:
-            pd->active_phy_mode = ic->ic_state == IEEE80211_S_RUN && ic->ic_bss &&
-                (ic->ic_bss->ni_flags & IEEE80211_NODE_HE) ? APPLE80211_MODE_11AX : APPLE80211_MODE_AUTO;
-            break;
-
-        default:
-            pd->active_phy_mode = APPLE80211_MODE_AUTO;
-            break;
+    const auto *node = ic->ic_bss;
+    switch (RealtekPhy::active(ic->ic_state == IEEE80211_S_RUN && node,
+        node && (node->ni_flags & IEEE80211_NODE_HE),
+        node && (node->ni_flags & IEEE80211_NODE_VHT),
+        node && (node->ni_flags & IEEE80211_NODE_HT))) {
+    case RealtekPhy::Mode::HE: pd->active_phy_mode = APPLE80211_MODE_11AX; break;
+    case RealtekPhy::Mode::VHT: pd->active_phy_mode = APPLE80211_MODE_11AC; break;
+    case RealtekPhy::Mode::HT: pd->active_phy_mode = APPLE80211_MODE_11N; break;
+    case RealtekPhy::Mode::Legacy:
+        pd->active_phy_mode = ic->ic_curmode == IEEE80211_MODE_11A ? APPLE80211_MODE_11A :
+            ic->ic_curmode == IEEE80211_MODE_11B ? APPLE80211_MODE_11B : APPLE80211_MODE_11G;
+        break;
+    default: pd->active_phy_mode = APPLE80211_MODE_AUTO; break;
     }
 
     return kIOReturnSuccess;

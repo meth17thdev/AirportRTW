@@ -1,9 +1,11 @@
 /* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
 #include "RTWCore89.hpp"
 #include "Rtw89PciTransport.hpp"
+#include <net80211/ieee80211_he_policy.hpp>
 
 #include <IOKit/IOLib.h>
 #include <HAL/RealtekPciIds.hpp>
+#include <pexpert/pexpert.h>
 
 /* net80211 sources are compiled as C++ in this target. */
 void ieee80211_recv_assoc_resp(struct ieee80211com *, mbuf_t,
@@ -41,6 +43,8 @@ bool RTWCore89::rtw89_match(IOPCIDevice *device)
 
 bool RTWCore89::attach(IOPCIDevice *device)
 {
+    int noHE = 0;
+    heDisabled = PE_parse_boot_argn("-nohe", &noHE, sizeof(noHE));
     IOLog("AirportRTW-RTW89: attach begin\n");
     device->setProperty("RTWHALStage", "PCI ID match");
     if (!rtw89_match(device))
@@ -226,7 +230,8 @@ IOReturn RTWCore89::enable(IONetworkInterface *interface)
     // The native frontend owns association; an initial discovery must never
     // select a cached network before it submits a join request.
     sc.sc_ic.ic_flags &= ~IEEE80211_F_AUTO_JOIN;
-    sc.sc_ic.ic_flags &= ~IEEE80211_F_HEON;
+    if (sc.sc_ic.ic_hecaps)
+        sc.sc_ic.ic_flags |= IEEE80211_F_HEON;
     if (sc.sc_ic.ic_event_handler)
         sc.sc_ic.ic_event_handler(&sc.sc_ic, IEEE80211_EVT_DRIVER_READY, nullptr);
 #else
@@ -296,6 +301,29 @@ IOReturn RTWCore89::setMulticastList(IOEthernetAddress *addresses, int count)
     return kIOReturnSuccess;
 }
 
+void RTWCore89::configureHECapabilities(bool fiveGHz)
+{
+    auto *ic = &sc.sc_ic;
+    Rtw89NativeCapabilities caps = {};
+    rtw89LinuxGetCapabilities(&linuxContext, fiveGHz, caps);
+    ic->ic_hecaps = caps.he && !heDisabled ? 1 : 0;
+    bzero(&ic->ic_he_cap_elem, sizeof(ic->ic_he_cap_elem));
+    bzero(&ic->ic_he_mcs_nss_supp, sizeof(ic->ic_he_mcs_nss_supp));
+    bzero(ic->ic_ppe_thres, sizeof(ic->ic_ppe_thres));
+    ic->ic_flags &= ~(IEEE80211_F_HEON | IEEE80211_F_HTON | IEEE80211_F_VHTON);
+    if (caps.ht) ic->ic_flags |= IEEE80211_F_HTON;
+    if (caps.vht) ic->ic_flags |= IEEE80211_F_VHTON;
+    if (!ic->ic_hecaps) return;
+    memcpy(ic->ic_he_cap_elem.mac_cap_info, caps.heMAC, sizeof(caps.heMAC));
+    memcpy(ic->ic_he_cap_elem.phy_cap_info, caps.hePHY, sizeof(caps.hePHY));
+    ic->ic_he_mcs_nss_supp.rx_mcs_80 = htole16(caps.heRxMCS80);
+    ic->ic_he_mcs_nss_supp.tx_mcs_80 = htole16(caps.heTxMCS80);
+    ic->ic_he_mcs_nss_supp.rx_mcs_160 = ic->ic_he_mcs_nss_supp.tx_mcs_160 = 0xffff;
+    ic->ic_he_mcs_nss_supp.rx_mcs_80p80 = ic->ic_he_mcs_nss_supp.tx_mcs_80p80 = 0xffff;
+    memcpy(ic->ic_ppe_thres, caps.hePPE, sizeof(caps.hePPE));
+    ic->ic_flags |= IEEE80211_F_HEON;
+}
+
 bool RTWCore89::attachNet80211()
 {
     if (!linuxContext.hardware)
@@ -340,6 +368,7 @@ bool RTWCore89::attachNet80211()
         }
         ic->ic_flags |= IEEE80211_F_VHTON;
     }
+    configureHECapabilities(caps5.he);
     ic->ic_max_rssi = 100;
     ic->ic_sup_rates[IEEE80211_MODE_11A] = ieee80211_std_rateset_11a;
     ic->ic_sup_rates[IEEE80211_MODE_11B] = ieee80211_std_rateset_11b;
@@ -983,6 +1012,7 @@ int RTWCore89::newstate(struct ieee80211com *ic,
             return EINVAL;
         }
         const uint16_t channel = ieee80211_chan2ieee(ic, node->ni_chan);
+        owner->configureHECapabilities(channel > 14);
         if (!channel || !rtw89LinuxPrepareConnection(&owner->linuxContext,
                                                       node->ni_bssid, channel)) {
             if (endedScan) {
@@ -1022,6 +1052,14 @@ int RTWCore89::newstate(struct ieee80211com *ic,
         peer.caps.vhtCaps = node->ni_vhtcaps;
         peer.caps.vhtRxMCS = le16toh(node->ni_vht_mcsinfo.rx_mcs_map);
         peer.caps.vhtTxMCS = le16toh(node->ni_vht_mcsinfo.tx_mcs_map);
+        peer.caps.he = (node->ni_flags & IEEE80211_NODE_HE) != 0;
+        memcpy(peer.caps.heMAC, node->ni_he_cap_elem.mac_cap_info, sizeof(peer.caps.heMAC));
+        memcpy(peer.caps.hePHY, node->ni_he_cap_elem.phy_cap_info, sizeof(peer.caps.hePHY));
+        peer.caps.heRxMCS80 = le16toh(node->ni_he_mcs_nss_supp.rx_mcs_80);
+        peer.caps.heTxMCS80 = le16toh(node->ni_he_mcs_nss_supp.tx_mcs_80);
+        memcpy(peer.caps.hePPE, node->ni_ppe_thres, sizeof(peer.caps.hePPE));
+        peer.heOperation = node->ni_he_oper_params;
+        peer.heBasicMCS = node->ni_he_oper_nss_set;
         peer.widthMHz = node->ni_chw == IEEE80211_CHAN_WIDTH_80 ? 80 :
             node->ni_chw == IEEE80211_CHAN_WIDTH_40 ? 40 : 20;
         peer.centerFrequency = peer.widthMHz == 20 ? node->ni_chan->ic_freq :
@@ -1041,6 +1079,13 @@ int RTWCore89::newstate(struct ieee80211com *ic,
     }
 
     const int result = sc->sc_newstate(ic, state, arg);
+    if (result == 0 && state == IEEE80211_S_RUN) {
+        updateEdca(ic);
+        owner->getController()->setProperty("RTW89NegotiatedPHY",
+            (node->ni_flags & IEEE80211_NODE_HE) ? "802.11ax" :
+            (node->ni_flags & IEEE80211_NODE_VHT) ? "802.11ac" :
+            (node->ni_flags & IEEE80211_NODE_HT) ? "802.11n" : "legacy");
+    }
     if (result != 0) {
         if (associated) {
             rtw89LinuxDisassociate(&owner->linuxContext);
@@ -1147,10 +1192,17 @@ void RTWCore89::updateEdca(struct ieee80211com *ic)
     };
     for (uint8_t ac = 0; ac < EDCA_NUM_AC; ++ac) {
         const struct ieee80211_edca_ac_params *params = &ic->ic_edca_ac[ac];
+        const uint8_t *mu = nullptr;
+        auto *node = ic->ic_bss;
+        if (node && (node->ni_flags & IEEE80211_NODE_HE) && node->ni_he_mu_edca_present) {
+            for (unsigned i = 0; i < 4; ++i)
+                if (((node->ni_he_mu_edca[i * 3] >> 5) & 3) == ac)
+                    mu = &node->ni_he_mu_edca[i * 3];
+        }
         rtw89LinuxConfigureQueue(&owner->linuxContext, linuxAccessClass[ac],
                                  (1U << params->ac_ecwmin) - 1,
                                  (1U << params->ac_ecwmax) - 1,
-                                 params->ac_aifsn, params->ac_txoplimit);
+                                 params->ac_aifsn, params->ac_txoplimit, mu);
     }
 }
 

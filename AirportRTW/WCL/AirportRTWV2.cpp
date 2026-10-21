@@ -380,11 +380,6 @@ bool AirportRTW::start(IOService *provider)
     if (PE_parse_boot_argn("-noht40", &boot_value, sizeof(boot_value)))
         fHalService->get80211Controller()->ic_userflags |= IEEE80211_F_NOHT40;
 
-#ifdef AIRPORT_WCL
-    // The Realtek frontend currently exposes legacy/HT/VHT operation only.
-    fHalService->get80211Controller()->ic_userflags &= ~IEEE80211_F_HEON;
-#endif
-
     stage("Realtek HAL attach");
     if (!fHalService->attach(pciNub)) {
         XYLog("attach fail\n");

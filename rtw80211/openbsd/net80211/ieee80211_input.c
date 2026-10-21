@@ -1,3 +1,4 @@
+#include "ieee80211_he_policy.hpp"
 /*
  * Copyright (C) 2020  钟先耀
  *
@@ -1680,6 +1681,7 @@ ieee80211_recv_probe_resp(struct ieee80211com *ic, mbuf_t m,
     const uint8_t *vhtopmode;
     const uint8_t *hecap;
     const uint8_t *heopmode;
+    const uint8_t *heMuEdca = NULL;
     u_int16_t capinfo, bintval;
     u_int8_t chan, bchan, erp, dtim_count, dtim_period;
     int is_new;
@@ -1798,8 +1800,10 @@ ieee80211_recv_probe_resp(struct ieee80211com *ic, mbuf_t m,
                 }
                 break;
             case IEEE80211_ELEMID_EXTENSION:
+                if (frm[1] < 1) break;
                 switch (frm[2]) {
                     case IEEE80211_ELEMID_EXT_HE_MU_EDCA:
+                        heMuEdca = frm;
                         break;
                     case IEEE80211_ELEMID_EXT_HE_CAPABILITY:
                         hecap = frm;
@@ -1907,9 +1911,18 @@ ieee80211_recv_probe_resp(struct ieee80211com *ic, mbuf_t m,
         ieee80211_setup_vhtcaps(ic, ni, vhtcap);
         ieee80211_setup_vhtopmode(ni, vhtopmode);
     }
-    if (hecap != NULL && heopmode != NULL) {
+    if (hecap != NULL && heopmode != NULL && hecap[1] > 1 && heopmode[1] > 1 &&
+        Net80211HE::validCapabilities(hecap + 3, hecap[1] - 1) &&
+        Net80211HE::validOperation(heopmode + 3, heopmode[1] - 1)) {
         ieee80211_setup_hecaps(ni, hecap + 3, hecap[1] - 1);
         ieee80211_setup_heop(ni, heopmode + 3, heopmode[1] - 1);
+        bool hasMu = heMuEdca && heMuEdca[1] >= 14;
+        bool muChanged = hasMu != ni->ni_he_mu_edca_present ||
+            (hasMu && memcmp(ni->ni_he_mu_edca, heMuEdca + 4, 12));
+        ni->ni_he_mu_edca_present = hasMu;
+        if (hasMu) memcpy(ni->ni_he_mu_edca, heMuEdca + 4, 12);
+        if (muChanged && ni == ic->ic_bss && ic->ic_state == IEEE80211_S_RUN &&
+            ic->ic_updateedca) ic->ic_updateedca(ic);
     }
     
     ni->ni_dtimcount = dtim_count;
@@ -2671,6 +2684,7 @@ ieee80211_recv_assoc_resp(struct ieee80211com *ic, mbuf_t m,
     const uint8_t *vhtopmode;
     const uint8_t *hecap;
     const uint8_t *heopmode;
+    const uint8_t *heMuEdca = NULL;
     u_int16_t capinfo, status, associd;
     u_int8_t rate;
     
@@ -2754,8 +2768,10 @@ ieee80211_recv_assoc_resp(struct ieee80211com *ic, mbuf_t m,
                 }
                 break;
             case IEEE80211_ELEMID_EXTENSION:
+                if (frm[1] < 1) break;
                 switch (frm[2]) {
                     case IEEE80211_ELEMID_EXT_HE_MU_EDCA:
+                        heMuEdca = frm;
                         break;
                     case IEEE80211_ELEMID_EXT_HE_CAPABILITY:
                         hecap = frm;
@@ -2814,14 +2830,26 @@ ieee80211_recv_assoc_resp(struct ieee80211com *ic, mbuf_t m,
         ieee80211_setup_vhtcaps(ic, ni, vhtcap);
         ieee80211_setup_vhtopmode(ni, vhtopmode);
     }
-    if (hecap != NULL && heopmode != NULL) {
+    if (hecap != NULL && heopmode != NULL && hecap[1] > 1 && heopmode[1] > 1 &&
+        Net80211HE::validCapabilities(hecap + 3, hecap[1] - 1) &&
+        Net80211HE::validOperation(heopmode + 3, heopmode[1] - 1)) {
         ieee80211_setup_hecaps(ni, hecap + 3, hecap[1] - 1);
         ieee80211_setup_heop(ni, heopmode + 3, heopmode[1] - 1);
+        bool hasMu = heMuEdca && heMuEdca[1] >= 14;
+        bool muChanged = hasMu != ni->ni_he_mu_edca_present ||
+            (hasMu && memcmp(ni->ni_he_mu_edca, heMuEdca + 4, 12));
+        ni->ni_he_mu_edca_present = hasMu;
+        if (hasMu) memcpy(ni->ni_he_mu_edca, heMuEdca + 4, 12);
+        if (muChanged && ni == ic->ic_bss && ic->ic_state == IEEE80211_S_RUN &&
+            ic->ic_updateedca) ic->ic_updateedca(ic);
     }
 
+    ni->ni_flags &= ~IEEE80211_NODE_HE;
     ieee80211_ht_negotiate(ic, ni);
     ieee80211_vht_negotiate(ic, ni);
-    if (hecap != NULL && heopmode != NULL) {
+    if (hecap != NULL && heopmode != NULL && hecap[1] > 1 && heopmode[1] > 1 &&
+        Net80211HE::validCapabilities(hecap + 3, hecap[1] - 1) &&
+        Net80211HE::validOperation(heopmode + 3, heopmode[1] - 1)) {
         ieee80211_he_negotiate(ic, ni);
     }
     

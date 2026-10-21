@@ -3,6 +3,7 @@
 #include "Rtw89PciTransport.hpp"
 #include "Rtw89RxLayout.hpp"
 #include "Rtw89LinkPolicy.hpp"
+#include <net80211/ieee80211_he_policy.hpp>
 
 #include <IOKit/IOLib.h>
 
@@ -668,7 +669,7 @@ void rtw89LinuxAmpduStop(Rtw89LinuxContext *context, uint8_t tid,
 
 bool rtw89LinuxConfigureQueue(Rtw89LinuxContext *context, uint8_t accessClass,
                               uint16_t cwMin, uint16_t cwMax, uint8_t aifs,
-                              uint16_t txop)
+                              uint16_t txop, const uint8_t *muEdca)
 {
     if (!context || accessClass >= 4)
         return false;
@@ -681,6 +682,8 @@ bool rtw89LinuxConfigureQueue(Rtw89LinuxContext *context, uint8_t accessClass,
     params.cw_max = cwMax;
     params.aifs = aifs;
     params.txop = txop;
+    params.mu_edca = muEdca != nullptr;
+    if (muEdca) memcpy(&params.mu_edca_param_rec, muEdca, 3);
     WiphyGuard guard(hw);
     return hw->ops->conf_tx(hw, vif, 0, accessClass, &params) == 0;
 }
@@ -817,6 +820,17 @@ bool rtw89LinuxGetCapabilities(Rtw89LinuxContext *context, bool fiveGHz,
     caps.vhtCaps = band->vht_cap.cap;
     caps.vhtRxMCS = le16_to_cpu(band->vht_cap.vht_mcs.rx_mcs_map);
     caps.vhtTxMCS = le16_to_cpu(band->vht_cap.vht_mcs.tx_mcs_map);
+    const auto *he = ieee80211_get_he_iftype_cap(band, NL80211_IFTYPE_STATION);
+    if (he && he->has_he) {
+        caps.he = true;
+        memcpy(caps.heMAC, he->he_cap_elem.mac_cap_info, sizeof(caps.heMAC));
+        memcpy(caps.hePHY, he->he_cap_elem.phy_cap_info, sizeof(caps.hePHY));
+        // This bridge supports contiguous channels up to 80 MHz.
+        caps.hePHY[0] &= ~(0x08 | 0x10);
+        caps.heRxMCS80 = le16_to_cpu(he->he_mcs_nss_supp.rx_mcs_80);
+        caps.heTxMCS80 = le16_to_cpu(he->he_mcs_nss_supp.tx_mcs_80);
+        memcpy(caps.hePPE, he->ppe_thres, sizeof(caps.hePPE));
+    }
     return true;
 }
 
@@ -892,6 +906,37 @@ bool rtw89LinuxAssociate(Rtw89LinuxContext *context,
         sta->deflink.vht_cap.vht_mcs.tx_mcs_map = cpu_to_le16(Rtw89Link::intersectMCS(
             le16_to_cpu(supported->vht_cap.vht_mcs.rx_mcs_map), peer.caps.vhtTxMCS));
     }
+    if (peer.caps.he) {
+        const auto *own = ieee80211_get_he_iftype_cap(supported, NL80211_IFTYPE_STATION);
+        if (!own || !own->has_he || !Net80211HE::ratesValid(
+            le16_to_cpu(own->he_mcs_nss_supp.rx_mcs_80),
+            le16_to_cpu(own->he_mcs_nss_supp.tx_mcs_80),
+            peer.caps.heRxMCS80, peer.caps.heTxMCS80, peer.heBasicMCS)) {
+            releaseStation(context);
+            return false;
+        }
+        auto &he = sta->deflink.he_cap;
+        he.has_he = true;
+        memcpy(he.he_cap_elem.mac_cap_info, peer.caps.heMAC, sizeof(peer.caps.heMAC));
+        memcpy(he.he_cap_elem.phy_cap_info, peer.caps.hePHY, sizeof(peer.caps.hePHY));
+        he.he_cap_elem.phy_cap_info[0] &= ~(0x08 | 0x10);
+        he.he_mcs_nss_supp.rx_mcs_80 = cpu_to_le16(Net80211HE::intersect(
+            le16_to_cpu(own->he_mcs_nss_supp.tx_mcs_80), peer.caps.heRxMCS80));
+        he.he_mcs_nss_supp.tx_mcs_80 = cpu_to_le16(Net80211HE::intersect(
+            le16_to_cpu(own->he_mcs_nss_supp.rx_mcs_80), peer.caps.heTxMCS80));
+        he.he_mcs_nss_supp.rx_mcs_160 = he.he_mcs_nss_supp.tx_mcs_160 = cpu_to_le16(0xffff);
+        he.he_mcs_nss_supp.rx_mcs_80p80 = he.he_mcs_nss_supp.tx_mcs_80p80 = cpu_to_le16(0xffff);
+        memcpy(he.ppe_thres, peer.caps.hePPE, sizeof(peer.caps.hePPE));
+        sta->deflink.rx_nss = Net80211HE::streams(le16_to_cpu(he.he_mcs_nss_supp.rx_mcs_80));
+    }
+    vif->bss_conf.he_support = sta->deflink.he_cap.has_he;
+    vif->bss_conf.he_oper.params = peer.caps.he ? peer.heOperation : 0;
+    vif->bss_conf.he_oper.nss_set = peer.caps.he ? peer.heBasicMCS : 0;
+    vif->bss_conf.he_bss_color.color = (peer.heOperation >> 24) & 0x3f;
+    vif->bss_conf.he_bss_color.partial = peer.caps.he && (peer.heOperation & (1U << 30));
+    vif->bss_conf.he_bss_color.enabled = peer.caps.he && !(peer.heOperation & (1U << 31));
+    vif->bss_conf.htc_trig_based_pkt_ext = peer.caps.he ? peer.heOperation & 7 : 0;
+    vif->bss_conf.frame_time_rts_th = peer.caps.he ? (peer.heOperation >> 4) & 0x3ff : 0;
     vif->bss_conf.chandef_chan = hw->conf.chandef.chan;
     vif->bss_conf.chandef_width = hw->conf.chandef.width;
 
@@ -937,7 +982,8 @@ bool rtw89LinuxAssociate(Rtw89LinuxContext *context,
     {
         WiphyGuard guard(hw);
         if (hw->ops->link_info_changed)
-            hw->ops->link_info_changed(hw, vif, bss, BSS_CHANGED_BSSID);
+            hw->ops->link_info_changed(hw, vif, bss, BSS_CHANGED_BSSID |
+                (bss->he_support ? BSS_CHANGED_HE_BSS_COLOR : 0));
         if (hw->ops->vif_cfg_changed)
             hw->ops->vif_cfg_changed(hw, vif, BSS_CHANGED_ASSOC);
         else if (hw->ops->bss_info_changed)
@@ -969,6 +1015,13 @@ void rtw89LinuxDisassociate(Rtw89LinuxContext *context)
     }
     context->txAmpduMask = 0;
     releaseStation(context);
+    if (vif) {
+        vif->bss_conf.he_support = false;
+        vif->bss_conf.he_oper = {};
+        vif->bss_conf.he_bss_color = {};
+        vif->bss_conf.htc_trig_based_pkt_ext = 0;
+        vif->bss_conf.frame_time_rts_th = 0;
+    }
 }
 
 bool rtw89LinuxSetKey(Rtw89LinuxContext *context, uint8_t keyIndex,
