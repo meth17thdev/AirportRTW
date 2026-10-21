@@ -7,8 +7,10 @@ macOS Wi-Fi driver for supported Realtek RTW88 and RTW89 PCIe cards. One kext co
 Build targets cover macOS High Sierra (10.13) through Sonoma (14), plus an experimental native Wi-Fi frontend for Sequoia 15.2+ and Tahoe 26.x on x86_64.
 
 Supported cards:
+
 RTW88:
 RTL8723DE, RTL8812AE, RTL8814AE, RTL8821AE, RTL8821CE, RTL8822BE, RTL8822CE
+
 RTW89:
 8851BE, 8852AE, 8852BE, 8852CE, and 8922AE
 
