@@ -15,6 +15,8 @@ Included cards (RTW88 hardware validation is pending):
 - RTL8821CE (RTW88)
 - RTL8822BE (RTW88)
 - RTL8822CE (RTW88)
+- RTL8723DE (RTW88, 2.4 GHz / 802.11n)
+- RTL8814AE (RTW88, 802.11ac)
 
 - RTL8851BE
 - RTL8852AE

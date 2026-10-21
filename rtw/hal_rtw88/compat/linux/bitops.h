@@ -6,6 +6,14 @@
 
 #include "types.h"
 
+/* Extend bit index (inclusive) from an unsigned 32-bit register value. */
+static inline int32_t sign_extend32(uint32_t value, int index)
+{
+    uint32_t sign = (uint32_t)1 << index;
+    value &= sign | (sign - 1);
+    return (int32_t)((value ^ sign) - sign);
+}
+
 #define BIT(n)          (1UL << (n))
 #define BIT_ULL(n)      (1ULL << (n))
 

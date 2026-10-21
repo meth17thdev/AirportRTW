@@ -6,6 +6,14 @@
 extern const struct rtw_chip_info rtw8822c_hw_spec;
 extern const struct rtw_chip_info rtw8822b_hw_spec;
 extern const struct rtw_chip_info rtw8821c_hw_spec;
+extern const struct rtw_chip_info rtw8723d_hw_spec;
+extern const struct rtw_chip_info rtw8814a_hw_spec;
+
+unsigned rtw88_hw_get_nss(struct ieee80211_hw *hw)
+{
+    struct rtw_dev *device = hw ? hw->priv : NULL;
+    return device && device->efuse.hw_cap.nss ? device->efuse.hw_cap.nss : 1;
+}
 
 int airportrtw88_probe(struct pci_dev *pdev)
 {
@@ -16,6 +24,8 @@ int airportrtw88_probe(struct pci_dev *pdev)
     case 0xb822: id.driver_data = (kernel_ulong_t)&rtw8822b_hw_spec; break;
     case 0xc821: case 0xb821:
         id.driver_data = (kernel_ulong_t)&rtw8821c_hw_spec; break;
+    case 0xd723: id.driver_data = (kernel_ulong_t)&rtw8723d_hw_spec; break;
+    case 0x8813: id.driver_data = (kernel_ulong_t)&rtw8814a_hw_spec; break;
     default: return -ENODEV;
     }
     id.vendor = pdev->vendor;

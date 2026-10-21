@@ -4,10 +4,25 @@ The normal AirportRTW kext now includes **both RTW88 and RTW89 HALs**. The share
 factory selects the hardware backend from the PCI vendor/device ID, before
 attaching it. The networking frontend and net80211 architecture are shared.
 
-RTW88 matching covers RTL8822CE (10ec:c822/c82f), RTL8822BE (10ec:b822), and
-RTL8821CE (10ec:c821/b821). Existing RTW89 matching remains available. Unknown
-IDs and other PCI vendors are rejected. This does not add every RTW88 chipset;
-USB and SDIO are outside this PCIe backend.
+RTW88 matching covers five PCIe models:
+
+| Model | PCI IDs | Bands / protocol |
+|---|---|---|
+| RTL8821CE | 10ec:c821, 10ec:b821 | 2.4/5 GHz, HT/VHT |
+| RTL8822BE | 10ec:b822 | 2.4/5 GHz, HT/VHT |
+| RTL8822CE | 10ec:c822, 10ec:c82f | 2.4/5 GHz, HT/VHT |
+| RTL8723DE | 10ec:d723 | 2.4 GHz only, HT |
+| RTL8814AE | 10ec:8813 | 2.4/5 GHz, HT/VHT |
+
+Existing RTW89 matching remains available. Unknown IDs and other PCI vendors
+are rejected. USB and SDIO are outside this PCIe backend.
+
+Band availability, HT/VHT capabilities and stream counts come from the probed
+Linux hardware specification and efuse data. The native channel table excludes
+unsupported bands; association intersects the peer's MCS masks with the local
+card's capabilities. RTL8814A's upstream driver chooses two or three spatial
+streams based on its RF configuration; the port does not assume four streams.
+All five RTW88 models still require physical hardware validation.
 
 `RTWCore88` owns its net80211 controller and forwards hardware operations through
 `Rtw88LinuxBridge` and `Rtw88PciTransport`. The existing net80211 scan, MLME,

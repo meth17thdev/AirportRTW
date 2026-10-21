@@ -35,9 +35,8 @@ public:
 
     struct ieee80211com *get80211Controller() override { return &sc.sc_ic; }
 
-    int getTxNSS() override { return pciDevice &&
-        (pciDevice->configRead16(kIOPCIConfigDeviceID) == 0xc821 ||
-         pciDevice->configRead16(kIOPCIConfigDeviceID) == 0xb821) ? 1 : 2; }
+    int getTxNSS() override;
+    bool is5GBandSupport() override;
     const char *getFirmwareName() override;
     const char *getFirmwareCountryCode() override;
     uint32_t getTxQueueSize() override;

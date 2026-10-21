@@ -15,6 +15,7 @@ extern "C" {
 int airportrtw88_probe(struct pci_dev *);
 void rtw_pci_remove(struct pci_dev *);
 struct ieee80211_hw *rtw88_get_hw(void);
+unsigned rtw88_hw_get_nss(struct ieee80211_hw *);
 void rtw88_register_vif(struct ieee80211_vif *);
 void rtw88_unregister_vif(void);
 }
@@ -818,6 +819,12 @@ bool rtw88LinuxIsScanning(Rtw88LinuxContext *context)
     return context && rtw88_is_scanning();
 }
 
+unsigned rtw88LinuxGetNSS(Rtw88LinuxContext *context)
+{
+    auto *hw = context ? static_cast<ieee80211_hw *>(context->hardware) : nullptr;
+    return rtw88_hw_get_nss(hw);
+}
+
 bool rtw88LinuxGetCapabilities(Rtw88LinuxContext *context, bool fiveGHz,
                                Rtw88NativeCapabilities &caps)
 {
@@ -910,9 +917,8 @@ bool rtw88LinuxAssociate(Rtw88LinuxContext *context,
                sizeof(peer.caps.htMCS));
         for (unsigned i = 0; i < sizeof(peer.caps.htMCS); ++i)
             sta->deflink.ht_cap.mcs.rx_mask[i] &= supported->ht_cap.mcs.rx_mask[i];
-        unsigned nss = 1;
-        for (unsigned i = 0; i < 4; ++i)
-            if (sta->deflink.ht_cap.mcs.rx_mask[i]) nss = i + 1;
+        unsigned nss = Rtw88Link::htStreams(sta->deflink.ht_cap.mcs.rx_mask,
+                                           sizeof(sta->deflink.ht_cap.mcs.rx_mask));
         if (sta->deflink.rx_nss > nss) sta->deflink.rx_nss = nss;
     }
     if (supported && vht) {
@@ -922,6 +928,9 @@ bool rtw88LinuxAssociate(Rtw88LinuxContext *context,
             le16_to_cpu(supported->vht_cap.vht_mcs.tx_mcs_map), peer.caps.vhtRxMCS));
         sta->deflink.vht_cap.vht_mcs.tx_mcs_map = cpu_to_le16(Rtw88Link::intersectMCS(
             le16_to_cpu(supported->vht_cap.vht_mcs.rx_mcs_map), peer.caps.vhtTxMCS));
+        unsigned nss = Rtw88Link::vhtStreams(
+            le16_to_cpu(sta->deflink.vht_cap.vht_mcs.rx_mcs_map));
+        if (sta->deflink.rx_nss > nss) sta->deflink.rx_nss = nss;
     }
     vif->bss_conf.chandef_chan = hw->conf.chandef.chan;
     vif->bss_conf.chandef_width = hw->conf.chandef.width;

@@ -7,6 +7,8 @@
 
 class Rtw88PciTransport;
 
+unsigned rtw88LinuxGetNSS(struct Rtw88LinuxContext *context);
+
 struct Rtw88NativeCapabilities {
     uint16_t htCaps;
     uint8_t ampduParams;

@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
 #include "RTWCore88.hpp"
 #include "Rtw88PciTransport.hpp"
+#include "Rtw88LinkPolicy.hpp"
 
 #include <IOKit/IOLib.h>
 #include <HAL/RealtekPciIds.hpp>
@@ -22,6 +23,8 @@ constexpr UInt16 kRtl8822CEAlternate = 0xc82f;
 constexpr UInt16 kRtl8822BE = 0xb822;
 constexpr UInt16 kRtl8821CE = 0xc821;
 constexpr UInt16 kRtl8821CEAlternate = 0xb821;
+constexpr UInt16 kRtl8723DE = 0xd723;
+constexpr UInt16 kRtl8814AE = 0x8813;
 constexpr uint32_t kRtw88TxQueueSize = 256;
 }
 
@@ -86,8 +89,10 @@ bool RTWCore88::attach(IOPCIDevice *device)
     sc.sc_rtwdev = static_cast<struct rtw_dev *>(linuxContext.device);
     sc.sc_vif = static_cast<struct ieee80211_vif *>(linuxContext.vif);
     sc.sc_vif_size = linuxContext.vifAllocationSize;
-    if (product == kRtl8822BE) firmware = "rtw88/rtw8822b_fw.bin";
-    if (product == kRtl8821CE || product == kRtl8821CEAlternate) firmware = "rtw88/rtw8821c_fw.bin";
+    if (product == kRtl8822BE) { firmware = "rtw88/rtw8822b_fw.bin"; chipName = "embedded RTL8822B"; }
+    if (product == kRtl8821CE || product == kRtl8821CEAlternate) { firmware = "rtw88/rtw8821c_fw.bin"; chipName = "embedded RTL8821C"; }
+    if (product == kRtl8723DE) { firmware = "rtw88/rtw8723d_fw.bin"; chipName = "embedded RTL8723D"; }
+    if (product == kRtl8814AE) { firmware = "rtw88/rtw8814a_fw.bin"; chipName = "embedded RTL8814A"; }
     strlcpy(sc.sc_fwname, firmware, sizeof(sc.sc_fwname));
     strlcpy(sc.sc_fwver, chipName, sizeof(sc.sc_fwver));
     strlcpy(sc.sc_country, "00", sizeof(sc.sc_country));
@@ -241,6 +246,17 @@ void RTWCore88::free()
     super::free();
 }
 
+int RTWCore88::getTxNSS()
+{
+    return rtw88LinuxGetNSS(&linuxContext);
+}
+
+bool RTWCore88::is5GBandSupport()
+{
+    Rtw88NativeCapabilities caps = {};
+    return rtw88LinuxGetCapabilities(&linuxContext, true, caps);
+}
+
 const char *RTWCore88::getFirmwareName()
 {
     return sc.sc_fwname;
@@ -291,8 +307,9 @@ bool RTWCore88::attachNet80211()
                     (IEEE80211_HTCAP_SMPS_DIS << IEEE80211_HTCAP_SMPS_SHIFT);
     ic->ic_ampdu_params = IEEE80211_AMPDU_PARAM_SS_4 | 0x3;
     Rtw88NativeCapabilities caps2 = {}, caps5 = {};
-    rtw88LinuxGetCapabilities(&linuxContext, false, caps2);
-    rtw88LinuxGetCapabilities(&linuxContext, true, caps5);
+    const bool has2GHz = rtw88LinuxGetCapabilities(&linuxContext, false, caps2);
+    const bool has5GHz = rtw88LinuxGetCapabilities(&linuxContext, true, caps5);
+    if (!has2GHz && !has5GHz) return false;
     const auto &htCaps = caps5.ht ? caps5 : caps2;
     if (htCaps.ht) {
         ic->ic_htcaps = htCaps.htCaps;
@@ -325,6 +342,8 @@ bool RTWCore88::attachNet80211()
     };
     for (size_t index = 0; index < nitems(channels); ++index) {
         const uint8_t channel = channels[index];
+        if ((channel <= 14 && !has2GHz) || (channel > 14 && !has5GHz))
+            continue;
         auto *entry = &ic->ic_channels[channel];
         entry->ic_freq = channel == 14 ? 2484
             : channel <= 13 ? 2407 + channel * 5 : 5000 + channel * 5;
@@ -989,7 +1008,7 @@ int RTWCore88::newstate(struct ieee80211com *ic,
             ic->ic_flags |= IEEE80211_F_QOS;
             qos = true;
         }
-        const uint8_t nss = node->ni_rxmcs[1] ? 2 : 1;
+        const uint8_t nss = Rtw88Link::htStreams(node->ni_rxmcs, sizeof(node->ni_rxmcs));
         Rtw88NativePeer peer = {};
         peer.caps.htCaps = node->ni_htcaps;
         peer.caps.ampduParams = node->ni_ampdu_param;

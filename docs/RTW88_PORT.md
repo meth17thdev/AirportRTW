@@ -117,3 +117,19 @@ Use `scripts/build_release_kexts.sh` and the normal `build/releases/Release`
 bundles. The old RTW88-specific Python build command now delegates to the normal
 combined build. No standalone RTW88 variant is needed. Hardware validation is
 still required on RTL8822CE and after installing the combined build on RTW89.
+
+
+## RTL8723DE and RTL8814AE extension
+
+The combined kext now also matches RTL8723DE (`10ec:d723`) and RTL8814AE
+(`10ec:8813`) through `RTWCore88`. Their chip implementations, calibration and
+power tables, PCI wrappers and the shared 8723X support are imported unchanged
+from the same local rtw88-stable reference as the original core. The two new
+firmware files are from upstream linux-firmware; their hashes and source are
+recorded in `UPSTREAM.json`. All new C exports use the RTW88 private namespace.
+
+The native bridge queries actual band availability and efuse stream counts.
+RTL8723DE exposes no 5 GHz channels or VHT. RTL8814AE keeps the donor's RF and
+stream configuration and is not limited to the original two-stream association
+shortcut. These are software implementations pending scan/join/DHCP, TX/RX,
+crypto, aggregation and lifecycle tests on the actual cards.

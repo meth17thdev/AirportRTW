@@ -73,6 +73,17 @@
     "firmware/LICENCE.rtlwifi_firmware.txt": "f0f60e6d425b98fc1cb25eaf0668e3a3aa972c1b6b13d8cd1d365cd52d0c71d3",
     "firmware/rtw8821c_fw.bin": "2ef409bc418549fcf294061dd0cae1fc22fd9da79b60524950b25de18732f3f0",
     "firmware/rtw8822b_fw.bin": "a72da690597bfa99d8eb6fc2ab090d18d8ad92ac2befd35db1c9e3662d8d8418",
-    "firmware/rtw8822c_fw.bin": "3deecb31210986d98cdbfb000391e08d602a6eee4ffc883969faa2b907ab03ba"
-  }
+    "firmware/rtw8822c_fw.bin": "3deecb31210986d98cdbfb000391e08d602a6eee4ffc883969faa2b907ab03ba",
+    "driver/rtw8723x.c": "6b5b8aef26726dd0068ce9574b791050e377c720ee11fb13fa005c0e8d21a8c6",
+    "driver/rtw8723d.c": "764a56256bc3e8069bdfd0e03d9c976eb39b31f43b13b42fa99dbfe1d5d4ee7d",
+    "driver/rtw8723d_table.c": "d9d162edd84992158f992a91261e719fc6fa297a0fc77c810cf41573e78f3692",
+    "driver/rtw8723de.c": "cfdbfb9e691496de837eb72b7ac20dd6d73ed22984d22831a9bae8f78870458b",
+    "driver/rtw8814a.c": "ebd8f19b7dea497ba11c9485ebf9782ca2b86e463f81ef1182c1a99fe38a6e33",
+    "driver/rtw8814a_table.c": "40418d3774023b8bdcc17e377ed302ecac03c786a7500c9ee3faac955d40451a",
+    "driver/rtw8814ae.c": "5c8a83b6c77871ce772220adf9aa9b475eccc449cedb5cf4ea9376bd42d8a5d1",
+    "firmware/rtw8723d_fw.bin": "9c64e079815a333a3f7b731be7cc0be65206ebc883891659dc8ff5ed36a5e2f5",
+    "firmware/rtw8814a_fw.bin": "aa6bf9d62b2d2d8a37254fd6d917ba2839888cdedc21850d4481874cb1d3d7cb"
+  },
+  "extension_source": "RTL8723D/X and RTL8814A sources copied unchanged from the same local rtw88-stable archive as the existing core",
+  "extension_firmware_source": "https://gitlab.com/kernel-firmware/linux-firmware/-/tree/main/rtw88 (downloaded 2026-10-21; SHA-256 pinned below)"
 }

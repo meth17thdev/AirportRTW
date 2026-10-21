@@ -29,7 +29,7 @@
 			<key>IOMatchCategory</key>
 			<string>IODefaultMatchCategory</string>
 			<key>IOPCIPrimaryMatch</key>
-			<string>0x885210ec 0xa85a10ec 0xb85210ec 0xb85b10ec 0xb85110ec 0xb52010ec 0xc85210ec 0x892210ec 0x892b10ec</string>
+			<string>0x885210ec 0xa85a10ec 0xb85210ec 0xb85b10ec 0xb85110ec 0xb52010ec 0xc85210ec 0x892210ec 0x892b10ec 0xc82210ec 0xc82f10ec 0xb82210ec 0xc82110ec 0xb82110ec 0xd72310ec 0x881310ec</string>
 			<key>IOProbeScore</key>
 			<integer>2000</integer>
 			<key>IOProviderClass</key>

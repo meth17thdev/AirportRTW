@@ -10,7 +10,7 @@ import subprocess
 
 ROOT = Path(__file__).resolve().parents[1]
 HAL = ROOT/'rtw/hal_rtw88'
-EXPECTED = {0xc822, 0xc82f, 0xb822, 0xc821, 0xb821}
+EXPECTED = {0xc822, 0xc82f, 0xb822, 0xc821, 0xb821, 0xd723, 0x8813}
 
 def require(ok, message):
     if not ok: raise RuntimeError(message)
@@ -30,13 +30,20 @@ def main():
     ids = {int(s,16) for s in re.findall(r'case (0x[0-9a-f]+):', hardware)}
     require(ids == EXPECTED, 'Probe IDs differ from supported PCIe cards')
     upstream = set()
-    for chip in ['rtw8822ce', 'rtw8822be', 'rtw8821ce']:
+    for chip in ['rtw8822ce', 'rtw8822be', 'rtw8821ce', 'rtw8723de', 'rtw8814ae']:
         upstream.update(int(s,16) for s in re.findall(r'PCI_DEVICE\(PCI_VENDOR_ID_REALTEK,\s*(0x[0-9A-Fa-f]+)\)', (HAL/'driver'/f'{chip}.c').read_text()))
     require(ids == upstream, 'Probe must match actual upstream PCI ID tables')
+    for path in [ROOT/'rtw/Info.plist', *list((ROOT/'AirportRTW').rglob('*Info.plist'))]:
+        info = plistlib.loads(path.read_bytes())
+        matches = {int(token, 16) >> 16
+                   for entry in info.get('IOKitPersonalities', {}).values()
+                   for key in ['IOPCIMatch', 'IOPCIPrimaryMatch']
+                   for token in entry.get(key, '').split()}
+        require(EXPECTED <= matches, str(path)+': missing RTW88 PCI matches')
     require('id.driver_data' in hardware and 'rtw_pci_probe(pdev, &id)' in hardware,
             'RTW88 requires actual chip specification at probe')
-    for fw in ['rtw8821c_fw.bin','rtw8822b_fw.bin','rtw8822c_fw.bin']:
-        require((HAL/'firmware'/fw).stat().st_size > 100000, 'Missing/truncated firmware: '+fw)
+    for fw in ['rtw8821c_fw.bin','rtw8822b_fw.bin','rtw8822c_fw.bin','rtw8723d_fw.bin','rtw8814a_fw.bin']:
+        require((HAL/'firmware'/fw).stat().st_size > 20000, 'Missing/truncated firmware: '+fw)
     require((HAL/'firmware/LICENCE.rtlwifi_firmware.txt').is_file(), 'Missing firmware notice')
     require(not list(HAL.rglob('*IEEE80211.cpp')), 'Donor MLME must not replace net80211')
     bridge = (HAL/'Rtw88LinuxBridge.cpp').read_text()
@@ -60,7 +67,10 @@ def main():
             symbols=subprocess.check_output(['nm',str(binary)],text=True)
             require('_ZN7RTWCore10gMetaClassE' in symbols,
                     'Missing shared RTWCore base class')
-            require('_rtw8822c_hw_spec' in symbols and 'RTWCore88' in symbols, 'Missing RTW88 implementation')
+            require('RTWCore88' in symbols, 'Missing RTW88 HAL')
+            for chip in ['8821c', '8822b', '8822c', '8723d', '8814a']:
+                require('_airportrtw88_rtw'+chip+'_hw_spec' in symbols,
+                        'Missing chip implementation: '+chip)
             require('_rtw89_pci_probe' in symbols and 'RTWCore89' in symbols, 'RTW89 backend missing from combined kext')
             require('_airportrtw88_rtw_pci_probe' in symbols, 'RTW88 probe is not isolated')
             unresolved=subprocess.check_output(['nm','-u',str(binary)],text=True)
