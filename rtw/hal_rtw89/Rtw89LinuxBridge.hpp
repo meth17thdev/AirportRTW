@@ -42,6 +42,7 @@ struct Rtw89LinuxContext {
     void *station;
     size_t vifAllocationSize;
     size_t stationAllocationSize;
+    uint32_t peerAudit[11];
     unsigned stationState; // Last completed ieee80211_sta_state transition.
     void *keys[12]; /* group 0..5, pairwise 6..11 */
     uint8_t macAddress[6];

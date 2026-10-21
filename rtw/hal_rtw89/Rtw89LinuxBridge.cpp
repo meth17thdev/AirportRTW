@@ -18,6 +18,7 @@ struct ieee80211_hw *rtw88_get_hw(void);
 void rtw88_register_vif(struct ieee80211_vif *);
 void rtw88_unregister_vif(void);
 void rtw89_macos_flush_rx_ba(struct ieee80211_sta *);
+void rtw89_macos_peer_audit(struct ieee80211_hw *, struct ieee80211_vif *, uint32_t *);
 }
 
 namespace {
@@ -1033,6 +1034,7 @@ bool rtw89LinuxAssociate(Rtw89LinuxContext *context,
         else if (hw->ops->bss_info_changed)
             hw->ops->bss_info_changed(hw, vif, bss,
                                       BSS_CHANGED_ASSOC | BSS_CHANGED_QOS);
+        rtw89_macos_peer_audit(hw, vif, context->peerAudit);
     }
     return true;
 }

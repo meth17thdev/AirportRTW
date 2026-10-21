@@ -560,7 +560,7 @@ struct ieee80211com {
     uint32_t        ic_vhtcaps;
     uint32_t        ic_hecaps;
     void           *ic_sae;
-    uint32_t        ic_join_rx_early[13]; /* Non-secret RX boundary counters. */
+    uint32_t        ic_join_rx_early[33]; /* Non-secret RX boundary counters. */
     uint32_t        ic_join_serial;
     uint32_t        ic_sae_rx_headers[8][4]; /* FC, length, flags/state, EtherType only */
     uint32_t        ic_sae_rx_data, ic_sae_rx_eapol;

@@ -58,6 +58,10 @@ static void retainIncompleteJoin(IOService *controller, ieee80211com *ic, uint32
         snprintf(key, sizeof(key), "RTWLastIncompleteJoin%s", field);
         if (auto value = controller->getProperty(key)) record->setObject(field, value);
     }
+    if (ic->ic_state == IEEE80211_S_RUN) {
+        if (auto audit = controller->getProperty("RTW89PeerAudit"))
+            record->setObject("PeerAudit", audit);
+    }
     if (auto serial = OSNumber::withNumber(ic->ic_join_serial, 32)) {
         record->setObject("Serial", serial);
         serial->release();

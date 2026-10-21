@@ -5,6 +5,19 @@
 #include <stdint.h>
 #include <string.h>
 namespace Rtw89Rx {
+// The direct MLME association-response path bypasses ieee80211_inputm.
+// Validate its envelope before any fixed fields, IEs or state are consumed.
+inline bool associationResponse(const uint8_t *frame, size_t length,
+                                const uint8_t station[6], const uint8_t peer[6])
+{
+    if (!frame || !station || !peer || length < 30) return false;
+    if (frame[0] != 0x10 && frame[0] != 0x30) return false;
+    // Management has no DS direction. Reject fragmentation and protection;
+    // these pre-key association responses cannot use a protected envelope.
+    if ((frame[1] & (0x03 | 0x04 | 0x40 | 0x80)) || (frame[22] & 15)) return false;
+    return !memcmp(frame + 4, station, 6) &&
+           !memcmp(frame + 10, peer, 6) && !memcmp(frame + 16, peer, 6);
+}
 // For hardware-decrypted CCMP data with IV and MIC still present, excluding FCS.
 struct CCMPLayout { size_t headerLength; unsigned keyIndex; bool multicast; };
 inline size_t dataHeaderLength(const uint8_t *frame, size_t length)

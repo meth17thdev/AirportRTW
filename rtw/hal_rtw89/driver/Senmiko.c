@@ -490,6 +490,29 @@ void rtw88_connect_hw_setup(struct ieee80211_hw *hw, struct ieee80211_vif *vif,
 			 RTW89_ROLE_INFO_CHANGE);
 }
 
+/* Read-only audit after association. AX forwarding registers are not shared
+ * with BE, so those fields remain unavailable on BE rather than reading AX offsets. */
+void rtw89_macos_peer_audit(struct ieee80211_hw *hw, struct ieee80211_vif *vif, u32 *out)
+{
+    struct rtw89_dev *dev = hw->priv;
+    struct rtw89_vif_link *link = rtw89_get_designated_link((struct rtw89_vif *)vif->drv_priv);
+    out[0] = dev->hal.rx_fltr;
+    out[1] = out[2] = out[3] = 0xffffffff;
+    if (dev->chip->chip_gen == RTW89_CHIP_AX) {
+        out[1] = rtw89_read32(dev, R_AX_RX_FLTR_OPT);
+        out[2] = rtw89_read32(dev, R_AX_MGNT_FLTR);
+        out[3] = rtw89_read32(dev, R_AX_DATA_FLTR);
+    }
+    if (!link) return;
+    out[4] = link->net_type;
+    out[5] = link->addr_cam.valid;
+    out[6] = link->bssid_cam.valid;
+    out[7] = ether_addr_equal(link->mac_addr, vif->addr);
+    out[8] = ether_addr_equal(link->bssid, vif->cfg.ap_addr);
+    out[9] = dev->scanning;
+    out[10] = vif->cfg.assoc;
+}
+
 /* Re-apply channel + BSSID after an internal reset while associated. */
 void rtw88_restore_connected_hw(struct ieee80211_hw *hw,
 				struct ieee80211_vif *vif,

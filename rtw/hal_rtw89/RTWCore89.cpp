@@ -827,6 +827,15 @@ void RTWCore89::traceReceive(void *opaque, unsigned stage, const uint8_t *frame,
     if (type == IEEE80211_FC0_TYPE_MGT) {
         if (stage == 0) {
             __sync_fetch_and_add(&counts[10], 1);
+            unsigned subtype = (frame[0] >> 4) & 15;
+            __sync_fetch_and_add(&counts[13 + subtype], 1);
+            if (!IEEE80211_ADDR_EQ(frame + 4, ic->ic_myaddr) && !(frame[4] & 1))
+                __sync_fetch_and_add(&counts[29], 1);
+            if (subtype == 1 || subtype == 3) {
+                if (frame[1] & 8) __sync_fetch_and_add(&counts[30], 1);
+                if (Rtw89Rx::associationResponse(frame, length, ic->ic_myaddr, ic->ic_bss->ni_bssid))
+                    __sync_fetch_and_add(&counts[31], 1);
+            }
             if ((frame[0] & IEEE80211_FC0_SUBTYPE_MASK) == IEEE80211_FC0_SUBTYPE_BEACON)
                 __sync_fetch_and_add(&counts[11], 1);
         }
@@ -959,7 +968,8 @@ void RTWCore89::receive(void *opaque, const uint8_t *frame, size_t length,
     struct mbuf_list list;
     ml_init(&list);
     const bool assocResponse = frameType == IEEE80211_FC0_TYPE_MGT &&
-        frameSubtype == IEEE80211_FC0_SUBTYPE_ASSOC_RESP;
+        (frameSubtype == IEEE80211_FC0_SUBTYPE_ASSOC_RESP ||
+         frameSubtype == IEEE80211_FC0_SUBTYPE_REASSOC_RESP);
     // Native raw-management listeners can consume Block Ack actions before
     // net80211 sees them, just like association responses. Only dispatch
     // ordinary, unfragmented BA actions from our associated AP here. Frames
@@ -975,12 +985,24 @@ void RTWCore89::receive(void *opaque, const uint8_t *frame, size_t length,
         IEEE80211_ADDR_EQ(wh->i_addr2, node->ni_bssid) &&
         IEEE80211_ADDR_EQ(wh->i_addr3, node->ni_bssid);
     if (assocResponse) {
+        if (ic->ic_state != IEEE80211_S_ASSOC || !ic->ic_bss ||
+            !Rtw89Rx::associationResponse(frame, length, ic->ic_myaddr, ic->ic_bss->ni_bssid)) {
+            ++ic->ic_stats.is_rx_mgtdiscard;
+            if (ic->ic_bss && !ic->ic_bss->ni_port_valid &&
+                IEEE80211_ADDR_EQ(wh->i_addr2, ic->ic_bss->ni_bssid))
+                __sync_fetch_and_add(&ic->ic_join_rx_early[32], 1);
+            mbuf_freem(m);
+            ieee80211_release_node(ic, node);
+            splx(networkPriority);
+            return;
+        }
         owner->assocStateBeforeInput = (UInt32)ic->ic_state;
         /* IO80211's raw 802.11 BPF listener consumes this valid MLME frame
          * before net80211 dispatch.  RX length/FCS and node lookup have
          * already been validated, so deliver only association responses
          * directly to their concrete parser. */
-        ieee80211_recv_assoc_resp(ic, m, node, 0);
+        ieee80211_recv_assoc_resp(ic, m, node,
+            frameSubtype == IEEE80211_FC0_SUBTYPE_REASSOC_RESP);
         mbuf_freem(m);
         owner->assocStateAfterInput = (UInt32)ic->ic_state;
         owner->assocStatusAfterInput = (UInt32)ic->ic_assoc_status;
@@ -1158,6 +1180,8 @@ int RTWCore89::newstate(struct ieee80211com *ic,
 
     const int result = sc->sc_newstate(ic, state, arg);
     if (result == 0 && state == IEEE80211_S_RUN) {
+        owner->getController()->setProperty("RTW89PeerAudit", owner->linuxContext.peerAudit,
+                                           sizeof(owner->linuxContext.peerAudit));
         updateEdca(ic);
         if (ic->ic_sae_enabled)
             owner->getController()->setProperty("RTWSAENegotiatedPHY",
