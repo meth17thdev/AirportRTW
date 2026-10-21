@@ -140,10 +140,12 @@ ieee80211_eapol_key_input(struct ieee80211com *ic, mbuf_t m,
     
     /* discard EAPOL-Key frames with an unknown descriptor version */
     desc = info & EAPOL_KEY_VERSION_MASK;
-    if (desc < EAPOL_KEY_DESC_V1 || desc > EAPOL_KEY_DESC_V3)
-        goto done;
+    if (ni->ni_rsnakms == IEEE80211_AKM_SAE ? desc != 0 :
+        (desc < EAPOL_KEY_DESC_V1 || desc > EAPOL_KEY_DESC_V3)) goto done;
     
-    if (ieee80211_is_sha256_akm((enum ieee80211_akm)ni->ni_rsnakms)) {
+    if (ni->ni_rsnakms == IEEE80211_AKM_SAE) {
+        if (desc != 0) goto done;
+    } else if (ieee80211_is_sha256_akm((enum ieee80211_akm)ni->ni_rsnakms)) {
         if (desc != EAPOL_KEY_DESC_V3)
             goto done;
     } else if (ni->ni_rsncipher == IEEE80211_CIPHER_CCMP ||
@@ -446,11 +448,16 @@ ieee80211_recv_4way_msg3(struct ieee80211com *ic,
      * RSN IEs in message 3/4.  We only take into account the IE of the
      * version of the protocol we negotiated at association time.
      */
+    const uint8_t *saeRSNXE = NULL;
     rsnie1 = rsnie2 = gtk = igtk = NULL;
     while (frm + 2 <= efrm) {
         if (frm + 2 + frm[1] > efrm)
             break;
         switch (frm[0]) {
+            case 244: /* Authenticate the AP RSNXE against discovery. */
+                if (saeRSNXE) return;
+                saeRSNXE = frm;
+                break;
             case IEEE80211_ELEMID_RSN:
                 if (ni->ni_rsnprotos != IEEE80211_PROTO_RSN)
                     break;
@@ -486,6 +493,13 @@ ieee80211_recv_4way_msg3(struct ieee80211com *ic,
                 break;
         }
         frm += 2 + frm[1];
+    }
+    if (ni->ni_rsnakms == IEEE80211_AKM_SAE) {
+        if (!gtk || !igtk || !(info & EAPOL_KEY_ENCRYPTED)) return;
+        if (ni->ni_sae_rsnxe[1]) {
+            if (!saeRSNXE || saeRSNXE[1] != ni->ni_sae_rsnxe[1] ||
+                memcmp(saeRSNXE, ni->ni_sae_rsnxe, saeRSNXE[1] + 2)) return;
+        } else if (saeRSNXE) return;
     }
     /* first WPA/RSN IE is mandatory */
     if (rsnie1 == NULL) {

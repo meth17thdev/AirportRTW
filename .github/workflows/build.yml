@@ -47,6 +47,15 @@ jobs:
           xcrun clang++ -std=c++14 -Wall -Wextra -Werror \
             tests/rtw88_hal_test.cpp -o build/tests/rtw88-hal
           build/tests/rtw88-hal
+      - name: Check SAE crypto and malformed exchanges
+        run: |
+          SAE_HOST_TEST=1 DERIVED_FILE_DIR="$PWD/build/tests/sae" bash scripts/build_sae_archive.sh
+          python3 tools/validate_sae_backend.py --archive build/tests/sae/librtw_sae.a
+          for test in sae_exchange_test sae_crypto_test; do
+            xcrun clang -std=c11 -Wall -Wextra -Werror "tests/$test.c" \
+              build/tests/sae/librtw_sae.a -o "build/tests/$test"
+            "build/tests/$test"
+          done
       - name: Build target
         env:
           PLATFORM: ${{ matrix.platform }}

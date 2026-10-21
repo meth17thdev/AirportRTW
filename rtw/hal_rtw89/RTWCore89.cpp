@@ -270,6 +270,7 @@ IOReturn RTWCore89::disable(IONetworkInterface *interface)
 
 void RTWCore89::free()
 {
+    ieee80211_sae_clear(&sc.sc_ic, true);
     detach(pciDevice);
     super::free();
 }
@@ -340,7 +341,7 @@ bool RTWCore89::attachNet80211()
     ic->ic_caps = IEEE80211_C_WEP | IEEE80211_C_RSN |
                   IEEE80211_C_SCANALL | IEEE80211_C_SCANALLBAND |
                   IEEE80211_C_SHSLOT | IEEE80211_C_SHPREAMBLE |
-                  IEEE80211_C_QOS | IEEE80211_C_TX_AMPDU;
+                  IEEE80211_C_QOS | IEEE80211_C_TX_AMPDU | IEEE80211_C_MFP;
     ic->ic_htcaps = IEEE80211_HTCAP_SGI20 |
                     IEEE80211_HTCAP_CBW20_40 | IEEE80211_HTCAP_SGI40 |
                     IEEE80211_HTCAP_LDPC |
@@ -1132,6 +1133,11 @@ int RTWCore89::setKey(struct ieee80211com *ic, struct ieee80211_node *node,
     // TKIP is not supported by RTL8852A hardware; CCMP uses security CAM.
     // The Linux bridge normalizes hardware-decrypted CCMP to net80211's
     // IV/replay/MIC contract without changing the shared crypto stack.
+    const auto *peer = node ? node : ic->ic_bss;
+    if (key->k_cipher == IEEE80211_CIPHER_BIP ||
+        (key->k_cipher == IEEE80211_CIPHER_CCMP &&
+         (ic->ic_sae_enabled || (peer && (peer->ni_flags & IEEE80211_NODE_MFP)))))
+        return ieee80211_set_key(ic, node, key);
     if (key->k_cipher == IEEE80211_CIPHER_TKIP)
         return ieee80211_set_key(ic, node, key);
     auto *sc = static_cast<struct rtw89_softc *>(ic->ic_if.if_softc);

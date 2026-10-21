@@ -1027,6 +1027,10 @@ getCARD_CAPABILITIES(OSObject *object,
         (1 << APPLE80211_CAP_AES_CCM) | (1 << APPLE80211_CAP_TKIP) : 0;
     cd->capabilities[1] &= ~(1 << (APPLE80211_CAP_WPA1 - 8));
     cd->capabilities[5] = 0x40; // Scan completion events.
+    if (caps & IEEE80211_C_MFP) {
+        cd->capabilities[6] |= 0x01; // PMF
+        cd->capabilities[9] |= 0x18; // SAE authentication and key management
+    }
     cd->capabilities[2] = (1 << (APPLE80211_CAP_WME - 16)) |
         (1 << (APPLE80211_CAP_SHORT_GI_40MHZ - 16)) |
         (1 << (APPLE80211_CAP_SHORT_GI_20MHZ - 16));

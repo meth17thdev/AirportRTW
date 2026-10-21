@@ -1474,6 +1474,7 @@ ieee80211_parse_rsn_akm(const u_int8_t selector[4])
                 return IEEE80211_AKM_PSK;
             case 5:    /* IEEE 802.1X with SHA256 KDF */
                 return IEEE80211_AKM_SHA256_8021X;
+            case 8: return IEEE80211_AKM_SAE;
             case 6:    /* PSK with SHA256 KDF */
                 return IEEE80211_AKM_SHA256_PSK;
         }
@@ -1682,6 +1683,8 @@ ieee80211_recv_probe_resp(struct ieee80211com *ic, mbuf_t m,
     const uint8_t *hecap;
     const uint8_t *heopmode;
     const uint8_t *heMuEdca = NULL;
+    bool saeH2E = false;
+    const uint8_t *saeRSNXE = NULL;
     u_int16_t capinfo, bintval;
     u_int8_t chan, bchan, erp, dtim_count, dtim_period;
     int is_new;
@@ -1799,6 +1802,11 @@ ieee80211_recv_probe_resp(struct ieee80211com *ic, mbuf_t m,
                         wmmie = frm;
                 }
                 break;
+            case 244: /* RSN Extension: SAE Hash-to-Element */
+                if (frm[1] >= 1 && frm[1] <= 16 && (frm[2] & 15) + 1 == frm[1]) {
+                    saeH2E = (frm[2] & 0x20) != 0; saeRSNXE = frm;
+                }
+                break;
             case IEEE80211_ELEMID_EXTENSION:
                 if (frm[1] < 1) break;
                 switch (frm[2]) {
@@ -1901,6 +1909,9 @@ ieee80211_recv_probe_resp(struct ieee80211com *ic, mbuf_t m,
         is_new = 0;
     
     ni->ni_chan = &ic->ic_channels[chan];
+    ni->ni_sae_h2e = saeH2E;
+    bzero(ni->ni_sae_rsnxe, sizeof(ni->ni_sae_rsnxe));
+    if (saeRSNXE) memcpy(ni->ni_sae_rsnxe, saeRSNXE, saeRSNXE[1] + 2);
     
     if (htcaps)
         ieee80211_setup_htcaps(ni, htcaps + 2, htcaps[1]);
@@ -2301,7 +2312,13 @@ ieee80211_recv_auth(struct ieee80211com *ic, mbuf_t m,
     DPRINTF(("auth %d seq %d from %s\n", algo, seq,
              ether_sprintf((u_int8_t *)wh->i_addr2)));
     
-    /* only "open" auth mode is supported */
+    if (ic->ic_sae_enabled) {
+        if (algo != 3) return;
+        ieee80211_sae_receive(ic, ni, wh, seq, status, frm,
+            mbuf_len(m) - sizeof(*wh) - 6);
+        return;
+    }
+    /* Other algorithms retain their existing dispatch. */
     if (algo != IEEE80211_AUTH_ALG_OPEN) {
         DPRINTF(("unsupported auth algorithm %d from %s\n",
                  algo, ether_sprintf((u_int8_t *)wh->i_addr2)));

@@ -33,7 +33,7 @@ for target in "${TARGETS[@]}"; do
     ARCHS=x86_64 \
     CODE_SIGNING_ALLOWED=NO \
     EXCLUDED_SOURCE_FILE_NAMES="$BACKEND_C_SOURCES" \
-    'OTHER_LDFLAGS=$(inherited) $(DERIVED_FILE_DIR)/librtw89_c.a $(DERIVED_FILE_DIR)/librtw88_c.a' \
+    'OTHER_LDFLAGS=$(inherited) $(DERIVED_FILE_DIR)/librtw89_c.a $(DERIVED_FILE_DIR)/librtw88_c.a $(DERIVED_FILE_DIR)/librtw_sae.a' \
     SYMROOT="$OUTPUT" \
     OBJROOT="$OBJECTS"
 done

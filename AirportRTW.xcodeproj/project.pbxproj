@@ -1191,6 +1191,26 @@
 		CBA9EFBAE9E82B12992317B1 = {isa = PBXBuildFile; fileRef = F4EECB33D3633F2837E58459; };
 		D1297E9526F4F7FFA9AE5B00 = {isa = PBXBuildFile; fileRef = F4EECB33D3633F2837E58459; };
 		31CCB9C53494AF82C3A99AA0 = {isa = PBXBuildFile; fileRef = F4EECB33D3633F2837E58459; };
+		DFEDE34BE05194DDF156D366 = {isa = PBXBuildFile; fileRef = B62DC19B24447AD44E3C60BF; };
+		875181B37BB0E41BDA1F70B3 = {isa = PBXBuildFile; fileRef = B62DC19B24447AD44E3C60BF; };
+		FFCFD4D9827D21B647C0D6DE = {isa = PBXBuildFile; fileRef = B62DC19B24447AD44E3C60BF; };
+		59B054B8D56DB1D0598A630C = {isa = PBXBuildFile; fileRef = B62DC19B24447AD44E3C60BF; };
+		352FE609C4E51CA273B9E8C9 = {isa = PBXBuildFile; fileRef = B62DC19B24447AD44E3C60BF; };
+		46D2A1BE266F74F75138A438 = {isa = PBXBuildFile; fileRef = B62DC19B24447AD44E3C60BF; };
+		543767CBC5FB181521F14BFD = {isa = PBXBuildFile; fileRef = B62DC19B24447AD44E3C60BF; };
+		E27FE31F14F4C07D98A9AF8F = {isa = PBXBuildFile; fileRef = B62DC19B24447AD44E3C60BF; };
+		C20BF755A67C1D1A2CB71351 = {isa = PBXBuildFile; fileRef = B62DC19B24447AD44E3C60BF; };
+		2833111488EF5C2B162A3A23 = {isa = PBXBuildFile; fileRef = 4EC218A429C0D44F88933AAA; };
+		97FC604522D1B683948BC2A7 = {isa = PBXBuildFile; fileRef = 4EC218A429C0D44F88933AAA; };
+		CCC88D57F315A0B5E8AB4D33 = {isa = PBXBuildFile; fileRef = 4EC218A429C0D44F88933AAA; };
+		5A06A27BA3E5C26933F953CA = {isa = PBXBuildFile; fileRef = 4EC218A429C0D44F88933AAA; };
+		5CCEDF05473086BBCD1AE8F8 = {isa = PBXBuildFile; fileRef = 4EC218A429C0D44F88933AAA; };
+		CF6A31CF4A96DCD872059A19 = {isa = PBXBuildFile; fileRef = 4EC218A429C0D44F88933AAA; };
+		8379D0A256B4E6AC9A538420 = {isa = PBXBuildFile; fileRef = 4EC218A429C0D44F88933AAA; };
+		CF7F9049AE00BBCFE7E154DF = {isa = PBXBuildFile; fileRef = 4EC218A429C0D44F88933AAA; };
+		83A2AC34A4C79456EF00A9C8 = {isa = PBXBuildFile; fileRef = 4EC218A429C0D44F88933AAA; };
+		55CE93417624514489E53E5C = {isa = PBXBuildFile; fileRef = 4EC218A429C0D44F88933AAA; };
+		71364CC896DF7F6554F1C119 = {isa = PBXBuildFile; fileRef = 4EC218A429C0D44F88933AAA; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1526,6 +1546,8 @@
 		DBC0CFBADAF3631C5C579D20 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "rtw/hal_rtw88/Rtw88PciTransport.cpp"; sourceTree = SOURCE_ROOT; };
 		03FA85F0AE0017B405B4FBBE = {isa = PBXFileReference; lastKnownFileType = text; path = "rtw/hal_rtw88/firmware/LICENCE.rtlwifi_firmware.txt"; sourceTree = SOURCE_ROOT; };
 		F4EECB33D3633F2837E58459 = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = "rtw/RTWCore.cpp"; sourceTree = SOURCE_ROOT; };
+		4EC218A429C0D44F88933AAA = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "rtw80211/openbsd/net80211/ieee80211_sae.c"; sourceTree = SOURCE_ROOT; };
+		B62DC19B24447AD44E3C60BF = {isa = PBXFileReference; lastKnownFileType = text; path = "rtw80211/sae/NOTICE.txt"; sourceTree = SOURCE_ROOT; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1607,6 +1629,8 @@
 		024A07A223FCBC3C009FBA6C = {
 			isa = PBXGroup;
 			children = (
+				4EC218A429C0D44F88933AAA,
+				B62DC19B24447AD44E3C60BF,
 				F4EECB33D3633F2837E58459,
 				07B5BB249744E37FC2B8C48B,
 				532A4840CEEDDC0BA97CE34A,
@@ -2628,6 +2652,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				DFEDE34BE05194DDF156D366,
 				CA86D0107E3D9E10D894A2C3,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2636,6 +2661,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				875181B37BB0E41BDA1F70B3,
 				234FD0090E4177E9FE83FE28,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2644,6 +2670,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				FFCFD4D9827D21B647C0D6DE,
 				9806976253BFBD5CE9FCB0F2,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2652,6 +2679,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				59B054B8D56DB1D0598A630C,
 				6E4BF08F226174D7A4EF8C77,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2660,6 +2688,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				352FE609C4E51CA273B9E8C9,
 				501B4D4A6035C01BF87ABA3C,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2668,6 +2697,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				46D2A1BE266F74F75138A438,
 				D9396B23AAE34A574F81AFBE,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2676,6 +2706,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				543767CBC5FB181521F14BFD,
 				12DF5E068E9E893D339BD431,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2684,6 +2715,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				E27FE31F14F4C07D98A9AF8F,
 				A3E14542F971C851F4A5E516,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2692,6 +2724,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				C20BF755A67C1D1A2CB71351,
 				A99F8318ADB0AE5EBF999634,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -2709,11 +2742,11 @@
 			);
 			name = "Build RTW89 C Archive";
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a",
+				"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "scripts/build_rtw89_c_archive.sh\nscripts/build_rtw88_c_archive.sh\n";
+			shellScript = "scripts/build_rtw89_c_archive.sh\nscripts/build_rtw88_c_archive.sh\nscripts/build_sae_archive.sh\n";
 		};
 		A89C00012F00000000000002 /* Build RTW89 C Archive */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2725,11 +2758,11 @@
 			);
 			name = "Build RTW89 C Archive";
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a",
+				"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "scripts/build_rtw89_c_archive.sh\nscripts/build_rtw88_c_archive.sh\n";
+			shellScript = "scripts/build_rtw89_c_archive.sh\nscripts/build_rtw88_c_archive.sh\nscripts/build_sae_archive.sh\n";
 		};
 		A89C00012F00000000000003 /* Build RTW89 C Archive */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2741,11 +2774,11 @@
 			);
 			name = "Build RTW89 C Archive";
 			outputPaths = (
-				"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a",
+				"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/bash;
-			shellScript = "scripts/build_rtw89_c_archive.sh\nscripts/build_rtw88_c_archive.sh\n";
+			shellScript = "scripts/build_rtw89_c_archive.sh\nscripts/build_rtw88_c_archive.sh\nscripts/build_sae_archive.sh\n";
 		};
 		5066D63C25287F8E00EE6F38 /* Generate Firmware */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -2773,6 +2806,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2833111488EF5C2B162A3A23,
 				31E003EBB0EAA203578E0DD4,
 				2B691B79D3135B66E0A7839C,
 				FCE042C681F923EF3AB7D60F,
@@ -2872,6 +2906,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				97FC604522D1B683948BC2A7,
 				A3B321905ECF906E633F050E,
 				3826DDE64AF66E5A65ED69EA,
 				3DC1C337F2E4006C6E8D07EF,
@@ -2973,6 +3008,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CCC88D57F315A0B5E8AB4D33,
 				6E7090A4DF6AB6EF8523AD8C,
 				6182C9C41C09715A4F08A0E2,
 				6F9EE2B56A4403AF0B00241F,
@@ -3074,6 +3110,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5A06A27BA3E5C26933F953CA,
 				97A2033B6FB99C23DE371C1F,
 				296D47365CCB164832D412CF,
 				91A58AAB205F0B1F5844FDC8,
@@ -3175,6 +3212,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				5CCEDF05473086BBCD1AE8F8,
 				41C3106A32670E97B2945E2B,
 				4B8E3FF5F0EF564A5E795A27,
 				C267C3A134F89FBC8E39F987,
@@ -3277,6 +3315,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CF6A31CF4A96DCD872059A19,
 				9F2723E77526B9F447E839D9,
 				8E3E31415D76089B57F0E6D8,
 				132D465C2CE6376FC7638E18,
@@ -3378,6 +3417,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8379D0A256B4E6AC9A538420,
 				31AD9D658C676168203046D1,
 				49EA6367ECB2A9D16664D237,
 				780C4DCDA3469FC8A2ED3BB7,
@@ -3448,6 +3488,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CF7F9049AE00BBCFE7E154DF,
 				8B66E6D84EF9037C2C403E25,
 				39514F831FBDE0AF5DE3E5C6,
 				069C0A31021D69365A71FD8C,
@@ -3517,6 +3558,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				83A2AC34A4C79456EF00A9C8,
 				CBA9EFBAE9E82B12992317B1,
 				F82A0D3161EC7725109038E0,
 				2AAE04BE49196B6903030EA8,
@@ -3586,6 +3628,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				55CE93417624514489E53E5C,
 				D1297E9526F4F7FFA9AE5B00,
 				18B4F1FAD5B8BCFCCFF3FDFF,
 				7F6F701D910FE1B8E05A3652,
@@ -3655,6 +3698,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				71364CC896DF7F6554F1C119,
 				31CCB9C53494AF82C3A99AA0,
 				68A78AA0A52D7B7856066ABC,
 				8598648B4C8970D27563C0DA,
@@ -3913,7 +3957,7 @@
 		024A07B723FCBC3C009FBA6C /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a");
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a");
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
@@ -3941,7 +3985,7 @@
 		024A07B823FCBC3C009FBA6C /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a");
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a");
 				FRAMEWORK_SEARCH_PATHS = "";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
@@ -3969,7 +4013,7 @@
 		35CBE6B8251CB89700435CBC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a");
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Big Sur";
 				CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -4001,7 +4045,7 @@
 		35CBE6B9251CB89700435CBC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a");
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Big Sur";
 				CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -4033,7 +4077,7 @@
 		35CBE722251CB8BF00435CBC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a");
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Mojave";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
@@ -4064,7 +4108,7 @@
 		35CBE723251CB8BF00435CBC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a");
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Mojave";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
@@ -4095,7 +4139,7 @@
 		35CBE78D251CB8CA00435CBC /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a");
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/High Sierra";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
@@ -4126,7 +4170,7 @@
 		35CBE78E251CB8CA00435CBC /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a");
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/High Sierra";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
 				GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
@@ -4169,7 +4213,7 @@
 		F897ED16266EFF93005EE8F7 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a");
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Monterey";
 				CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -4201,7 +4245,7 @@
 		F897ED17266EFF93005EE8F7 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a");
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Monterey";
 				CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -4233,7 +4277,7 @@
 		F89B6BC125021C9C000F77FF /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a");
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Catalina";
 				CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -4267,7 +4311,7 @@
 		F89B6BC225021C9C000F77FF /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a");
+				OTHER_LDFLAGS = ("$(inherited)", "$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a");
 				CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/Catalina";
 				CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
 				GCC_PRECOMPILE_PREFIX_HEADER = YES;
@@ -4325,7 +4369,7 @@
 				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a",
+					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
@@ -4361,7 +4405,7 @@
 				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a",
+					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
@@ -4396,7 +4440,7 @@
 				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a",
+					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
@@ -4431,7 +4475,7 @@
 				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a",
+					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_NAME = AirportRTW;
@@ -4466,7 +4510,7 @@
 				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a",
+					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;
@@ -4502,7 +4546,7 @@
 				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a",
+					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;
@@ -4539,7 +4583,7 @@
 				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a",
+					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;
@@ -4576,7 +4620,7 @@
 				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a",
+					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;
@@ -4613,7 +4657,7 @@
 				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a",
+					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;
@@ -4650,7 +4694,7 @@
 				MODULE_NAME = com.senmiko.AirportRTW;
 				OTHER_LDFLAGS = (
 					"$(inherited)",
-					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a",
+					"$(DERIVED_FILE_DIR)/librtw89_c.a", "$(DERIVED_FILE_DIR)/librtw88_c.a", "$(DERIVED_FILE_DIR)/librtw_sae.a",
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.senmiko.AirportRTW;
 				PRODUCT_MODULE_NAME = AirportRTW;

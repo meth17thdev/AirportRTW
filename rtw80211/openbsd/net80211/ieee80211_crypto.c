@@ -92,6 +92,7 @@ ieee80211_crypto_detach(struct _ifnet *ifp)
 {
     XYLog("%s\n", __FUNCTION__);
 	struct ieee80211com *ic = (struct ieee80211com *)ifp;
+    ieee80211_sae_clear(ic, true);
 	struct ieee80211_pmk *pmk;
 
 	/* purge the PMKSA cache */
@@ -218,7 +219,8 @@ ieee80211_get_txkey(struct ieee80211com *ic, const struct ieee80211_frame *wh,
         return &ni->ni_pairwise_key;
 
     /* All other cases (including WEP) use a group key. */
-    if (ni->ni_flags & IEEE80211_NODE_MFP)
+    if ((ni->ni_flags & IEEE80211_NODE_MFP) &&
+        (wh->i_fc[0] & IEEE80211_FC0_TYPE_MASK) == IEEE80211_FC0_TYPE_MGT)
         kid = ic->ic_igtk_kid;
     else
         kid = ic->ic_def_txkey;
@@ -423,8 +425,13 @@ ieee80211_derive_ptk(enum ieee80211_akm akm, const u_int8_t *pmk,
     memcpy(&buf[44], ret ? snonce : anonce, EAPOL_KEY_NONCE_LEN);
 
     kdf = ieee80211_is_sha256_akm(akm) ? ieee80211_kdf : ieee80211_prf;
+    /* SAE is restricted to CCMP-128 here: KCK16 + KEK16 + TK16.
+     * SHA-256 KDF encodes the output length, so deriving 64 then truncating
+     * would produce different keys from the AP's required 48-byte PTK. */
+    size_t length = akm == IEEE80211_AKM_SAE ? 48 : sizeof(*ptk);
+    bzero(ptk, sizeof(*ptk));
     (*kdf)(pmk, IEEE80211_PMK_LEN, (const u_int8_t *)"Pairwise key expansion", 23,
-        buf, sizeof buf, (u_int8_t *)ptk, sizeof(*ptk));
+        buf, sizeof buf, (u_int8_t *)ptk, length);
 }
 
 static void
@@ -506,6 +513,7 @@ ieee80211_eapol_key_mic(struct ieee80211_eapol_key *key, const u_int8_t *kck)
         /* truncate HMAC-SHA1 to its 128 MSBs */
         memcpy(key->mic, digest, EAPOL_KEY_MIC_LEN);
         break;
+    case 0: /* SAE AKM-defined AES-CMAC / AES key wrap */
     case EAPOL_KEY_DESC_V3:
         AES_CMAC_Init(&ctx.cmac);
         AES_CMAC_SetKey(&ctx.cmac, kck);
@@ -572,6 +580,7 @@ ieee80211_eapol_key_encrypt(struct ieee80211com *ic,
         rc4_crypt(&ctx.rc4, data, data, len);
         break;
     case EAPOL_KEY_DESC_V2:
+    case 0: /* SAE AKM-defined AES-CMAC / AES key wrap */
     case EAPOL_KEY_DESC_V3:
         if (len < 16 || (len & 7) != 0) {
             /* insert padding */
@@ -625,6 +634,7 @@ ieee80211_eapol_key_decrypt(struct ieee80211_eapol_key *key,
         rc4_crypt(&ctx.rc4, data, data, len);
         return 0;
     case EAPOL_KEY_DESC_V2:
+    case 0: /* SAE AKM-defined AES-CMAC / AES key wrap */
     case EAPOL_KEY_DESC_V3:
         /* Key Data Length must be a multiple of 8 */
         if (len < 16 + 8 || (len & 7) != 0)

@@ -559,6 +559,10 @@ struct ieee80211com {
 	u_int16_t		ic_htcaps;
     uint32_t        ic_vhtcaps;
     uint32_t        ic_hecaps;
+    void           *ic_sae;
+    bool            ic_sae_enabled;
+    uint8_t         ic_sae_password[64];
+    uint8_t         ic_sae_password_len;
 	u_int8_t		ic_ampdu_params;
 	u_int8_t		ic_sup_mcs[howmany(80, NBBY)];
 	u_int16_t		ic_max_rxrate;	/* in Mb/s, 0 <= rate <= 1023 */

@@ -34,6 +34,29 @@ int main()
     request[0x21c] = 1;
     assert(!decodeJoin(request, sizeof(request), join));
 
+    // SAE needs the passphrase; a WPA2 PMK must never be treated as one.
+    request[0x21c] = 2;
+    request[0x15] = 0x10; // SAE: upper auth bit 12
+    request[0x44] = 63; request[0x48] = 10;
+    memset(request + 0x50, 'p', 63);
+    assert(decodeJoin(request, sizeof(request), join));
+    assert(classifyLegacyAuth(join) == LegacyAuth::SAE);
+    request[0x44] = 64;
+    assert(decodeJoin(request, sizeof(request), join));
+    assert(classifyLegacyAuth(join) == LegacyAuth::Invalid);
+    request[0x44] = 32; request[0x48] = 6;
+    assert(decodeJoin(request, sizeof(request), join));
+    assert(classifyLegacyAuth(join) == LegacyAuth::Invalid);
+    request[0x15] = 0; request[0x14] = 8;
+    assert(decodeJoin(request, sizeof(request), join));
+    assert(classifyLegacyAuth(join) == LegacyAuth::Personal);
+    request[0x48] = 10;
+    assert(decodeJoin(request, sizeof(request), join));
+    assert(classifyLegacyAuth(join) == LegacyAuth::PersonalPassphrase);
+    request[0x44] = 7;
+    assert(decodeJoin(request, sizeof(request), join));
+    assert(classifyLegacyAuth(join) == LegacyAuth::Invalid);
+
     uint8_t channels[32] = {};
     channels[36 / 8] |= 1u << (36 % 8);
     assert(scanChannelSelected(channels, true, 36));

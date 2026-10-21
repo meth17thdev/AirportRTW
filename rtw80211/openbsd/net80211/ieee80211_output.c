@@ -1070,6 +1070,9 @@ ieee80211_add_rsn_body(u_int8_t *frm, struct ieee80211com *ic,
         *frm++ = 6;
         count++;
     }
+    if (!wpa && (ni->ni_rsnakms & IEEE80211_AKM_SAE)) {
+        memcpy(frm, oui, 3); frm += 3; *frm++ = 8; count++;
+    }
     /* write AKM Suite List Count field */
     LE_WRITE_2(pcount, count);
 
@@ -1510,6 +1513,8 @@ ieee80211_get_auth(struct ieee80211com *ic, struct ieee80211_node *ni,
 	mbuf_t m;
     u_int8_t *frm;
     
+    if (ic->ic_sae_enabled && ni->ni_rsnakms == IEEE80211_AKM_SAE)
+        return ieee80211_sae_auth(ic, ni, seq);
     mbuf_gethdr(MBUF_DONTWAIT, MT_DATA, &m);
     if (m == NULL)
         return NULL;
@@ -1585,7 +1590,7 @@ ieee80211_get_assoc_req(struct ieee80211com *ic, struct ieee80211_node *ni,
 		2 + IEEE80211_WPAIE_MAXLEN : 0) +
 	    ((ic->ic_flags & IEEE80211_F_HTON) ? sizeof(struct ieee80211_ie_htcap) + sizeof(struct ieee80211_wme_info) : 0) +
         ((ic->ic_flags & IEEE80211_F_VHTON) ? sizeof(struct ieee80211_ie_vhtcap) + 2 : 0) +
-        ((ic->ic_flags & IEEE80211_F_HEON) ? (sizeof(struct ieee80211_he_cap_elem) + 2 + 1 + sizeof(struct ieee80211_he_mcs_nss_supp) + IEEE80211_HE_PPE_THRES_MAX_LEN) : 0));
+        ((ic->ic_flags & IEEE80211_F_HEON) ? (sizeof(struct ieee80211_he_cap_elem) + 2 + 1 + sizeof(struct ieee80211_he_mcs_nss_supp) + IEEE80211_HE_PPE_THRES_MAX_LEN) : 0) + 3);
 	if (m == NULL)
 		return NULL;
 
@@ -1611,7 +1616,7 @@ ieee80211_get_assoc_req(struct ieee80211com *ic, struct ieee80211_node *ni,
 	if ((ic->ic_flags & IEEE80211_F_RSNON) &&
 		(ni->ni_rsnprotos & IEEE80211_PROTO_RSN)) {
 #ifdef USE_APPLE_SUPPLICANT
-		if (ic->ic_rsn_ie_override[1] > 0) {
+		if (ic->ic_rsn_ie_override[1] > 0 && !ic->ic_sae_enabled) {
 			memcpy(frm, ic->ic_rsn_ie_override, 2 + ic->ic_rsn_ie_override[1]);
 			frm += 2 + ic->ic_rsn_ie_override[1];
 		}
@@ -1624,7 +1629,7 @@ ieee80211_get_assoc_req(struct ieee80211com *ic, struct ieee80211_node *ni,
 	if ((ic->ic_flags & IEEE80211_F_RSNON) &&
 		(ni->ni_rsnprotos & IEEE80211_PROTO_WPA)) {
 #ifdef USE_APPLE_SUPPLICANT
-		if (ic->ic_rsn_ie_override[1] > 0) {
+		if (ic->ic_rsn_ie_override[1] > 0 && !ic->ic_sae_enabled) {
 			memcpy(frm, ic->ic_rsn_ie_override, 2 + ic->ic_rsn_ie_override[1]);
 			frm += 2 + ic->ic_rsn_ie_override[1];
 		}
@@ -1642,6 +1647,9 @@ ieee80211_get_assoc_req(struct ieee80211com *ic, struct ieee80211_node *ni,
     
     if (ic->ic_flags & IEEE80211_F_HEON)
         frm = ieee80211_add_hecaps(frm, ic);
+    if (ic->ic_sae_enabled && ni->ni_sae_h2e) {
+        *frm++ = 244; *frm++ = 1; *frm++ = 0x20;
+    }
 
     size_t l = frm - mtod(m, u_int8_t *);
     mbuf_pkthdr_setlen(m, l);

@@ -1615,7 +1615,9 @@ ieee80211_choose_rsnparams(struct ieee80211com *ic)
     /* filter out unsupported AKMPs */
     ni->ni_rsnakms &= ic->ic_rsnakms;
     /* prefer SHA-256 based AKMPs */
-    if ((ic->ic_flags & IEEE80211_F_PSK) && (ni->ni_rsnakms &
+    if (ic->ic_sae_enabled && (ni->ni_rsnakms & IEEE80211_AKM_SAE)) {
+        ni->ni_rsnakms = IEEE80211_AKM_SAE;
+    } else if ((ic->ic_flags & IEEE80211_F_PSK) && (ni->ni_rsnakms &
                                              (IEEE80211_AKM_PSK | IEEE80211_AKM_SHA256_PSK))) {
         /* AP supports PSK AKMP and a PSK is configured */
         if (ni->ni_rsnakms & IEEE80211_AKM_SHA256_PSK)

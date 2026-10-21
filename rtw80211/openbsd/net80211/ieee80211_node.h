@@ -428,6 +428,8 @@ struct ieee80211_node {
     uint32_t        ni_he_oper_params;
     uint16_t        ni_he_oper_nss_set;
     uint8_t         ni_he_optional[8];
+    bool            ni_sae_h2e;
+    uint8_t         ni_sae_rsnxe[18]; /* original AP RSNXE, including header */
     bool            ni_he_mu_edca_present;
     uint8_t         ni_he_mu_edca[12];
     

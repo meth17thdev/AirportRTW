@@ -1,3 +1,4 @@
+#include <crypto/sha1.h>
 //
 //  WCL.cpp
 //  AirportRTW
@@ -445,7 +446,9 @@ IOReturn AirportRTWSkywalkInterface::beginWCLJoin(apple80211AssocCandidates *req
 IOReturn AirportRTWSkywalkInterface::startWCLJoin(AirportWCL::JoinRequest &join)
 {
     auto auth = AirportWCL::classifyLegacyAuth(join);
-    bool personal = auth == AirportWCL::LegacyAuth::Personal;
+    bool sae = auth == AirportWCL::LegacyAuth::SAE;
+    bool passphrase = auth == AirportWCL::LegacyAuth::PersonalPassphrase;
+    bool personal = auth == AirportWCL::LegacyAuth::Personal || passphrase;
     bool enterprise = auth == AirportWCL::LegacyAuth::Enterprise;
     bool supported = auth != AirportWCL::LegacyAuth::Invalid;
     ieee80211com *ic = fHalService->get80211Controller();
@@ -467,6 +470,7 @@ IOReturn AirportRTWSkywalkInterface::startWCLJoin(AirportWCL::JoinRequest &join)
     }
     if (ic->ic_state == IEEE80211_S_RUN || ic->ic_state == IEEE80211_S_AUTH || ic->ic_state == IEEE80211_S_ASSOC)
         leaveWCLNetwork();
+    ieee80211_sae_clear(ic, true);
     ieee80211_disable_rsn(ic);
     ieee80211_disable_wep(ic);
     explicit_bzero(ic->ic_psk, sizeof(ic->ic_psk));
@@ -474,7 +478,7 @@ IOReturn AirportRTWSkywalkInterface::startWCLJoin(AirportWCL::JoinRequest &join)
     ic->ic_flags &= ~(IEEE80211_F_AUTO_JOIN | IEEE80211_F_PSK);
     ic->ic_wcl_enterprise = enterprise;
 
-    if (personal || enterprise) {
+    if (personal || enterprise || sae) {
         ieee80211_wpaparams wpa = {};
         wpa.i_enabled = 1;
         if (join.upperAuth & (APPLE80211_AUTHTYPE_WPA | APPLE80211_AUTHTYPE_WPA_PSK))
@@ -491,7 +495,13 @@ IOReturn AirportRTWSkywalkInterface::startWCLJoin(AirportWCL::JoinRequest &join)
         if (join.upperAuth & APPLE80211_AUTHTYPE_SHA256_8021X)
             wpa.i_akms |= IEEE80211_WPA_AKM_SHA256_8021X;
         wpa.i_ciphers = IEEE80211_WPA_CIPHER_CCMP | IEEE80211_WPA_CIPHER_TKIP;
-        if (join.rsnLength >= 8 && join.rsn[0] == IEEE80211_ELEMID_RSN &&
+        if (sae) {
+            wpa.i_protos = IEEE80211_WPA_PROTO_WPA2;
+            wpa.i_akms = IEEE80211_WPA_AKM_SAE;
+            wpa.i_ciphers = IEEE80211_WPA_CIPHER_CCMP;
+            wpa.i_groupcipher = IEEE80211_WPA_CIPHER_CCMP;
+        }
+        if (!sae && join.rsnLength >= 8 && join.rsn[0] == IEEE80211_ELEMID_RSN &&
             join.rsn[4] == 0 && join.rsn[5] == 0x0f && join.rsn[6] == 0xac) {
             if (join.rsn[7] == 2) wpa.i_groupcipher = IEEE80211_WPA_CIPHER_TKIP;
             if (join.rsn[7] == 4) wpa.i_groupcipher = IEEE80211_WPA_CIPHER_CCMP;
@@ -501,8 +511,23 @@ IOReturn AirportRTWSkywalkInterface::startWCLJoin(AirportWCL::JoinRequest &join)
             explicit_bzero(&join, sizeof(join));
             return kIOReturnBadArgument;
         }
-        if (personal) {
-            memcpy(ic->ic_psk, join.key, sizeof(ic->ic_psk));
+        if (sae) {
+            ic->ic_sae_enabled = true;
+            ic->ic_sae_password_len = join.keyLength;
+            memcpy(ic->ic_sae_password, join.key, join.keyLength);
+            ic->ic_flags |= IEEE80211_F_MFPR | IEEE80211_F_PSK;
+#ifdef USE_APPLE_SUPPLICANT
+            bzero(ic->ic_rsn_ie_override, sizeof(ic->ic_rsn_ie_override));
+#endif
+        } else if (personal) {
+            if (passphrase) {
+                char password[65] = {};
+                memcpy(password, join.key, join.keyLength);
+                int error = pbkdf2_sha1(password, join.ssid, join.ssidLength, 4096,
+                                        ic->ic_psk, sizeof(ic->ic_psk));
+                explicit_bzero(password, sizeof(password));
+                if (error) { explicit_bzero(&join, sizeof(join)); return kIOReturnError; }
+            } else memcpy(ic->ic_psk, join.key, sizeof(ic->ic_psk));
             ic->ic_flags |= IEEE80211_F_PSK;
         } else if (join.keyLength == IEEE80211_PMK_LEN) {
             bool cached = true;
@@ -549,6 +574,7 @@ IOReturn AirportRTWSkywalkInterface::startWCLJoin(AirportWCL::JoinRequest &join)
         joinPending = false;
         joinTimer->cancelTimeout();
         ic->ic_wcl_join_requested = false;
+        ieee80211_sae_clear(ic, true);
         clearWCLPMKSA();
         ic->ic_wcl_enterprise = false;
         explicit_bzero(ic->ic_psk, sizeof(ic->ic_psk));
@@ -656,6 +682,7 @@ void AirportRTWSkywalkInterface::finishWCLJoin(uint16_t status, uint16_t reason,
     if (status) {
         ieee80211com *ic = fHalService->get80211Controller();
         ic->ic_wcl_join_requested = false;
+        ieee80211_sae_clear(ic, true);
         clearWCLPMKSA();
         ic->ic_wcl_enterprise = false;
         explicit_bzero(ic->ic_psk, sizeof(ic->ic_psk));
@@ -685,6 +712,7 @@ IOReturn AirportRTWSkywalkInterface::leaveWCLNetwork()
     ic->ic_deauth_reason = IEEE80211_REASON_AUTH_LEAVE;
     if (ic->ic_state > IEEE80211_S_SCAN)
         ieee80211_new_state(ic, IEEE80211_S_SCAN, -1);
+    ieee80211_sae_clear(ic, true);
     ieee80211_disable_rsn(ic);
     ieee80211_disable_wep(ic);
     explicit_bzero(ic->ic_psk, sizeof(ic->ic_psk));

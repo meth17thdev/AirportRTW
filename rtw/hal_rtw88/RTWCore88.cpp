@@ -242,6 +242,7 @@ IOReturn RTWCore88::disable(IONetworkInterface *interface)
 
 void RTWCore88::free()
 {
+    ieee80211_sae_clear(&sc.sc_ic, true);
     detach(pciDevice);
     super::free();
 }
@@ -300,7 +301,7 @@ bool RTWCore88::attachNet80211()
     ic->ic_caps = IEEE80211_C_WEP | IEEE80211_C_RSN |
                   IEEE80211_C_SCANALL | IEEE80211_C_SCANALLBAND |
                   IEEE80211_C_SHSLOT | IEEE80211_C_SHPREAMBLE |
-                  IEEE80211_C_QOS | IEEE80211_C_TX_AMPDU;
+                  IEEE80211_C_QOS | IEEE80211_C_TX_AMPDU | IEEE80211_C_MFP;
     ic->ic_htcaps = IEEE80211_HTCAP_SGI20 |
                     IEEE80211_HTCAP_CBW20_40 | IEEE80211_HTCAP_SGI40 |
                     IEEE80211_HTCAP_LDPC |

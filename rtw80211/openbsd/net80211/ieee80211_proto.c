@@ -1440,6 +1440,8 @@ ieee80211_newstate(struct ieee80211com *ic, enum ieee80211_state nstate,
 #endif
 
 	ostate = ic->ic_state;
+    if (nstate == IEEE80211_S_INIT || nstate == IEEE80211_S_SCAN)
+        ieee80211_sae_clear(ic, false);
 	if (ifp->if_flags & IFF_DEBUG)
 		XYLog("%s: %s -> %s\n", ifp->if_xname,
 		    ieee80211_state_name[ostate], ieee80211_state_name[nstate]);
