@@ -47,6 +47,11 @@ jobs:
           xcrun clang++ -std=c++14 -Wall -Wextra -Werror \
             tests/rtw88_hal_test.cpp -o build/tests/rtw88-hal
           build/tests/rtw88-hal
+      - name: Check RTW89 Block Ack CAM lifetime
+        run: |
+          xcrun clang -std=gnu11 -Wall -Wextra -Werror -fsanitize=address,undefined \
+            tests/rtw89_ba_cam_test.c -o build/tests/rtw89-ba-cam
+          build/tests/rtw89-ba-cam
       - name: Check SAE crypto and malformed exchanges
         run: |
           SAE_HOST_TEST=1 DERIVED_FILE_DIR="$PWD/build/tests/sae" bash scripts/build_sae_archive.sh

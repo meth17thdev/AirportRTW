@@ -47,7 +47,7 @@ compile_c() {
 }
 
 for file in \
-  core.c mac80211.c mac.c mac_be.c phy.c phy_be.c fw.c cam.c efuse.c \
+  core.c ba_cam.c mac80211.c mac.c mac_be.c phy.c phy_be.c fw.c cam.c efuse.c \
   efuse_be.c regd.c sar.c coex.c ps.c chan.c ser.c acpi.c util.c \
   pci.c pci_be.c \
   rtw8852a.c rtw8852a_rfk.c rtw8852a_rfk_table.c rtw8852a_table.c rtw8852ae.c \

@@ -17,6 +17,7 @@ void rtw_pci_remove(struct pci_dev *);
 struct ieee80211_hw *rtw88_get_hw(void);
 void rtw88_register_vif(struct ieee80211_vif *);
 void rtw88_unregister_vif(void);
+void rtw89_macos_flush_rx_ba(struct ieee80211_sta *);
 }
 
 namespace {
@@ -265,14 +266,18 @@ static struct ieee80211_channel *findChannel(struct ieee80211_hw *hw,
 
 static void releaseStation(Rtw89LinuxContext *context)
 {
-    if (!context || !context->station)
-        return;
+    if (!context) return;
     auto *hw = static_cast<struct ieee80211_hw *>(context->hardware);
+    WiphyGuard guard(hw);
+    if (!context->station) return;
     auto *vif = static_cast<struct ieee80211_vif *>(context->vif);
     auto *sta = static_cast<struct ieee80211_sta *>(context->station);
     rtw88_unregister_sta();
+    // Linux mac80211 stops every RX BA session before sta_state teardown.
+    // The native bridge owns that ordering: CAM entries live in the device
+    // but their list head lives inside sta. Never free sta with entries linked.
+    rtw89_macos_flush_rx_ba(sta);
     if (hw && hw->ops && vif) {
-        WiphyGuard guard(hw);
         if (hw->ops->sta_state) {
             hw->ops->sta_state(hw, vif, sta, IEEE80211_STA_ASSOC,
                                IEEE80211_STA_AUTH);
@@ -629,7 +634,9 @@ unsigned int rtw89LinuxTxAvailableSlots(Rtw89LinuxContext *context)
 bool rtw89LinuxAmpduStart(Rtw89LinuxContext *context, uint8_t tid,
                           bool receive, uint16_t sequence, uint16_t window)
 {
-    if (!context || !context->vif || !context->station || tid >= 16)
+    if (!context) return false;
+    WiphyGuard guard(static_cast<struct ieee80211_hw *>(context->hardware));
+    if (!context->vif || !context->station || tid >= 16)
         return false;
     auto *vif = static_cast<struct ieee80211_vif *>(context->vif);
     auto *sta = static_cast<struct ieee80211_sta *>(context->station);
@@ -651,7 +658,9 @@ bool rtw89LinuxAmpduStart(Rtw89LinuxContext *context, uint8_t tid,
 void rtw89LinuxAmpduStop(Rtw89LinuxContext *context, uint8_t tid,
                          bool receive)
 {
-    if (!context || !context->vif || !context->station || tid >= 16)
+    if (!context) return;
+    WiphyGuard guard(static_cast<struct ieee80211_hw *>(context->hardware));
+    if (!context->vif || !context->station || tid >= 16)
         return;
     auto *vif = static_cast<struct ieee80211_vif *>(context->vif);
     auto *sta = static_cast<struct ieee80211_sta *>(context->station);

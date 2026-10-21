@@ -274,6 +274,23 @@ void rtw88_rx_ampdu_stop(struct ieee80211_sta *sta, u8 tid)
 	rtw89_chip_h2c_ba_cam(rtwdev, sta_to_rtwsta(sta), false, &params);
 }
 
+/* Called with the wiphy lock held, before native station teardown. */
+void rtw89_macos_flush_rx_ba(struct ieee80211_sta *sta)
+{
+    struct ieee80211_hw *hw = rtw88_get_hw();
+    if (!hw || !hw->priv || !sta) return;
+    struct rtw89_dev *rtwdev = to_rtw89(hw->priv);
+    struct rtw89_sta *rtwsta = sta_to_rtwsta(sta);
+    for (u8 tid = 0; tid < IEEE80211_NUM_TIDS; ++tid)
+        rtw88_rx_ampdu_stop(sta, tid);
+    // Also unlink software nodes if an H2C error interrupted a multi-link stop.
+    for (u8 i = 0; i < rtwsta->links_inst_valid_num; ++i) {
+        struct rtw89_sta_link *link = &rtwsta->links_inst[i];
+        if (link->ba_cam_list.next && link->ba_cam_list.prev)
+            rtw89_core_purge_sta_ba_entries(rtwdev, link);
+    }
+}
+
 /* ------------------------------------------------------------------ */
 /*  Scan bridges                                                       */
 /* ------------------------------------------------------------------ */
