@@ -91,6 +91,7 @@ ieee80211_eapol_key_input(struct ieee80211com *ic, mbuf_t m,
                           struct ieee80211_node *ni)
 {
     XYLog("%s\n", __FUNCTION__);
+    if (ic->ic_sae_enabled) ++ic->ic_sae_eapol_calls;
     struct _ifnet *ifp = &ic->ic_if;
     struct ether_header *eh;
     struct ieee80211_eapol_key *key;

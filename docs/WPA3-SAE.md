@@ -58,3 +58,15 @@ failed join and are reset when another SAE join begins.
 The PTK known-answer test checks the production MAC/nonce ordering and SAE
 48-byte SHA-256 derivation with its 22-byte label (no terminating NUL), plus
 legacy WPA2 SHA-1 derivation with its NUL separator. These label formats differ.
+
+The native frontend now advertises HE when the selected HAL enables it;
+`-nohe` continues to disable it. Active PHY reporting follows the negotiated
+node flags. Supported HE widths are limited to the bridge's 20/40/80 MHz path.
+This capability advertisement still requires hardware interoperability testing.
+
+RTW89 retains `RTWSAERawData` (data frames from the SAE peer), `RTWSAERawEAPOL`
+(clear, unfragmented EAPOL observed at the HAL), and `RTWSAEEAPOLCalls`
+(net80211 EAPOL dispatch calls). They reset for each SAE join and survive
+fallback to WPA2; these counters and the stage identify the receive boundary
+without recording EAPOL bodies or credentials. `RTW89HECapable` and
+`RTW89HEEnabled` expose the current HAL capability and enable state.

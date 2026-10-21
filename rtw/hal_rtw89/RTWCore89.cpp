@@ -1,6 +1,7 @@
 /* SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause */
 #include "RTWCore89.hpp"
 #include "Rtw89PciTransport.hpp"
+#include "Rtw89RxLayout.hpp"
 #include <net80211/ieee80211_he_policy.hpp>
 
 #include <IOKit/IOLib.h>
@@ -317,6 +318,7 @@ void RTWCore89::configureHECapabilities(bool fiveGHz)
     if (!ic->ic_hecaps) return;
     memcpy(ic->ic_he_cap_elem.mac_cap_info, caps.heMAC, sizeof(caps.heMAC));
     memcpy(ic->ic_he_cap_elem.phy_cap_info, caps.hePHY, sizeof(caps.hePHY));
+    ic->ic_he_cap_elem.phy_cap_info[0] &= ~(0x08 | 0x10); // Native bridge supports up to 80 MHz.
     ic->ic_he_mcs_nss_supp.rx_mcs_80 = htole16(caps.heRxMCS80);
     ic->ic_he_mcs_nss_supp.tx_mcs_80 = htole16(caps.heTxMCS80);
     ic->ic_he_mcs_nss_supp.rx_mcs_160 = ic->ic_he_mcs_nss_supp.tx_mcs_160 = 0xffff;
@@ -648,6 +650,11 @@ void RTWCore89::watchdog(struct _ifnet *ifp)
                             owner->associationRecoveryAttemptCount, 64);
     controller->setProperty("RTW89AssociationRecoverySuccessCount",
                             owner->associationRecoverySuccessCount, 64);
+    controller->setProperty("RTW89HECapable", owner->sc.sc_ic.ic_hecaps != 0);
+    controller->setProperty("RTW89HEEnabled", (owner->sc.sc_ic.ic_flags & IEEE80211_F_HEON) != 0);
+    controller->setProperty("RTWSAERawData", owner->sc.sc_ic.ic_sae_rx_data, 32);
+    controller->setProperty("RTWSAERawEAPOL", owner->sc.sc_ic.ic_sae_rx_eapol, 32);
+    controller->setProperty("RTWSAEEAPOLCalls", owner->sc.sc_ic.ic_sae_eapol_calls, 32);
     controller->setProperty("RTWSAEStage", owner->sc.sc_ic.ic_sae_stage, 32);
     controller->setProperty("RTWSAEError", owner->sc.sc_ic.ic_sae_error, 32);
     controller->setProperty("RTW89Net80211State",
@@ -810,6 +817,17 @@ void RTWCore89::receive(void *opaque, const uint8_t *frame, size_t length,
     auto *wh = reinterpret_cast<const struct ieee80211_frame *>(frame);
     const uint8_t frameType = wh->i_fc[0] & IEEE80211_FC0_TYPE_MASK;
     const uint8_t frameSubtype = wh->i_fc[0] & IEEE80211_FC0_SUBTYPE_MASK;
+    // Count only the SAE peer's data, retaining the attempt after fallback.
+    // Inspect LLC/EtherType only on unencrypted, complete frames; no key data.
+    if (ic->ic_sae_enabled && ic->ic_bss && frameType == IEEE80211_FC0_TYPE_DATA &&
+        IEEE80211_ADDR_EQ(wh->i_addr2, ic->ic_bss->ni_bssid)) {
+        ++ic->ic_sae_rx_data;
+        const size_t h = Rtw89Rx::dataHeaderLength(frame, length);
+        if (h && !(wh->i_fc[1] & (IEEE80211_FC1_PROTECTED | IEEE80211_FC1_MORE_FRAG)) &&
+            !(wh->i_seq[0] & 15) && length >= h + 8 &&
+            !memcmp(frame + h, "\xaa\xaa\x03\x00\x00\x00\x88\x8e", 8))
+            ++ic->ic_sae_rx_eapol;
+    }
     mbuf_t m = nullptr;
     /* The OpenBSD receive/decapsulation path and IO80211 use mtod() plus
      * mbuf_len() in several places, so normal management and data frames
