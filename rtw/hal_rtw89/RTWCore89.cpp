@@ -652,6 +652,8 @@ void RTWCore89::watchdog(struct _ifnet *ifp)
                             owner->associationRecoverySuccessCount, 64);
     controller->setProperty("RTW89HECapable", owner->sc.sc_ic.ic_hecaps != 0);
     controller->setProperty("RTW89HEEnabled", (owner->sc.sc_ic.ic_flags & IEEE80211_F_HEON) != 0);
+    controller->setProperty("RTWSAERxHeaders", owner->sc.sc_ic.ic_sae_rx_headers,
+                            sizeof(owner->sc.sc_ic.ic_sae_rx_headers));
     controller->setProperty("RTWSAERawData", owner->sc.sc_ic.ic_sae_rx_data, 32);
     controller->setProperty("RTWSAERawEAPOL", owner->sc.sc_ic.ic_sae_rx_eapol, 32);
     controller->setProperty("RTWSAEEAPOLCalls", owner->sc.sc_ic.ic_sae_eapol_calls, 32);
@@ -818,15 +820,15 @@ void RTWCore89::receive(void *opaque, const uint8_t *frame, size_t length,
     const uint8_t frameType = wh->i_fc[0] & IEEE80211_FC0_TYPE_MASK;
     const uint8_t frameSubtype = wh->i_fc[0] & IEEE80211_FC0_SUBTYPE_MASK;
     // Count only the SAE peer's data, retaining the attempt after fallback.
-    // Inspect LLC/EtherType only on unencrypted, complete frames; no key data.
+    // Keep only header metadata and readable LLC EtherType, never packet bodies.
     if (ic->ic_sae_enabled && ic->ic_bss && frameType == IEEE80211_FC0_TYPE_DATA &&
         IEEE80211_ADDR_EQ(wh->i_addr2, ic->ic_bss->ni_bssid)) {
-        ++ic->ic_sae_rx_data;
-        const size_t h = Rtw89Rx::dataHeaderLength(frame, length);
-        if (h && !(wh->i_fc[1] & (IEEE80211_FC1_PROTECTED | IEEE80211_FC1_MORE_FRAG)) &&
-            !(wh->i_seq[0] & 15) && length >= h + 8 &&
-            !memcmp(frame + h, "\xaa\xaa\x03\x00\x00\x00\x88\x8e", 8))
-            ++ic->ic_sae_rx_eapol;
+        const unsigned index = ic->ic_sae_rx_data++ % 8;
+        auto header = Rtw89Rx::handshakeHeader(frame, length, decrypted, ivStripped);
+        header.flags |= (IEEE80211_ADDR_EQ(wh->i_addr1, ic->ic_myaddr) ? 4 : 0) |
+                        ((wh->i_addr1[0] & 1) ? 8 : 0) | (unsigned(ic->ic_state) << 8);
+        memcpy(ic->ic_sae_rx_headers[index], &header, sizeof(header));
+        if (header.etherType == 0x888e) ++ic->ic_sae_rx_eapol;
     }
     mbuf_t m = nullptr;
     /* The OpenBSD receive/decapsulation path and IO80211 use mtod() plus
@@ -1102,6 +1104,11 @@ int RTWCore89::newstate(struct ieee80211com *ic,
     const int result = sc->sc_newstate(ic, state, arg);
     if (result == 0 && state == IEEE80211_S_RUN) {
         updateEdca(ic);
+        if (ic->ic_sae_enabled)
+            owner->getController()->setProperty("RTWSAENegotiatedPHY",
+                (node->ni_flags & IEEE80211_NODE_HE) ? "802.11ax" :
+                (node->ni_flags & IEEE80211_NODE_VHT) ? "802.11ac" :
+                (node->ni_flags & IEEE80211_NODE_HT) ? "802.11n" : "legacy");
         owner->getController()->setProperty("RTW89NegotiatedPHY",
             (node->ni_flags & IEEE80211_NODE_HE) ? "802.11ax" :
             (node->ni_flags & IEEE80211_NODE_VHT) ? "802.11ac" :

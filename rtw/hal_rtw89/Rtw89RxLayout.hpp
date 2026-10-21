@@ -3,6 +3,7 @@
 #define RTW89_RX_LAYOUT_HPP
 #include <stddef.h>
 #include <stdint.h>
+#include <string.h>
 namespace Rtw89Rx {
 // For hardware-decrypted CCMP data with IV and MIC still present, excluding FCS.
 struct CCMPLayout { size_t headerLength; unsigned keyIndex; bool multicast; };
@@ -17,6 +18,26 @@ inline size_t dataHeaderLength(const uint8_t *frame, size_t length)
         if (frame[1] & 0x80) header += 4;
     }
     return length >= header ? header : 0;
+}
+// Header metadata only. For SAE's CCMP-128 path; never interpret ciphertext.
+struct HandshakeHeader { uint32_t control, length, flags, etherType; };
+inline HandshakeHeader handshakeHeader(const uint8_t *frame, size_t length,
+                                      bool decrypted, bool ivStripped)
+{
+    HandshakeHeader result = {0, uint32_t(length),
+        uint32_t((decrypted ? 1 : 0) | (ivStripped ? 2 : 0)), 0xffffffffu};
+    if (!frame || length < 24) return result;
+    result.control = frame[0] | (uint32_t(frame[1]) << 8);
+    size_t offset = dataHeaderLength(frame, length);
+    if (!offset || (frame[0] & 0x40) || (frame[1] & 4) || (frame[22] & 15))
+        return result; // No-data and fragmented frames have no complete LLC here.
+    if (frame[1] & 0x40) {
+        if (!decrypted) return result;
+        if (!ivStripped) offset += 8;
+    }
+    if (length >= offset + 8 && !memcmp(frame + offset, "\xaa\xaa\x03\x00\x00\x00", 6))
+        result.etherType = (uint32_t(frame[offset + 6]) << 8) | frame[offset + 7];
+    return result;
 }
 inline bool ccmpLayout(const uint8_t *frame, size_t length, CCMPLayout &out)
 {

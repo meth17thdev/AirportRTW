@@ -65,8 +65,18 @@ node flags. Supported HE widths are limited to the bridge's 20/40/80 MHz path.
 This capability advertisement still requires hardware interoperability testing.
 
 RTW89 retains `RTWSAERawData` (data frames from the SAE peer), `RTWSAERawEAPOL`
-(clear, unfragmented EAPOL observed at the HAL), and `RTWSAEEAPOLCalls`
+(readable, unfragmented EAPOL observed at the HAL), and `RTWSAEEAPOLCalls`
 (net80211 EAPOL dispatch calls). They reset for each SAE join and survive
 fallback to WPA2; these counters and the stage identify the receive boundary
 without recording EAPOL bodies or credentials. `RTW89HECapable` and
 `RTW89HEEnabled` expose the current HAL capability and enable state.
+
+`RTWSAERxHeaders` retains the last eight SAE-peer data headers as four native
+32-bit words per record: frame control, frame length, flags, and EtherType
+(0xffffffff when unreadable or not LLC/SNAP). Flags are decrypted=1,
+IV-stripped=2, addressed-to-this-station=4, multicast=8, and net80211 state
+in bits 8 and above. No packet bodies, MAC addresses, credentials or keys
+are included. Index records using `RTWSAERawData` modulo eight. Null-data,
+fragmented and undecrypted encrypted frames are not treated as readable EAPOL.
+`RTWSAENegotiatedPHY` retains the latest SAE association's PHY separately
+from the active connection, so fallback to Orange does not overwrite it.
