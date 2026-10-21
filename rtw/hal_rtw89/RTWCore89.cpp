@@ -460,6 +460,7 @@ void RTWCore89::watchdog(struct _ifnet *ifp)
         return;
     controller->setProperty("RTW89InterruptCount",
                             owner->transport ? owner->transport->getInterruptCount() : 0, 64);
+    controller->setProperty("RTW89StationState", owner->linuxContext.stationState, 32);
     controller->setProperty("RTW89ScanChannelCount", owner->scanChannelCount, 64);
     controller->setProperty("RTW89RawReceiveCount", owner->rawReceiveCount, 64);
     controller->setProperty("RTW89AcceptedReceiveCount", owner->acceptedReceiveCount, 64);
@@ -978,7 +979,8 @@ int RTWCore89::newstate(struct ieee80211com *ic,
         owner->associationRunWatchdogTicks < 5 &&
         !owner->associationRecoveryAttempted;
 
-    if (previous == IEEE80211_S_RUN && state != IEEE80211_S_RUN) {
+    if ((state == IEEE80211_S_INIT || state == IEEE80211_S_SCAN) &&
+        owner->linuxContext.station) {
         rtw89LinuxDisassociate(&owner->linuxContext);
         sc->sc_sta = nullptr;
     }
@@ -1027,7 +1029,9 @@ int RTWCore89::newstate(struct ieee80211com *ic,
         }
     }
 
-    if (state == IEEE80211_S_AUTH) {
+    if (state == IEEE80211_S_AUTH ||
+        (state == IEEE80211_S_ASSOC && previous == IEEE80211_S_RUN)) {
+        sc->sc_sta = nullptr;
         if (!node || !node->ni_chan) {
             if (endedScan) {
                 rtw89LinuxScanBegin(&owner->linuxContext);
@@ -1049,6 +1053,12 @@ int RTWCore89::newstate(struct ieee80211com *ic,
             return EIO;
         }
     }
+
+    // Authentication has completed before net80211 sends the association
+    // request. Match the firmware station state without replacing net80211 MLME.
+    if (state == IEEE80211_S_ASSOC &&
+        !rtw89LinuxAuthenticateStation(&owner->linuxContext))
+        return EIO;
 
     if (state == IEEE80211_S_RUN) {
         if (!node || !node->ni_chan)
@@ -1091,6 +1101,8 @@ int RTWCore89::newstate(struct ieee80211com *ic,
         if (!rtw89LinuxAssociate(&owner->linuxContext, node->ni_bssid, aid,
                                  node->ni_capinfo, channel, node->ni_intval,
                                  node->ni_dtimperiod, qos, ht, vht, nss, peer)) {
+            rtw89LinuxDisassociate(&owner->linuxContext);
+            sc->sc_sta = nullptr;
             if (endedScan) {
                 rtw89LinuxScanBegin(&owner->linuxContext);
                 sc->sc_flags |= RTW89_FLAG_SCANNING;
@@ -1116,7 +1128,7 @@ int RTWCore89::newstate(struct ieee80211com *ic,
             (node->ni_flags & IEEE80211_NODE_HT) ? "802.11n" : "legacy");
     }
     if (result != 0) {
-        if (associated) {
+        if (associated || state == IEEE80211_S_AUTH || state == IEEE80211_S_ASSOC) {
             rtw89LinuxDisassociate(&owner->linuxContext);
             sc->sc_sta = nullptr;
         }

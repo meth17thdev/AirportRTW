@@ -276,22 +276,20 @@ static void releaseStation(Rtw89LinuxContext *context)
     // Linux mac80211 stops every RX BA session before sta_state teardown.
     // The native bridge owns that ordering: CAM entries live in the device
     // but their list head lives inside sta. Never free sta with entries linked.
-    rtw89_macos_flush_rx_ba(sta);
-    if (hw && hw->ops && vif) {
-        if (hw->ops->sta_state) {
-            hw->ops->sta_state(hw, vif, sta, IEEE80211_STA_ASSOC,
-                               IEEE80211_STA_AUTH);
-            hw->ops->sta_state(hw, vif, sta, IEEE80211_STA_AUTH,
-                               IEEE80211_STA_NONE);
-            hw->ops->sta_state(hw, vif, sta, IEEE80211_STA_NONE,
-                               IEEE80211_STA_NOTEXIST);
-        } else if (hw->ops->sta_remove) {
-            hw->ops->sta_remove(hw, vif, sta);
+    if (context->stationState >= IEEE80211_STA_NONE)
+        rtw89_macos_flush_rx_ba(sta);
+    if (hw && hw->ops && vif && hw->ops->sta_state) {
+        while (context->stationState > IEEE80211_STA_NOTEXIST) {
+            auto oldState = static_cast<ieee80211_sta_state>(context->stationState);
+            auto nextState = static_cast<ieee80211_sta_state>(context->stationState - 1);
+            hw->ops->sta_state(hw, vif, sta, oldState, nextState);
+            context->stationState = nextState;
         }
     }
     IOFree(sta, context->stationAllocationSize);
     context->station = nullptr;
     context->stationAllocationSize = 0;
+    context->stationState = IEEE80211_STA_NOTEXIST;
 }
 }
 
@@ -757,6 +755,9 @@ bool rtw89LinuxPrepareConnection(Rtw89LinuxContext *context,
     struct ieee80211_channel *target = findChannel(hw, channel);
     if (!hw || !vif || !target)
         return false;
+    // A new authentication attempt owns a fresh station. Retrying or switching
+    // peers must unwind only the firmware states actually reached.
+    rtw89LinuxDisassociate(context);
     target->band = channel <= 14 ? NL80211_BAND_2GHZ : NL80211_BAND_5GHZ;
     hw->conf.chandef.chan = target;
     hw->conf.chandef.width = NL80211_CHAN_WIDTH_20;
@@ -765,7 +766,53 @@ bool rtw89LinuxPrepareConnection(Rtw89LinuxContext *context,
     rtw88_connect_hw_setup(hw, vif, bssid);
     vif->bss_conf.bssid = vif->bss_conf.bssid_buf;
     memcpy(vif->bss_conf.bssid_buf, bssid, ETH_ALEN);
+    memcpy(vif->cfg.ap_addr, bssid, ETH_ALEN);
+    context->stationAllocationSize = sizeof(struct ieee80211_sta) + hw->sta_data_size;
+    auto *sta = static_cast<ieee80211_sta *>(IOMallocZero(context->stationAllocationSize));
+    if (!sta) {
+        context->stationAllocationSize = 0;
+        return false;
+    }
+    context->station = sta;
+    context->stationState = IEEE80211_STA_NOTEXIST;
+    memcpy(sta->addr, bssid, ETH_ALEN);
+    sta->link[0] = &sta->deflink;
+    sta->deflink.sta = sta;
+    memcpy(sta->deflink.addr, bssid, ETH_ALEN);
+    sta->deflink.supp_rates[NL80211_BAND_2GHZ] = 0xfff;
+    sta->deflink.supp_rates[NL80211_BAND_5GHZ] = 0xff;
+    sta->deflink.rx_nss = 1;
+    sta->deflink.bandwidth = IEEE80211_STA_RX_BW_20;
+    int result;
+    {
+        WiphyGuard guard(hw);
+        result = hw->ops && hw->ops->sta_state ?
+            hw->ops->sta_state(hw, vif, sta, IEEE80211_STA_NOTEXIST,
+                               IEEE80211_STA_NONE) : -EOPNOTSUPP;
+        if (!result) context->stationState = IEEE80211_STA_NONE;
+    }
+    if (result) {
+        releaseStation(context);
+        return false;
+    }
+    rtw88_register_sta(sta);
     return true;
+}
+
+bool rtw89LinuxAuthenticateStation(Rtw89LinuxContext *context)
+{
+    if (!context || !context->station) return false;
+    auto *hw = static_cast<ieee80211_hw *>(context->hardware);
+    auto *vif = static_cast<ieee80211_vif *>(context->vif);
+    WiphyGuard guard(hw);
+    if (context->stationState == IEEE80211_STA_AUTH) return true;
+    if (!hw || !hw->ops || !hw->ops->sta_state ||
+        context->stationState != IEEE80211_STA_NONE) return false;
+    int result = hw->ops->sta_state(hw, vif,
+        static_cast<ieee80211_sta *>(context->station),
+        IEEE80211_STA_NONE, IEEE80211_STA_AUTH);
+    if (!result) context->stationState = IEEE80211_STA_AUTH;
+    return result == 0;
 }
 
 void rtw89LinuxScanBegin(Rtw89LinuxContext *context)
@@ -854,35 +901,25 @@ bool rtw89LinuxAssociate(Rtw89LinuxContext *context,
         return false;
     auto *hw = static_cast<struct ieee80211_hw *>(context->hardware);
     auto *vif = static_cast<struct ieee80211_vif *>(context->vif);
-    if (!hw || !hw->ops || !vif ||
+    if (!hw || !hw->ops || !hw->ops->sta_state || !vif ||
         !Rtw89Link::validChannel(channel == 14 ? 2484 :
             channel <= 13 ? 2407 + channel * 5 : 5000 + channel * 5,
             peer.centerFrequency, peer.widthMHz) ||
-        !rtw89LinuxPrepareConnection(context, bssid, channel))
+        !context->station || context->stationState != IEEE80211_STA_AUTH ||
+        memcmp(static_cast<ieee80211_sta *>(context->station)->addr, bssid, ETH_ALEN))
         return false;
 
-    rtw89LinuxDisassociate(context);
-    // Authentication uses 20 MHz; data uses the width negotiated by net80211.
-    // Apply it before sta_state/association initializes firmware rate control.
+    // Preserve the station prepared before authentication. Only the negotiated
+    // width and peer capabilities change here; do not recalibrate/recreate it.
     hw->conf.chandef.width = peer.widthMHz == 80 ? NL80211_CHAN_WIDTH_80 :
         peer.widthMHz == 40 ? NL80211_CHAN_WIDTH_40 : NL80211_CHAN_WIDTH_20;
     hw->conf.chandef.center_freq1 = peer.centerFrequency;
-    rtw88_connect_hw_setup(hw, vif, bssid);
-    context->stationAllocationSize = sizeof(struct ieee80211_sta) +
-                                     hw->sta_data_size;
-    auto *sta = static_cast<struct ieee80211_sta *>(
-        IOMallocZero(context->stationAllocationSize));
-    if (!sta)
-        return false;
-    context->station = sta;
-    memcpy(sta->addr, bssid, ETH_ALEN);
+    if (hw->conf.chandef.width != NL80211_CHAN_WIDTH_20 ||
+        hw->conf.chandef.center_freq1 != hw->conf.chandef.chan->center_freq)
+        rtw88_connect_hw_setup(hw, vif, bssid);
+    auto *sta = static_cast<ieee80211_sta *>(context->station);
     sta->aid = aid;
     sta->wme = qos;
-    sta->link[0] = &sta->deflink;
-    sta->deflink.sta = sta;
-    memcpy(sta->deflink.addr, bssid, ETH_ALEN);
-    sta->deflink.supp_rates[NL80211_BAND_2GHZ] = 0xfff;
-    sta->deflink.supp_rates[NL80211_BAND_5GHZ] = 0xff;
     sta->deflink.bandwidth = peer.widthMHz == 80 ? IEEE80211_STA_RX_BW_80 :
         peer.widthMHz == 40 ? IEEE80211_STA_RX_BW_40 : IEEE80211_STA_RX_BW_20;
     sta->deflink.rx_nss = rxNss ? rxNss : 1;
@@ -952,27 +989,14 @@ bool rtw89LinuxAssociate(Rtw89LinuxContext *context,
     int result = 0;
     {
         WiphyGuard guard(hw);
-        if (hw->ops->sta_state) {
-            result = hw->ops->sta_state(hw, vif, sta, IEEE80211_STA_NOTEXIST,
-                                        IEEE80211_STA_NONE);
-            if (!result)
-                result = hw->ops->sta_state(hw, vif, sta, IEEE80211_STA_NONE,
-                                            IEEE80211_STA_AUTH);
-            if (!result)
-                result = hw->ops->sta_state(hw, vif, sta, IEEE80211_STA_AUTH,
-                                            IEEE80211_STA_ASSOC);
-        } else if (hw->ops->sta_add) {
-            result = hw->ops->sta_add(hw, vif, sta);
-        } else {
-            result = -EOPNOTSUPP;
-        }
+        result = hw->ops->sta_state(hw, vif, sta, IEEE80211_STA_AUTH,
+                                    IEEE80211_STA_ASSOC);
+        if (!result) context->stationState = IEEE80211_STA_ASSOC;
     }
     if (result) {
         releaseStation(context);
         return false;
     }
-    rtw88_register_sta(sta);
-
     struct ieee80211_bss_conf *bss = &vif->bss_conf;
     bss->assoc = true;
     bss->aid = aid;

@@ -42,6 +42,7 @@ struct Rtw89LinuxContext {
     void *station;
     size_t vifAllocationSize;
     size_t stationAllocationSize;
+    unsigned stationState; // Last completed ieee80211_sta_state transition.
     void *keys[12]; /* group 0..5, pairwise 6..11 */
     uint8_t macAddress[6];
     bool probed;
@@ -136,6 +137,7 @@ bool rtw89LinuxAssociate(Rtw89LinuxContext *context,
                          uint16_t beaconInterval, uint8_t dtimPeriod,
                          bool qos, bool ht, bool vht, uint8_t rxNss,
                          const Rtw89NativePeer &peer);
+bool rtw89LinuxAuthenticateStation(Rtw89LinuxContext *context);
 void rtw89LinuxDisassociate(Rtw89LinuxContext *context);
 
 enum Rtw89NativeCipher : uint8_t {
