@@ -343,7 +343,7 @@ ieee80211_send_4way_msg2(struct ieee80211com *ic, struct ieee80211_node *ni,
     u_int16_t info;
     u_int8_t *frm;
     
-    if (ni->ni_rsnakms == IEEE80211_AKM_SAE) ic->ic_sae_stage = 6;
+    ic->ic_sae_stage = 6;
     ni->ni_rsn_supp_state = RSNA_SUPP_PTKNEGOTIATING;
     m = ieee80211_get_eapol_key(MBUF_DONTWAIT, MT_DATA,
                                 (ni->ni_rsnprotos == IEEE80211_PROTO_WPA) ?

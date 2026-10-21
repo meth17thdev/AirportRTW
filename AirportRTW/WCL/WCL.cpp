@@ -17,6 +17,27 @@
 
 extern IOCommandGate *_fCommandGate;
 
+// Preserve an incomplete join before automatic fallback resets live counters.
+static void retainIncompleteJoin(IOService *controller, ieee80211com *ic, uint32_t auth)
+{
+    if (!(ic->ic_flags & IEEE80211_F_RSNON)) return;
+    controller->setProperty("RTWLastIncompleteJoinAuth", auth, 32);
+    controller->setProperty("RTWLastIncompleteJoinStage", ic->ic_sae_stage, 32);
+    controller->setProperty("RTWLastIncompleteJoinError", ic->ic_sae_error, 32);
+    controller->setProperty("RTWLastIncompleteJoinData", ic->ic_sae_rx_data, 32);
+    controller->setProperty("RTWLastIncompleteJoinEAPOL", ic->ic_sae_rx_eapol, 32);
+    controller->setProperty("RTWLastIncompleteJoinEAPOLCalls", ic->ic_sae_eapol_calls, 32);
+    controller->setProperty("RTWLastIncompleteJoinHeaders", ic->ic_sae_rx_headers,
+                            sizeof(ic->ic_sae_rx_headers));
+    const auto *node = ic->ic_bss;
+    controller->setProperty("RTWLastIncompleteJoinPHY",
+        ic->ic_state != IEEE80211_S_RUN || !node ? "not associated" :
+        (node->ni_flags & IEEE80211_NODE_HE) ? "802.11ax" :
+        (node->ni_flags & IEEE80211_NODE_VHT) ? "802.11ac" :
+        (node->ni_flags & IEEE80211_NODE_HT) ? "802.11n" : "legacy");
+}
+
+
 struct AirportRTWSkywalkInterface::CountryUpdate {
     AirportRTWSkywalkInterface *interface;
     AirportRTW *controller;
@@ -479,6 +500,9 @@ IOReturn AirportRTWSkywalkInterface::startWCLJoin(AirportWCL::JoinRequest &join)
     ic->ic_wcl_enterprise = enterprise;
 
     if (personal || enterprise || sae) {
+        ic->ic_sae_stage = 1; ic->ic_sae_error = 0;
+        ic->ic_sae_rx_data = ic->ic_sae_rx_eapol = ic->ic_sae_eapol_calls = 0;
+        bzero(ic->ic_sae_rx_headers, sizeof(ic->ic_sae_rx_headers));
         ieee80211_wpaparams wpa = {};
         wpa.i_enabled = 1;
         if (join.upperAuth & (APPLE80211_AUTHTYPE_WPA | APPLE80211_AUTHTYPE_WPA_PSK))
@@ -512,9 +536,6 @@ IOReturn AirportRTWSkywalkInterface::startWCLJoin(AirportWCL::JoinRequest &join)
             return kIOReturnBadArgument;
         }
         if (sae) {
-            ic->ic_sae_stage = 1; ic->ic_sae_error = 0;
-            ic->ic_sae_rx_data = ic->ic_sae_rx_eapol = ic->ic_sae_eapol_calls = 0;
-            bzero(ic->ic_sae_rx_headers, sizeof(ic->ic_sae_rx_headers));
             ic->ic_sae_enabled = true;
             ic->ic_sae_password_len = join.keyLength;
             memcpy(ic->ic_sae_password, join.key, join.keyLength);
@@ -684,6 +705,7 @@ void AirportRTWSkywalkInterface::finishWCLJoin(uint16_t status, uint16_t reason,
     postWCLJoinMessage(AirportWCL::ConnectComplete, &event, sizeof(event));
     if (status) {
         ieee80211com *ic = fHalService->get80211Controller();
+        retainIncompleteJoin(instance, ic, current_authtype_upper);
         ic->ic_wcl_join_requested = false;
         ieee80211_sae_clear(ic, true);
         clearWCLPMKSA();
@@ -704,6 +726,7 @@ void AirportRTWSkywalkInterface::wclJoinTimeout(OSObject *owner, IOTimerEventSou
 IOReturn AirportRTWSkywalkInterface::leaveWCLNetwork()
 {
     ieee80211com *ic = fHalService->get80211Controller();
+    if (joinPending) retainIncompleteJoin(instance, ic, current_authtype_upper);
     joinPending = false;
     joinDeferred = false;
     explicit_bzero(&deferredJoin, sizeof(deferredJoin));

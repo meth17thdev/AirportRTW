@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Read non-secret SAE and PHY diagnostics from the loaded driver."""
+"""Read non-secret WPA2/WPA3 join and PHY diagnostics from the loaded driver."""
 import json
 import plistlib
 import struct
@@ -18,12 +18,7 @@ def controllers(value):
         for child in value:
             yield from controllers(child)
 
-for properties in controllers(tree):
-    result = {k: v for k, v in properties.items()
-              if (k.startswith("RTWSAE") and k != "RTWSAERxHeaders") or
-              k in ("RTW89HECapable", "RTW89HEEnabled", "RTW89NegotiatedPHY")}
-    raw = properties.get("RTWSAERxHeaders", b"")
-    count = properties.get("RTWSAERawData", 0)
+def decode_headers(raw, count):
     records = []
     if isinstance(raw, bytes) and len(raw) == 128:
         for number in range(max(0, count - 8), count):
@@ -34,5 +29,16 @@ for properties in controllers(tree):
                 "iv_stripped": bool(flags & 2), "addressed_to_station": bool(flags & 4),
                 "multicast": bool(flags & 8),
                 "ether_type": None if ether_type == 0xffffffff else hex(ether_type)})
-    result["headers"] = records
+    return records
+
+for properties in controllers(tree):
+    result = {k: v for k, v in properties.items()
+              if ((k.startswith("RTWSAE") or k.startswith("RTWLastIncompleteJoin"))
+                  and not k.endswith("Headers")) or
+              k in ("RTW89HECapable", "RTW89HEEnabled", "RTW89NegotiatedPHY")}
+    result["headers"] = decode_headers(properties.get("RTWSAERxHeaders", b""),
+                                        properties.get("RTWSAERawData", 0))
+    result["last_incomplete_headers"] = decode_headers(
+        properties.get("RTWLastIncompleteJoinHeaders", b""),
+        properties.get("RTWLastIncompleteJoinData", 0))
     print(json.dumps(result, indent=2))

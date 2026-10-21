@@ -819,9 +819,10 @@ void RTWCore89::receive(void *opaque, const uint8_t *frame, size_t length,
     auto *wh = reinterpret_cast<const struct ieee80211_frame *>(frame);
     const uint8_t frameType = wh->i_fc[0] & IEEE80211_FC0_TYPE_MASK;
     const uint8_t frameSubtype = wh->i_fc[0] & IEEE80211_FC0_SUBTYPE_MASK;
-    // Count only the SAE peer's data, retaining the attempt after fallback.
+    // Trace the RSN peer's data only while its controlled port is closed.
     // Keep only header metadata and readable LLC EtherType, never packet bodies.
-    if (ic->ic_sae_enabled && ic->ic_bss && frameType == IEEE80211_FC0_TYPE_DATA &&
+    if ((ic->ic_flags & IEEE80211_F_RSNON) && ic->ic_bss && !ic->ic_bss->ni_port_valid &&
+        frameType == IEEE80211_FC0_TYPE_DATA &&
         IEEE80211_ADDR_EQ(wh->i_addr2, ic->ic_bss->ni_bssid)) {
         const unsigned index = ic->ic_sae_rx_data++ % 8;
         auto header = Rtw89Rx::handshakeHeader(frame, length, decrypted, ivStripped);

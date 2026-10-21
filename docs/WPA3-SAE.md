@@ -80,3 +80,16 @@ are included. Index records using `RTWSAERawData` modulo eight. Null-data,
 fragmented and undecrypted encrypted frames are not treated as readable EAPOL.
 `RTWSAENegotiatedPHY` retains the latest SAE association's PHY separately
 from the active connection, so fallback to Orange does not overwrite it.
+
+The same receive trace and EAPOL stage counters now cover WPA2 and WPA3 RSN
+joins. Existing `RTWSAE*` property names are retained for the diagnostic reader.
+Raw data capture stops when the controlled port becomes valid. An incomplete
+join is saved as `RTWLastIncompleteJoin*` (upper authentication bits, stage,
+error, counters, headers and PHY) before an abort/failure clears its state.
+That saved record survives a successful automatic fallback to another network.
+An explicit cancellation may also produce an incomplete-join record; it is not
+by itself proof of an authentication failure. Read with:
+
+```sh
+python3 tools/read_sae_status.py
+```
