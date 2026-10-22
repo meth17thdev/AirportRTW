@@ -1718,6 +1718,11 @@ justcleanup:
                     " HE enabled" : "");
 			}
 #if defined(AIRPORT_WCL)
+            // The HAL is ready and the response has been validated. Notify WCL
+            // before open-network link-up; RSN still waits for authorization.
+            if (ostate == IEEE80211_S_ASSOC &&
+                ic->ic_opmode == IEEE80211_M_STA && ic->ic_event_handler)
+                ic->ic_event_handler(ic, IEEE80211_EVT_STA_ASSOC_DONE, NULL);
             if (!(ic->ic_flags & IEEE80211_F_RSNON)) {
 #elif defined(USE_APPLE_SUPPLICANT)
             {

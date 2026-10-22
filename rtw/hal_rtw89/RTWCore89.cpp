@@ -970,9 +970,8 @@ void RTWCore89::receive(void *opaque, const uint8_t *frame, size_t length,
     const bool assocResponse = frameType == IEEE80211_FC0_TYPE_MGT &&
         (frameSubtype == IEEE80211_FC0_SUBTYPE_ASSOC_RESP ||
          frameSubtype == IEEE80211_FC0_SUBTYPE_REASSOC_RESP);
-    // Native raw-management listeners can consume Block Ack actions before
-    // net80211 sees them, just like association responses. Only dispatch
-    // ordinary, unfragmented BA actions from our associated AP here. Frames
+    // Keep the existing direct Block Ack dispatch restricted to ordinary,
+    // unfragmented actions from the associated AP. Frames
     // requiring management protection retain the normal validation path.
     const bool blockAckAction = frameType == IEEE80211_FC0_TYPE_MGT &&
         frameSubtype == IEEE80211_FC0_SUBTYPE_ACTION && length >= 26 &&
@@ -997,10 +996,9 @@ void RTWCore89::receive(void *opaque, const uint8_t *frame, size_t length,
             return;
         }
         owner->assocStateBeforeInput = (UInt32)ic->ic_state;
-        /* IO80211's raw 802.11 BPF listener consumes this valid MLME frame
-         * before net80211 dispatch.  RX length/FCS and node lookup have
-         * already been validated, so deliver only association responses
-         * directly to their concrete parser. */
+        /* This direct parser path bypasses ieee80211_inputm(), so its
+         * frame envelope and association state must be validated above.
+         * The shared parser owns capability negotiation and completion. */
         ieee80211_recv_assoc_resp(ic, m, node,
             frameSubtype == IEEE80211_FC0_SUBTYPE_REASSOC_RESP);
         mbuf_freem(m);

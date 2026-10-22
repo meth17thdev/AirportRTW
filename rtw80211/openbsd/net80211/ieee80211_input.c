@@ -2724,10 +2724,13 @@ ieee80211_recv_assoc_resp(struct ieee80211com *ic, mbuf_t m,
     status =  LE_READ_2(frm); frm += 2;
 
     ic->ic_assoc_status = status;
-#ifndef AIRPORT_WCL
+#ifdef AIRPORT_WCL
+    // Rejects can be reported immediately. Success waits for validation and RUN.
+    if (status != IEEE80211_STATUS_SUCCESS)
+#else
     if (status == IEEE80211_STATUS_SUCCESS)
 #endif
-    { // WCL must also receive failed association responses.
+    {
         if (ic->ic_event_handler) {
             (*ic->ic_event_handler)(ic, IEEE80211_EVT_STA_ASSOC_DONE, NULL);
         }
@@ -2919,8 +2922,21 @@ ieee80211_recv_assoc_resp(struct ieee80211com *ic, mbuf_t m,
     } else if (ic->ic_flags & IEEE80211_F_WEPON)
         ni->ni_flags |= IEEE80211_NODE_TXRXPROT;
     
+#ifdef AIRPORT_WCL
+    // Both native Realtek HALs complete this transition synchronously. Do not
+    // tell WCL that association succeeded while firmware setup is incomplete.
+    const int transitionResult = ic->ic_newstate(ic, IEEE80211_S_RUN,
+                                                IEEE80211_FC0_SUBTYPE_ASSOC_RESP);
+    if (transitionResult || ic->ic_state != IEEE80211_S_RUN) {
+        ic->ic_assoc_status = IEEE80211_STATUS_UNSPECIFIED;
+        ic->ic_sae_error = 0x40000u | (unsigned(transitionResult) & 0xffffu);
+        if (ic->ic_event_handler)
+            ic->ic_event_handler(ic, IEEE80211_EVT_STA_ASSOC_DONE, NULL);
+    }
+#else
     ieee80211_new_state(ic, IEEE80211_S_RUN,
                         IEEE80211_FC0_SUBTYPE_ASSOC_RESP);
+#endif
 }
 
 /*-
