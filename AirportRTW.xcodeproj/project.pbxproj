@@ -1132,6 +1132,63 @@
 		E54B81109F472EE79C59ED7D /* ser.c in Sources */ = {isa = PBXBuildFile; fileRef = 36945556B12C57A61E294743 /* ser.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		00E4D4F918EA1AE399CB490A /* util.c in Sources */ = {isa = PBXBuildFile; fileRef = 9D6293E74769FFA90E8FB1CC /* util.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
 		5EA6FDEA71C3BFD70D5A3CDC /* wow.c in Sources */ = {isa = PBXBuildFile; fileRef = 415126AC9B02715679EA30CC /* wow.c */; settings = {COMPILER_FLAGS = "-DRTW89_MACOS -include $(SRCROOT)/rtw/hal_rtw89/compat/rtw89_compat.h"; }; };
+		A6ED72B3F83954457736D474 /* ItlRtw89.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E492786407CA2D19603227AE /* ItlRtw89.cpp */; };
+		68466D6FADEB1C8972C28F1A /* Rtw89LinuxBridge.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A3B0AEFC852BE8B8E4F2517B /* Rtw89LinuxBridge.cpp */; };
+		601140A56E2D708AA0787DF8 /* Rtw89PciTransport.cpp in Sources */ = {isa = PBXBuildFile; fileRef = CBF678ACAE6C9B8EA2717480 /* Rtw89PciTransport.cpp */; };
+		20EF2767F308587267030E5A /* _mbuf.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F8D257732495A33500872E4F /* _mbuf.cpp */; };
+		0A29EEE4C63521A58DA7A30D /* ieee80211_ra.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C594D125FD935B0007D19C /* ieee80211_ra.c */; };
+		0DA852AF7B203D3AF97841E6 /* _task.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F8F9EDE0240B7415009CB8E7 /* _task.cpp */; };
+		3BAA29041FA04358F4B0310D /* FwBinary.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 5076FA7F24CC71E40011B2BB /* FwBinary.cpp */; };
+		8FFAEDBCDA25D3C3EE13E875 /* ieee80211_proto.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC2F24080319007A9422 /* ieee80211_proto.c */; };
+		A97BF9FEE5DC306CD51353D9 /* _string.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC3024080319007A9422 /* _string.c */; };
+		55FBAA141157C0F0FDCCACA1 /* ieee80211_ioctl.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC3224080319007A9422 /* ieee80211_ioctl.c */; };
+		219B405DF5DD75AF33CD1E61 /* ieee80211.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC3324080319007A9422 /* ieee80211.c */; };
+		D66BBDC2537D656A62C88372 /* ieee80211_rssadapt.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC3424080319007A9422 /* ieee80211_rssadapt.c */; };
+		5BDC8608A4B29BF183E2B515 /* ieee80211_input.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC3524080319007A9422 /* ieee80211_input.c */; };
+		659ECA37D9C9906443100A7A /* timeout.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC3724080319007A9422 /* timeout.c */; };
+		5E0D28B1D4CF732A1CADC4B1 /* ieee80211_mira.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC3924080319007A9422 /* ieee80211_mira.c */; };
+		D9F4A40DA846AB393072E3CD /* ieee80211_crypto_bip.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC3B24080319007A9422 /* ieee80211_crypto_bip.c */; };
+		3E7A10B1DB432B32E2908BD5 /* ieee80211_crypto_tkip.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC3C24080319007A9422 /* ieee80211_crypto_tkip.c */; };
+		8C8C8AAC7BCEC95C0177DD63 /* ieee80211_crypto_ccmp.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC3D24080319007A9422 /* ieee80211_crypto_ccmp.c */; };
+		EEE216BA382CDCE7117D4F64 /* ieee80211_crypto_wep.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC462408031A007A9422 /* ieee80211_crypto_wep.c */; };
+		3ACE63E704BC26AFD856144B /* ieee80211_pae_input.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC3E24080319007A9422 /* ieee80211_pae_input.c */; };
+		0CD73E2BB3AA5F725DD2CEC0 /* ieee80211_amrr.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC4024080319007A9422 /* ieee80211_amrr.c */; };
+		0006DDA69794DB048497CF8A /* ieee80211_output.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC472408031A007A9422 /* ieee80211_output.c */; };
+		78D9ED226A90444E064429BD /* ieee80211_crypto.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC482408031A007A9422 /* ieee80211_crypto.c */; };
+		09A3F59B05E7CD593A52219A /* CTimeout.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC492408031A007A9422 /* CTimeout.cpp */; };
+		B3F57D9D4A4FE1BB20CD48AF /* ieee80211_regdomain.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC4B2408031A007A9422 /* ieee80211_regdomain.c */; };
+		1B35CB31D93CF9C34F4C98A8 /* ieee80211_node.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC4C2408031A007A9422 /* ieee80211_node.c */; };
+		B0A1D50D6F9A0D57C6C2B9A1 /* ieee80211_pae_output.c in Sources */ = {isa = PBXBuildFile; fileRef = F8C2EC4D2408031A007A9422 /* ieee80211_pae_output.c */; };
+		D7B42EB88596466BD9614B49 /* sha1-pbkdf2.c in Sources */ = {isa = PBXBuildFile; fileRef = F88D2B3B2414E64000BBE700 /* sha1-pbkdf2.c */; };
+		E7120A90DE767F7222E44527 /* aes.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07C923FCBC6C009FBA6C /* aes.c */; };
+		4134E5B2ED433E0B377E1264 /* hmac.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07CA23FCBC6C009FBA6C /* hmac.c */; };
+		AC74554AF2005518793C75AB /* sha2.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07CB23FCBC6C009FBA6C /* sha2.c */; };
+		1C205D861B19585558C8E718 /* rijndael.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07CC23FCBC6C009FBA6C /* rijndael.c */; };
+		AD81F6AFBCF6EA29A239B08E /* ecb3_enc.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07CD23FCBC6C009FBA6C /* ecb3_enc.c */; };
+		D12D06321377DDDD681FB245 /* set_key.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07CE23FCBC6C009FBA6C /* set_key.c */; };
+		CE70560EF6B4616217BB4B6C /* cast.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07CF23FCBC6C009FBA6C /* cast.c */; };
+		3D6064F1E10E2F93710751F5 /* michael.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07D123FCBC6C009FBA6C /* michael.c */; };
+		54EA90243E325FC871B010CB /* sha1.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07D823FCBC6C009FBA6C /* sha1.c */; };
+		A0AFFA84EF0114C978A5E226 /* cmac.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07DD23FCBC6C009FBA6C /* cmac.c */; };
+		E4F66876B2492608D9940A1D /* ecb_enc.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07E423FCBC6C009FBA6C /* ecb_enc.c */; };
+		892AEB7D52D70B2045B00632 /* chachapoly.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07E923FCBC6C009FBA6C /* chachapoly.c */; };
+		8FBBB7AF14BBB5DCA7DE8CED /* md5.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07EA23FCBC6C009FBA6C /* md5.c */; };
+		8B2875E0A0A31C6BBAA645B4 /* arc4.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07EB23FCBC6C009FBA6C /* arc4.c */; };
+		64086324CC6A2AF49F086F13 /* blf.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07EC23FCBC6C009FBA6C /* blf.c */; };
+		0F3FD5721AE3326268814168 /* _ifq.cpp in Sources */ = {isa = PBXBuildFile; fileRef = A5FA2AE328A797B200847103 /* _ifq.cpp */; };
+		909322A5755274C3CADBA81B /* poly1305.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07ED23FCBC6C009FBA6C /* poly1305.c */; };
+		03E110B8765661904AF07899 /* key_wrap.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07F023FCBC6C009FBA6C /* key_wrap.c */; };
+		1473C8880B51318EFB357DBA /* gmac.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07F223FCBC6C009FBA6C /* gmac.c */; };
+		0005E741CAC48212B10C3FEB /* rmd160.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07F323FCBC6C009FBA6C /* rmd160.c */; };
+		E47604F6D82A8B1B9CCD3CF3 /* idgen.c in Sources */ = {isa = PBXBuildFile; fileRef = 024A07F423FCBC6C009FBA6C /* idgen.c */; };
+		E3E17D88024795168B75F59D /* compat.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 024A07BA23FCBC6C009FBA6C /* compat.cpp */; };
+		B4FD5375295419035B30030D /* zutil.c in Sources */ = {isa = PBXBuildFile; fileRef = F8FA0EED2501E8C100B1822E /* zutil.c */; };
+		4B78661811B98B411B1636F3 /* ItlHalService.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F8D364F624F93AFD0029340B /* ItlHalService.cpp */; };
+		F143B2636136EFFE53726FE1 /* arp.c in Sources */ = {isa = PBXBuildFile; fileRef = A5A0C5232A501E6800EF9328 /* arp.c */; };
+		35982102FF001D7CC269564D /* RTWCore.cpp in Sources */ = {isa = PBXBuildFile; fileRef = 024A07B123FCBC3C009FBA6C /* RTWCore.cpp */; };
+		A5E5AB2FE46F0769BAB4B32B /* pm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F8D76361244F21BB00DEA040 /* pm.cpp */; };
+		D3F8F3BC2FC37A7386CD1FCB /* ItlNetworkUserClient.cpp in Sources */ = {isa = PBXBuildFile; fileRef = F8E49A12249B923500BE6868 /* ItlNetworkUserClient.cpp */; };
+		7F5EC1B3C30B699B3385C04B /* itlwm.cpp in Sources */ = {isa = PBXBuildFile; fileRef = E521CD2EB11B38C23618FD64 /* itlwm.cpp */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -1192,6 +1249,13 @@
 			remoteInfo = fw_gen;
 		};
 		F8D94C822B9ABFE20081A3C4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 024A07A323FCBC3C009FBA6C /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 5066D63825287F7900EE6F38;
+			remoteInfo = fw_gen;
+		};
+		B654B2A7061154576C8F6B9D /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 024A07A323FCBC3C009FBA6C /* Project object */;
 			proxyType = 1;
@@ -1452,6 +1516,10 @@
 		36945556B12C57A61E294743 /* ser.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "rtw/hal_rtw89/driver/ser.c"; sourceTree = SOURCE_ROOT; };
 		9D6293E74769FFA90E8FB1CC /* util.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "rtw/hal_rtw89/driver/util.c"; sourceTree = SOURCE_ROOT; };
 		415126AC9B02715679EA30CC /* wow.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = "rtw/hal_rtw89/driver/wow.c"; sourceTree = SOURCE_ROOT; };
+		F64277505209C70649FB74E4 /* rtwlm.kext */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = rtwlm.kext; sourceTree = BUILT_PRODUCTS_DIR; };
+		E521CD2EB11B38C23618FD64 /* itlwm.cpp */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.cpp.cpp; path = itlwm.cpp; sourceTree = "<group>"; };
+		B04D4DFBFC9719B1F9E9104D /* itlhdr.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = itlhdr.h; sourceTree = "<group>"; };
+		BE0AD31FCC2398CBC2505C10 /* rtwlm-Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = rtwlm-Info.plist; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -1527,6 +1595,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4200B0F040858CCF4D422B38 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -1549,6 +1624,7 @@
 			isa = PBXGroup;
 			children = (
 				024A07AC23FCBC3C009FBA6C /* RTWCore.kext */,
+				F64277505209C70649FB74E4 /* rtwlm.kext */,
 				F89B6BB925021C9C000F77FF /* AirportRTW.kext */,
 				35CBE6BA251CB89700435CBC /* AirportRTW.kext */,
 				35CBE724251CB8BF00435CBC /* AirportRTW.kext */,
@@ -1567,6 +1643,9 @@
 				0250B31C23FD768400FF8CEA /* firmware */,
 				024A07AF23FCBC3C009FBA6C /* RTWCore.hpp */,
 				024A07B123FCBC3C009FBA6C /* RTWCore.cpp */,
+				E521CD2EB11B38C23618FD64 /* itlwm.cpp */,
+				B04D4DFBFC9719B1F9E9104D /* itlhdr.h */,
+				BE0AD31FCC2398CBC2505C10 /* rtwlm-Info.plist */,
 				024A07B323FCBC3C009FBA6C /* Info.plist */,
 				F8D76361244F21BB00DEA040 /* pm.cpp */,
 				F8E49A12249B923500BE6868 /* ItlNetworkUserClient.cpp */,
@@ -2230,6 +2309,13 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		AD2491A9276DC0E07B567BAB /* Headers */ = {
+			isa = PBXHeadersBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXHeadersBuildPhase section */
 
 /* Begin PBXNativeTarget section */
@@ -2412,6 +2498,26 @@
 			productReference = F8D94CF52B9ABFE20081A3C4 /* AirportRTW.kext */;
 			productType = "com.apple.product-type.kernel-extension";
 		};
+		6B0FDF88DE07AC9BAD61D20D /* rtwlm */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 52AD8D8FD437C0F3F593C6B4 /* Build configuration list for PBXNativeTarget "rtwlm" */;
+			buildPhases = (
+				AD2491A9276DC0E07B567BAB /* Headers */,
+				7D81815B1FFBE455AE161E75 /* Build RTW89 C Archive */,
+				4035B972131CC3B6F5958086 /* Sources */,
+				4200B0F040858CCF4D422B38 /* Frameworks */,
+				976AE67E3E2FA8386009436C /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A17A438EF72F8585363DB756 /* PBXTargetDependency */,
+			);
+			name = rtwlm;
+			productName = rtwlm;
+			productReference = F64277505209C70649FB74E4 /* rtwlm.kext */;
+			productType = "com.apple.product-type.kernel-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -2479,6 +2585,7 @@
 				F8B210A72A2EC2680043ECBD /* AirportRTW-Sonoma14.0 */,
 				F8D94C802B9ABFE20081A3C4 /* AirportRTW-Sonoma14.4 */,
 				5066D63825287F7900EE6F38 /* fw_gen */,
+				6B0FDF88DE07AC9BAD61D20D /* rtwlm */,
 			);
 		};
 /* End PBXProject section */
@@ -2541,6 +2648,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		F8D94CF12B9ABFE20081A3C4 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		976AE67E3E2FA8386009436C /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -2613,6 +2727,21 @@
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
 			shellScript = "scripts/fw_gen.sh -P \"${PROJECT_DIR}/rtw/firmware/\"\n";
+		};
+		7D81815B1FFBE455AE161E75 /* Build RTW89 C Archive */ = {
+			isa = PBXShellScriptBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputPaths = (
+			);
+			name = "Build RTW89 C Archive";
+			outputPaths = (
+				"$(DERIVED_FILE_DIR)/librtw89_c.a",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/bash;
+			shellScript = "scripts/build_rtw89_c_archive.sh\n";
 		};
 /* End PBXShellScriptBuildPhase section */
 
@@ -3394,6 +3523,70 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4035B972131CC3B6F5958086 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A6ED72B3F83954457736D474 /* ItlRtw89.cpp in Sources */,
+				68466D6FADEB1C8972C28F1A /* Rtw89LinuxBridge.cpp in Sources */,
+				601140A56E2D708AA0787DF8 /* Rtw89PciTransport.cpp in Sources */,
+				20EF2767F308587267030E5A /* _mbuf.cpp in Sources */,
+				0A29EEE4C63521A58DA7A30D /* ieee80211_ra.c in Sources */,
+				0DA852AF7B203D3AF97841E6 /* _task.cpp in Sources */,
+				3BAA29041FA04358F4B0310D /* FwBinary.cpp in Sources */,
+				8FFAEDBCDA25D3C3EE13E875 /* ieee80211_proto.c in Sources */,
+				A97BF9FEE5DC306CD51353D9 /* _string.c in Sources */,
+				55FBAA141157C0F0FDCCACA1 /* ieee80211_ioctl.c in Sources */,
+				219B405DF5DD75AF33CD1E61 /* ieee80211.c in Sources */,
+				D66BBDC2537D656A62C88372 /* ieee80211_rssadapt.c in Sources */,
+				5BDC8608A4B29BF183E2B515 /* ieee80211_input.c in Sources */,
+				659ECA37D9C9906443100A7A /* timeout.c in Sources */,
+				5E0D28B1D4CF732A1CADC4B1 /* ieee80211_mira.c in Sources */,
+				D9F4A40DA846AB393072E3CD /* ieee80211_crypto_bip.c in Sources */,
+				3E7A10B1DB432B32E2908BD5 /* ieee80211_crypto_tkip.c in Sources */,
+				8C8C8AAC7BCEC95C0177DD63 /* ieee80211_crypto_ccmp.c in Sources */,
+				EEE216BA382CDCE7117D4F64 /* ieee80211_crypto_wep.c in Sources */,
+				3ACE63E704BC26AFD856144B /* ieee80211_pae_input.c in Sources */,
+				0CD73E2BB3AA5F725DD2CEC0 /* ieee80211_amrr.c in Sources */,
+				0006DDA69794DB048497CF8A /* ieee80211_output.c in Sources */,
+				78D9ED226A90444E064429BD /* ieee80211_crypto.c in Sources */,
+				09A3F59B05E7CD593A52219A /* CTimeout.cpp in Sources */,
+				B3F57D9D4A4FE1BB20CD48AF /* ieee80211_regdomain.c in Sources */,
+				1B35CB31D93CF9C34F4C98A8 /* ieee80211_node.c in Sources */,
+				B0A1D50D6F9A0D57C6C2B9A1 /* ieee80211_pae_output.c in Sources */,
+				D7B42EB88596466BD9614B49 /* sha1-pbkdf2.c in Sources */,
+				E7120A90DE767F7222E44527 /* aes.c in Sources */,
+				4134E5B2ED433E0B377E1264 /* hmac.c in Sources */,
+				AC74554AF2005518793C75AB /* sha2.c in Sources */,
+				1C205D861B19585558C8E718 /* rijndael.c in Sources */,
+				AD81F6AFBCF6EA29A239B08E /* ecb3_enc.c in Sources */,
+				D12D06321377DDDD681FB245 /* set_key.c in Sources */,
+				CE70560EF6B4616217BB4B6C /* cast.c in Sources */,
+				3D6064F1E10E2F93710751F5 /* michael.c in Sources */,
+				54EA90243E325FC871B010CB /* sha1.c in Sources */,
+				A0AFFA84EF0114C978A5E226 /* cmac.c in Sources */,
+				E4F66876B2492608D9940A1D /* ecb_enc.c in Sources */,
+				892AEB7D52D70B2045B00632 /* chachapoly.c in Sources */,
+				8FBBB7AF14BBB5DCA7DE8CED /* md5.c in Sources */,
+				8B2875E0A0A31C6BBAA645B4 /* arc4.c in Sources */,
+				64086324CC6A2AF49F086F13 /* blf.c in Sources */,
+				0F3FD5721AE3326268814168 /* _ifq.cpp in Sources */,
+				909322A5755274C3CADBA81B /* poly1305.c in Sources */,
+				03E110B8765661904AF07899 /* key_wrap.c in Sources */,
+				1473C8880B51318EFB357DBA /* gmac.c in Sources */,
+				0005E741CAC48212B10C3FEB /* rmd160.c in Sources */,
+				E47604F6D82A8B1B9CCD3CF3 /* idgen.c in Sources */,
+				E3E17D88024795168B75F59D /* compat.cpp in Sources */,
+				B4FD5375295419035B30030D /* zutil.c in Sources */,
+				4B78661811B98B411B1636F3 /* ItlHalService.cpp in Sources */,
+				F143B2636136EFFE53726FE1 /* arp.c in Sources */,
+				35982102FF001D7CC269564D /* RTWCore.cpp in Sources */,
+				A5E5AB2FE46F0769BAB4B32B /* pm.cpp in Sources */,
+				D3F8F3BC2FC37A7386CD1FCB /* ItlNetworkUserClient.cpp in Sources */,
+				7F5EC1B3C30B699B3385C04B /* itlwm.cpp in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -3441,6 +3634,11 @@
 			isa = PBXTargetDependency;
 			target = 5066D63825287F7900EE6F38 /* fw_gen */;
 			targetProxy = F8D94C822B9ABFE20081A3C4 /* PBXContainerItemProxy */;
+		};
+		A17A438EF72F8585363DB756 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 5066D63825287F7900EE6F38 /* fw_gen */;
+			targetProxy = B654B2A7061154576C8F6B9D /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -4174,6 +4372,72 @@
 			};
 			name = Release;
 		};
+		3BC3AB35724D3AE314E70B07 /* Debug */ = {
+			isa = XCBuildConfiguration;
+				buildSettings = {
+					CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/rtwlm";
+					CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
+					GCC_PRECOMPILE_PREFIX_HEADER = NO;
+					GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
+					GCC_PREPROCESSOR_DEFINITIONS = (
+						__PRIVATE_SPI__,
+						"$(inherited)",
+					);
+					INFOPLIST_FILE = rtw/rtwlm-Info.plist;
+					LIBRARY_SEARCH_PATHS = (
+						"$(PROJECT_DIR)/rtw80211",
+						"$(inherited)",
+						"$(PROJECT_DIR)/rtw80211/openbsd",
+						"$(PROJECT_DIR)/rtw80211/linux",
+						"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
+					);
+					MACOSX_DEPLOYMENT_TARGET = 10.15;
+					MODULE_VERSION = 2.1.0;
+					MODULE_NAME = com.zxystd.rtwlm;
+					OTHER_LDFLAGS = (
+						"$(inherited)",
+						"$(DERIVED_FILE_DIR)/librtw89_c.a",
+					);
+					PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.rtwlm;
+					PRODUCT_NAME = rtwlm;
+					SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+					WRAPPER_EXTENSION = kext;
+				};
+			name = Debug;
+		};
+		029CA528BBC7DE9F3CA51061 /* Release */ = {
+			isa = XCBuildConfiguration;
+				buildSettings = {
+					CONFIGURATION_BUILD_DIR = "$(SYMROOT)/$(CONFIGURATION)/rtwlm";
+					CURRENT_PROJECT_VERSION = "$(MODULE_VERSION)";
+					GCC_PRECOMPILE_PREFIX_HEADER = NO;
+					GCC_PREFIX_HEADER = rtw/PrivateSPI.pch;
+					GCC_PREPROCESSOR_DEFINITIONS = (
+						__PRIVATE_SPI__,
+						"$(inherited)",
+					);
+					INFOPLIST_FILE = rtw/rtwlm-Info.plist;
+					LIBRARY_SEARCH_PATHS = (
+						"$(PROJECT_DIR)/rtw80211",
+						"$(inherited)",
+						"$(PROJECT_DIR)/rtw80211/openbsd",
+						"$(PROJECT_DIR)/rtw80211/linux",
+						"$(PROJECT_DIR)/MacKernelSDK/Library/x86_64",
+					);
+					MACOSX_DEPLOYMENT_TARGET = 10.15;
+					MODULE_VERSION = 2.1.0;
+					MODULE_NAME = com.zxystd.rtwlm;
+					OTHER_LDFLAGS = (
+						"$(inherited)",
+						"$(DERIVED_FILE_DIR)/librtw89_c.a",
+					);
+					PRODUCT_BUNDLE_IDENTIFIER = com.zxystd.rtwlm;
+					PRODUCT_NAME = rtwlm;
+					SYSTEM_HEADER_SEARCH_PATHS = "rtw80211/openbsd rtw80211 include rtw/hal_rtw89 rtw/hal_rtw89/compat rtw/hal_rtw89/driver";
+					WRAPPER_EXTENSION = kext;
+				};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -4272,6 +4536,15 @@
 			buildConfigurations = (
 				F8D94CF32B9ABFE20081A3C4 /* Debug */,
 				F8D94CF42B9ABFE20081A3C4 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		52AD8D8FD437C0F3F593C6B4 /* Build configuration list for PBXNativeTarget "rtwlm" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3BC3AB35724D3AE314E70B07 /* Debug */,
+				029CA528BBC7DE9F3CA51061 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

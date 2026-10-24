@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>$(DEVELOPMENT_LANGUAGE)</string>
+	<key>CFBundleExecutable</key>
+	<string>$(EXECUTABLE_NAME)</string>
+	<key>CFBundleIdentifier</key>
+	<string>$(PRODUCT_BUNDLE_IDENTIFIER)</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleName</key>
+	<string>$(PRODUCT_NAME)</string>
+	<key>CFBundlePackageType</key>
+	<string>$(PRODUCT_BUNDLE_PACKAGE_TYPE)</string>
+	<key>CFBundleShortVersionString</key>
+	<string>$(MODULE_VERSION)</string>
+	<key>CFBundleVersion</key>
+	<string>$(MODULE_VERSION)</string>
+	<key>IOKitPersonalities</key>
+	<dict>
+		<key>rtwlm</key>
+		<dict>
+			<key>CFBundleIdentifier</key>
+			<string>com.zxystd.rtwlm</string>
+			<key>IOClass</key>
+			<string>itlwm</string>
+			<key>IOMatchCategory</key>
+			<string>IODefaultMatchCategory</string>
+			<key>IOPCIPrimaryMatch</key>
+			<string>0x885210ec 0xa85a10ec 0xb85210ec 0xb85b10ec 0xb85110ec 0xb52010ec 0xc85210ec 0x892210ec 0x892b10ec</string>
+			<key>IOProbeScore</key>
+			<integer>2000</integer>
+			<key>IOProviderClass</key>
+			<string>IOPCIDevice</string>
+			<key>IOUserClientClass</key>
+			<string>ItlNetworkUserClient</string>
+		</dict>
+	</dict>
+	<key>NSHumanReadableCopyright</key>
+	<string>Copyright © 2020 钟先耀. All rights reserved.</string>
+	<key>OSBundleLibraries</key>
+	<dict>
+		<key>com.apple.iokit.IONetworkingFamily</key>
+		<string>1.5.0</string>
+		<key>com.apple.iokit.IOPCIFamily</key>
+		<string>1.7</string>
+		<key>com.apple.kpi.bsd</key>
+		<string>8.10.0</string>
+		<key>com.apple.kpi.iokit</key>
+		<string>8.10.0</string>
+		<key>com.apple.kpi.libkern</key>
+		<string>8.10.0</string>
+		<key>com.apple.kpi.mach</key>
+		<string>8.10.0</string>
+	</dict>
+	<key>OSBundleRequired</key>
+	<string>Network-Root</string>
+</dict>
+</plist>

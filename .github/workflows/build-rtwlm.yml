@@ -1,0 +1,39 @@
+name: Build rtwlm.kext
+
+on:
+  push:
+    paths:
+      - "rtw/**"
+      - "rtw80211/**"
+      - "include/**"
+      - "scripts/**"
+      - "tools/**"
+      - "AirportRTW.xcodeproj/**"
+      - ".github/workflows/build-rtwlm.yml"
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build rtwlm kext
+        run: |
+          xcodebuild -project AirportRTW.xcodeproj \
+            -target rtwlm \
+            -configuration Release \
+            -jobs $(sysctl -n hw.ncpu) \
+            CODE_SIGNING_ALLOWED=NO build
+
+      - name: Collect artifact
+        run: |
+          mkdir -p artifact
+          cp -R "build/Release/rtwlm/rtwlm.kext" artifact/
+          plutil -p artifact/rtwlm.kext/Contents/Info.plist > artifact/Info.plist.txt
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: rtwlm-kext
+          path: artifact/
